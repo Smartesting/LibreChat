@@ -1,12 +1,12 @@
 import { useRecoilValue } from 'recoil';
 import { useCallback, useMemo } from 'react';
-import { isAssistantsEndpoint, isAgentsEndpoint } from 'librechat-data-provider';
+import { isAgentsEndpoint, isAssistantsEndpoint } from 'librechat-data-provider';
 import type { TMessageProps } from '~/common';
 import {
-  useChatContext,
   useAddedChatContext,
-  useAssistantsMapContext,
   useAgentsMapContext,
+  useAssistantsMapContext,
+  useChatContext,
 } from '~/Providers';
 import useCopyToClipboard from './useCopyToClipboard';
 import { useAuthContext } from '~/hooks/AuthContext';
@@ -106,7 +106,7 @@ export default function useMessageActions(props: TMessageActions) {
     } else if (assistant) {
       return assistant.name ?? 'Assistant';
     } else {
-      return message?.sender;
+      return message?.model;
     }
   }, [message, agent, assistant, UsernameDisplay, user, localize]);
 
