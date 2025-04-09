@@ -1,0 +1,55 @@
+services:
+  mongodb:
+    container_name: librechat-dev-mongodb
+    image: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./.storage/data-node:/data/db
+    command: mongod --noauth
+
+  meilisearch:
+    container_name: librechat-dev-meilisearch
+    image: getmeili/meilisearch:v1.5
+    restart: unless-stopped
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_NO_ANALYTICS=${MEILI_NO_ANALYTICS}
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+    volumes:
+      - ./.storage/meili_data_v1.5:/meili_data
+
+  vectordb:
+    container_name: librechat-dev-vectordb
+    image: ankane/pgvector:latest
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - pgdata2:/var/lib/postgresql/data
+
+  rag_api:
+    container_name: librechat-dev-rag_api
+    image: ghcr.io/danny-avila/librechat-rag-api-dev:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=vectordb
+      - DB_PORT=5432
+      - POSTGRES_DB=mydatabase
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+    depends_on:
+      - vectordb
+    env_file:
+      - .env
+
+volumes:
+  pgdata2:
