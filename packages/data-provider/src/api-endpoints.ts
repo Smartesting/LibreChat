@@ -1,6 +1,9 @@
 import type { AssistantsEndpoint } from './schemas';
 
 export const health = () => '/health';
+
+export const session = () => '/api/session';
+
 export const user = () => '/api/user';
 
 export const balance = () => '/api/balance';

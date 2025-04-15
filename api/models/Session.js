@@ -33,6 +33,11 @@ const createSession = async (userId, options = {}) => {
     throw new SessionError('User ID is required', 'INVALID_USER_ID');
   }
 
+  const existingSession = await findSession({ userId });
+  if (existingSession) {
+    await deleteSession({ sessionId: existingSession._id });
+  }
+
   try {
     const session = new Session({
       user: userId,

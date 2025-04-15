@@ -54,7 +54,9 @@ const logoutUser = async (req, refreshToken) => {
     }
 
     try {
-      req.session.destroy();
+      if (req.session) {
+        req.session.destroy();
+      }
     } catch (destroyErr) {
       logger.error('[logoutUser] Failed to destroy session.', destroyErr);
     }

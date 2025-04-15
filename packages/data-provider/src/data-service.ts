@@ -763,6 +763,10 @@ export function healthCheck(): Promise<string> {
   return request.get(endpoints.health());
 }
 
+export function getUserSession(): Promise<never> {
+  return request.get(endpoints.session());
+}
+
 export function getUserTerms(): Promise<t.TUserTermsResponse> {
   return request.get(endpoints.userTerms());
 }

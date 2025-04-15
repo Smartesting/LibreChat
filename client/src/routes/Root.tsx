@@ -13,6 +13,7 @@ import TermsAndConditionsModal from '~/components/ui/TermsAndConditionsModal';
 import { useUserTermsQuery, useGetStartupConfig } from '~/data-provider';
 import { Nav, MobileNav } from '~/components/Nav';
 import { Banner } from '~/components/Banners';
+import useSingleSessionVerifier from '~/hooks/useSingleSessionVerifier';
 
 export default function Root() {
   const [showTerms, setShowTerms] = useState(false);
@@ -27,6 +28,8 @@ export default function Root() {
   const agentsMap = useAgentsMap({ isAuthenticated });
   const fileMap = useFileMap({ isAuthenticated });
   const search = useSearch({ isAuthenticated });
+
+  useSingleSessionVerifier(() => logout('/login'));
 
   const { data: config } = useGetStartupConfig();
   const { data: termsData } = useUserTermsQuery({

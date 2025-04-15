@@ -26,6 +26,7 @@ const keys = require('./keys');
 const user = require('./user');
 const ask = require('./ask');
 const banner = require('./banner');
+const session = require('./session');
 
 module.exports = {
   ask,
@@ -56,4 +57,5 @@ module.exports = {
   categories,
   staticRoute,
   banner,
+  session,
 };
