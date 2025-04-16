@@ -179,6 +179,10 @@ export const defaultAgentFormValues = {
   [Tools.file_search]: false,
 };
 
+export const defaultOrgFormValues = {
+  name: '',
+};
+
 export const ImageVisionTool: FunctionTool = {
   type: Tools.function,
   [Tools.function]: {
