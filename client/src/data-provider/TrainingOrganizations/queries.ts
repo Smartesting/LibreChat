@@ -14,7 +14,7 @@ export const useListTrainingOrganizationsQuery = <
   TData = t.TrainingOrganization[],
 >(): QueryObserverResult<TData> => {
   return useQuery<t.AgentListResponse, unknown, TData>(
-    [QueryKeys.agents],
+    [QueryKeys.trainingOrganizations],
     () => dataService.listTrainingOrganizations(),
     {
       staleTime: 1000 * 5,
