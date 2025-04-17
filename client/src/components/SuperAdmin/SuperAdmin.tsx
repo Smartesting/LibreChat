@@ -3,14 +3,19 @@ import { PlusCircle } from 'lucide-react';
 import { TooltipAnchor } from '~/components';
 import useSmaLocalize from '~/hooks/useSmaLocalize';
 import OrgCreationModal from '~/components/SuperAdmin/OrgCreationModal';
+import OrgList from '~/components/SuperAdmin/OrgList';
 
 const SuperAdmin: FC = () => {
   const [isOrgCreationModalOpened, setIsOrgCreationModalOpened] = React.useState(false);
 
   return (
     <div>
+      <OrgCreationModal
+        isOpen={isOrgCreationModalOpened}
+        onClose={() => setIsOrgCreationModalOpened(false)}
+      />
       <TrainingOrganizationsTitle onAddIconClick={() => setIsOrgCreationModalOpened(true)} />
-      <OrgCreationModal isOpen={isOrgCreationModalOpened} onClose={() => setIsOrgCreationModalOpened(false)}/>
+      <OrgList />
     </div>
   );
 };

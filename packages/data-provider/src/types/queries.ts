@@ -105,6 +105,7 @@ export type GetToolCallParams = { conversationId: string };
 export type ToolCallResults = a.ToolCallResult[];
 
 export type TrainingOrganization = {
+  _id: string;
   name: string;
 };
 

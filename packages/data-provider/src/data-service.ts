@@ -719,6 +719,17 @@ export function updateAgentPermissions(
   return request.put(endpoints.updateAgentPermissions(variables.roleName), variables.updates);
 }
 
+/* Training organizations */
+export const createTrainingOrganization = ({
+  ...data
+}: q.TrainingOrganizationCreateParams): Promise<q.TrainingOrganization> => {
+  return request.post(endpoints.trainingOrganizations(), data);
+};
+
+export const listTrainingOrganizations = (): Promise<q.TrainingOrganization[]> => {
+  return request.get(endpoints.trainingOrganizations());
+};
+
 /* Tags */
 export function getConversationTags(): Promise<t.TConversationTagsResponse> {
   return request.get(endpoints.conversationTags());
@@ -759,12 +770,6 @@ export function healthCheck(): Promise<string> {
 export function getUserSession(): Promise<never> {
   return request.get(endpoints.session());
 }
-
-export const createTrainingOrganization = ({
-  ...data
-}: q.TrainingOrganizationCreateParams): Promise<q.TrainingOrganization> => {
-  return request.post(endpoints.trainingOrganizations(), data);
-};
 
 export function getUserTerms(): Promise<t.TUserTermsResponse> {
   return request.get(endpoints.userTerms());

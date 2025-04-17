@@ -13,7 +13,16 @@ const createTrainingOrganization = async (trainingOrgData) => {
   return (await TrainingOrganization.create(trainingOrgData)).toObject();
 };
 
+/**
+ * Get all training organizations.
+ * @returns {Promise<TrainingOrganization[]>} A promise that resolves to an array of training organizations.
+ */
+const getListTrainingOrganizations = async () => {
+  return (await TrainingOrganization.find({}).lean());
+};
+
 module.exports = {
   TrainingOrganization,
   createTrainingOrganization,
+  getListTrainingOrganizations,
 };

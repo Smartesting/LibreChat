@@ -1,5 +1,8 @@
 const { logger } = require('~/config');
-const { createTrainingOrganization } = require('~/models/TrainingOrganization');
+const {
+  createTrainingOrganization,
+  getListTrainingOrganizations,
+} = require('~/models/TrainingOrganization');
 
 /**
  * Creates a training organization.
@@ -19,6 +22,24 @@ const createTrainingOrganizationHandler = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves all training organizations.
+ * @route GET /training-organizations
+ * @param {object} req - Express Request
+ * @param {ServerResponse} res - The response object.
+ * @returns {Promise<TrainingOrganization[]>} 200 - success response - application/json
+ */
+const getListTrainingOrganizationsHandler = async (req, res) => {
+  try {
+    const trainingOrganizations = await getListTrainingOrganizations();
+    return res.json(trainingOrganizations);
+  } catch (error) {
+    logger.error('[/training-organizations] Error listing training organizations', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createTrainingOrganization: createTrainingOrganizationHandler,
+  getListTrainingOrganizations: getListTrainingOrganizationsHandler,
 };
