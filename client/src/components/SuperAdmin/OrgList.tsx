@@ -5,7 +5,11 @@ const OrgList: FC = () => {
   const { data: trainingOrganizations } = useListTrainingOrganizationsQuery();
 
   if (!trainingOrganizations) {
-    return <div>Loading...</div>;
+    return <div className="pl-6 text-text-primary">Loading...</div>;
+  }
+
+  if (trainingOrganizations.length === 0) {
+    return <div className="pl-6 text-text-primary">No items yet</div>;
   }
 
   return (
