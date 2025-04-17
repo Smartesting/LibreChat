@@ -5,6 +5,7 @@ import { useLocalize, useSmaLocalize } from '~/hooks';
 import { OrgForm } from '~/common';
 import { defaultOrgFormValues } from 'librechat-data-provider';
 import { Button } from '~/components';
+import { useCreateTrainingOrganizationMutation } from '~/data-provider/TrainingOrganizations';
 
 const labelClass = 'mb-2 text-token-text-primary block font-medium';
 const inputClass = cn(
@@ -25,15 +26,19 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
 
   const { control, handleSubmit } = methods;
 
+  const create = useCreateTrainingOrganizationMutation();
+
   const onFormSubmit = useCallback(
     (data: OrgForm) => {
       const { name } = data;
 
-      console.log(`TODO: handle the organization (${name}) creation.`);
+      create.mutate({
+        name,
+      });
 
       onSubmit();
     },
-    [onSubmit],
+    [create, onSubmit],
   );
 
   return (
@@ -69,6 +74,7 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
               size={'sm'}
               variant={'outline'}
               className="btn btn-neutral border-token-border-light relative h-9 w-full gap-1 rounded-lg font-medium"
+              type='button'
               onClick={onCancel}
             >
               {localize('com_ui_cancel')}

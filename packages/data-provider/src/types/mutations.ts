@@ -2,18 +2,19 @@ import * as types from '../types';
 import * as r from '../roles';
 import * as p from '../permissions';
 import {
-  Tools,
-  Assistant,
-  AssistantCreateParams,
-  AssistantUpdateParams,
-  ActionMetadata,
-  FunctionTool,
-  AssistantDocument,
   Action,
+  ActionMetadata,
   Agent,
   AgentCreateParams,
   AgentUpdateParams,
+  Assistant,
+  AssistantCreateParams,
+  AssistantDocument,
+  AssistantUpdateParams,
+  FunctionTool,
+  Tools,
 } from './assistants';
+import { TrainingOrganization, TrainingOrganizationCreateParams } from './queries';
 
 export type MutationOptions<
   Response,
@@ -123,6 +124,11 @@ export type UpdateAgentActionVariables = {
 export type UploadAgentAvatarOptions = MutationOptions<Agent, AgentAvatarVariables>;
 
 export type CreateAgentMutationOptions = MutationOptions<Agent, AgentCreateParams>;
+
+export type CreateTrainingOrganizationMutationOptions = MutationOptions<
+  TrainingOrganization,
+  TrainingOrganizationCreateParams
+>;
 
 export type UpdateAgentVariables = {
   agent_id: string;

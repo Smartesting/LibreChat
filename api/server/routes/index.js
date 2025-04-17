@@ -27,6 +27,7 @@ const user = require('./user');
 const ask = require('./ask');
 const banner = require('./banner');
 const session = require('./session');
+const trainingOrganizations = require('./trainingOrganizations');
 
 module.exports = {
   ask,
@@ -58,4 +59,5 @@ module.exports = {
   staticRoute,
   banner,
   session,
+  trainingOrganizations,
 };

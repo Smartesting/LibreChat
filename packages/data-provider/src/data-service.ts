@@ -736,6 +736,7 @@ export function updateConversationTag(
 ): Promise<t.TConversationTagResponse> {
   return request.put(endpoints.conversationTags(tag), payload);
 }
+
 export function deleteConversationTag(tag: string): Promise<t.TConversationTagResponse> {
   return request.delete(endpoints.conversationTags(tag));
 }
@@ -746,6 +747,7 @@ export function addTagToConversation(
 ): Promise<t.TTagConversationResponse> {
   return request.put(endpoints.addTagToConversation(conversationId), payload);
 }
+
 export function rebuildConversationTags(): Promise<t.TConversationTagsResponse> {
   return request.post(endpoints.conversationTags('rebuild'));
 }
@@ -757,6 +759,12 @@ export function healthCheck(): Promise<string> {
 export function getUserSession(): Promise<never> {
   return request.get(endpoints.session());
 }
+
+export const createTrainingOrganization = ({
+  ...data
+}: q.TrainingOrganizationCreateParams): Promise<q.TrainingOrganization> => {
+  return request.post(endpoints.trainingOrganizations(), data);
+};
 
 export function getUserTerms(): Promise<t.TUserTermsResponse> {
   return request.get(endpoints.userTerms());
