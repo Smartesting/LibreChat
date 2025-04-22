@@ -18,6 +18,12 @@ const createTrainingOrganizationHandler = async (req, res) => {
     res.status(201).json(trainingOrganization);
   } catch (error) {
     logger.error('[/training-organizations] Error creating training organization', error);
+
+    // Check if it's a validation error (Mongoose ValidationError)
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ error: error.message });
+    }
+
     res.status(500).json({ error: error.message });
   }
 };

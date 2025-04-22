@@ -22,9 +22,14 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
   const localize = useLocalize();
   const methods = useForm<OrgForm>({
     defaultValues: defaultOrgFormValues,
+    mode: 'onChange',
   });
 
-  const { control, handleSubmit } = methods;
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
 
   const create = useCreateTrainingOrganizationMutation();
 
@@ -32,8 +37,13 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
     (data: OrgForm) => {
       const { name } = data;
 
+      // Ensure name is not empty after trimming
+      if (!name || !name.trim()) {
+        return;
+      }
+
       create.mutate({
-        name,
+        name: name.trim(),
       });
 
       onSubmit();
@@ -56,16 +66,27 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
             <Controller
               name="name"
               control={control}
+              rules={{
+                required: smaLocalize('com_superadmin_error_name_required'),
+                validate: (value) =>
+                  (value && value.trim().length > 0) ||
+                  smaLocalize('com_superadmin_error_name_not_empty'),
+              }}
               render={({ field }) => (
-                <input
-                  {...field}
-                  value={field.value ?? ''}
-                  maxLength={512}
-                  className={inputClass}
-                  type="text"
-                  placeholder={smaLocalize('com_superadmin_give_org_name')}
-                  aria-label="Organization name"
-                />
+                <>
+                  <input
+                    {...field}
+                    value={field.value ?? ''}
+                    maxLength={512}
+                    className={inputClass}
+                    type="text"
+                    placeholder={smaLocalize('com_superadmin_give_org_name')}
+                    aria-label="Organization name"
+                  />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+                  )}
+                </>
               )}
             />
           </div>
@@ -74,7 +95,7 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
               size={'sm'}
               variant={'outline'}
               className="btn btn-neutral border-token-border-light relative h-9 w-full gap-1 rounded-lg font-medium"
-              type='button'
+              type="button"
               onClick={onCancel}
             >
               {localize('com_ui_cancel')}
