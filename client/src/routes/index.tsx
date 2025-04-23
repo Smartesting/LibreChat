@@ -1,14 +1,15 @@
-import {createBrowserRouter, Navigate, Outlet} from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import {
-    ApiErrorWatcher,
-    Login,
-    Registration,
-    RequestPasswordReset,
-    ResetPassword,
-    TwoFactorScreen,
-    VerifyEmail,
+  OrgAdminInvite,
+  ApiErrorWatcher,
+  Login,
+  Registration,
+  RequestPasswordReset,
+  ResetPassword,
+  TwoFactorScreen,
+  VerifyEmail,
 } from '~/components/Auth';
-import {AuthContextProvider} from '~/hooks/AuthContext';
+import { AuthContextProvider } from '~/hooks/AuthContext';
 import RouteErrorBoundary from './RouteErrorBoundary';
 import StartupLayout from './Layouts/Startup';
 import LoginLayout from './Layouts/Login';
@@ -17,87 +18,91 @@ import ShareRoute from './ShareRoute';
 import ChatRoute from './ChatRoute';
 import Search from './Search';
 import Root from './Root';
-import SuperAdmin from "~/components/SuperAdmin/SuperAdmin"
+import SuperAdmin from '~/components/SuperAdmin/SuperAdmin';
 
 const AuthLayout = () => (
-    <AuthContextProvider>
-        <Outlet/>
-        <ApiErrorWatcher/>
-    </AuthContextProvider>
+  <AuthContextProvider>
+    <Outlet/>
+    <ApiErrorWatcher/>
+  </AuthContextProvider>
 );
 
 export const router = createBrowserRouter([
-    {
-        path: 'admin',
-        element: <SuperAdmin/>,
-        errorElement: <RouteErrorBoundary/>,
-    },
-    {
-        path: 'share/:shareId',
-        element: <ShareRoute/>,
-        errorElement: <RouteErrorBoundary/>,
-    },
-    {
+  {
+    path: 'admin',
+    element: <SuperAdmin/>,
+    errorElement: <RouteErrorBoundary/>,
+  },
+  {
+    path: 'share/:shareId',
+    element: <ShareRoute/>,
+    errorElement: <RouteErrorBoundary/>,
+  },
+  {
+    path: '/',
+    element: <StartupLayout/>,
+    errorElement: <RouteErrorBoundary/>,
+    children: [
+      {
+        path: 'register',
+        element: <Registration/>,
+      },
+      {
+        path: 'forgot-password',
+        element: <RequestPasswordReset/>,
+      },
+      {
+        path: 'reset-password',
+        element: <ResetPassword/>,
+      },
+      {
+        path: 'org-admin-invite',
+        element: <OrgAdminInvite/>,
+      },
+    ],
+  },
+  {
+    path: 'verify',
+    element: <VerifyEmail/>,
+    errorElement: <RouteErrorBoundary/>,
+  },
+  {
+    element: <AuthLayout/>,
+    errorElement: <RouteErrorBoundary/>,
+    children: [
+      {
         path: '/',
-        element: <StartupLayout/>,
-        errorElement: <RouteErrorBoundary/>,
+        element: <LoginLayout/>,
         children: [
-            {
-                path: 'register',
-                element: <Registration/>,
-            },
-            {
-                path: 'forgot-password',
-                element: <RequestPasswordReset/>,
-            },
-            {
-                path: 'reset-password',
-                element: <ResetPassword/>,
-            },
+          {
+            path: 'login',
+            element: <Login/>,
+          },
+          {
+            path: 'login/2fa',
+            element: <TwoFactorScreen/>,
+          },
         ],
-    },
-    {
-        path: 'verify',
-        element: <VerifyEmail/>,
-        errorElement: <RouteErrorBoundary/>,
-    },
-    {
-        element: <AuthLayout/>,
-        errorElement: <RouteErrorBoundary/>,
+      },
+      dashboardRoutes,
+      {
+        path: '/',
+        element: <Root/>,
         children: [
-            {
-                path: '/',
-                element: <LoginLayout/>,
-                children: [
-                    {
-                        path: 'login',
-                        element: <Login/>,
-                    },
-                    {
-                        path: 'login/2fa',
-                        element: <TwoFactorScreen/>,
-                    },
-                ],
-            },
-            dashboardRoutes,
-            {
-                path: '/',
-                element: <Root/>,
-                children: [
-                    {
-                        index: true,
-                        element: <Navigate to="/c/new" replace={true}/>,
-                    },
-                    {
-                        path: 'c/:conversationId?',
-                        element: <ChatRoute/>,
-                    },
-                    {
-                        path: 'search',
-                        element: <Search/>,
-                    },
-                ],
-            },
+          {
+            index: true,
+            element: <Navigate to="/c/new" replace={true}/>,
+          },
+          {
+            path: 'c/:conversationId?',
+            element: <ChatRoute/>,
+          },
+          {
+            path: 'search',
+            element: <Search/>,
+          },
         ],
-    },
+      },
+    ],
+  },
 ]);

@@ -4,5 +4,13 @@
   "com_superadmin_organization_name": "Organization name",
   "com_superadmin_give_org_name": "Give your training organisation a name",
   "com_superadmin_error_name_required": "Name is required",
-  "com_superadmin_error_name_not_empty": "Name cannot be empty"
+  "com_superadmin_error_name_not_empty": "Name cannot be empty",
+  "com_superadmin_administrators": "Administrators",
+  "com_superadmin_admin_email_placeholder": "Enter administrator email",
+  "com_superadmin_add_administrator": "Add administrator",
+  "com_superadmin_error_email_required": "Email is required",
+  "com_superadmin_error_email_invalid": "Please enter a valid email address",
+  "com_superadmin_admin_invite_success": "You have successfully accepted the invitation. You can now log in as an administrator.",
+  "com_superadmin_admin_invite_success_with_org": "You have successfully accepted the invitation. You can now log in as an administrator of {{organizationName}}.",
+  "com_superadmin_admin_invite_error": "There was an error processing your invitation. Please try again or contact support."
 }

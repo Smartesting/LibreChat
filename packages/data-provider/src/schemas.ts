@@ -1,6 +1,6 @@
 import { z } from 'zod';
+import type { FunctionTool, FunctionToolCall, TMessageContentParts } from './types/assistants';
 import { Tools } from './types/assistants';
-import type { TMessageContentParts, FunctionTool, FunctionToolCall } from './types/assistants';
 import type { TEphemeralAgent } from './types';
 import type { TFile } from './types/files';
 
@@ -181,6 +181,7 @@ export const defaultAgentFormValues = {
 
 export const defaultOrgFormValues = {
   name: '',
+  administrators: [],
 };
 
 export const ImageVisionTool: FunctionTool = {
@@ -795,11 +796,11 @@ export const googleSchema = googleBaseSchema
   .catch(() => ({}));
 
 /**
-   * TODO: Map the following fields:
-  - presence_penalty -> presencePenalty
-  - frequency_penalty -> frequencyPenalty
-  - stop -> stopSequences
-   */
+ * TODO: Map the following fields:
+ - presence_penalty -> presencePenalty
+ - frequency_penalty -> frequencyPenalty
+ - stop -> stopSequences
+ */
 export const googleGenConfigSchema = z
   .object({
     maxOutputTokens: coerceNumber.optional(),

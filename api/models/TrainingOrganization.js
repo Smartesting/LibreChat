@@ -21,8 +21,35 @@ const getListTrainingOrganizations = async () => {
   return (await TrainingOrganization.find({}).lean());
 };
 
+/**
+ * Update an administrator in a training organization
+ * @param {string} orgId - The ID of the training organization
+ * @param {string} email - The email of the administrator to update
+ * @param {Object} updateData - The data to update
+ * @returns {Promise<Object|null>} The updated training organization document or null if not found
+ */
+const updateTrainingOrganizationAdmin = async (orgId, email, updateData) => {
+  return (await TrainingOrganization.findOneAndUpdate(
+    {
+      _id: orgId,
+      'administrators.email': email,
+    },
+    {
+      $set: {
+        'administrators.$.userId': updateData.userId,
+        'administrators.$.status': updateData.status,
+        'administrators.$.activatedAt': updateData.activatedAt,
+        'administrators.$.invitationToken': null,
+        'administrators.$.invitationExpires': null,
+      },
+    },
+    { new: true },
+  ).lean());
+};
+
 module.exports = {
   TrainingOrganization,
   createTrainingOrganization,
   getListTrainingOrganizations,
+  updateTrainingOrganizationAdmin,
 };
