@@ -12,5 +12,6 @@
   "com_superadmin_error_email_invalid": "Please enter a valid email address",
   "com_superadmin_admin_invite_success": "You have successfully accepted the invitation. You can now log in as an administrator.",
   "com_superadmin_admin_invite_success_with_org": "You have successfully accepted the invitation. You can now log in as an administrator of {{organizationName}}.",
-  "com_superadmin_admin_invite_error": "There was an error processing your invitation. Please try again or contact support."
+  "com_superadmin_admin_invite_error": "There was an error processing your invitation. Please try again or contact support.",
+  "com_nav_admin": "Administration"
 }

@@ -12,5 +12,6 @@
   "com_superadmin_error_email_invalid": "Veuillez saisir une adresse email valide",
   "com_superadmin_admin_invite_success": "Vous avez accepté l'invitation avec succès. Vous pouvez maintenant vous connecter en tant qu'administrateur.",
   "com_superadmin_admin_invite_success_with_org": "Vous avez accepté l'invitation avec succès. Vous pouvez maintenant vous connecter en tant qu'administrateur de {{organizationName}}.",
-  "com_superadmin_admin_invite_error": "Une erreur s'est produite lors du traitement de votre invitation. Veuillez réessayer ou contacter le support."
+  "com_superadmin_admin_invite_error": "Une erreur s'est produite lors du traitement de votre invitation. Veuillez réessayer ou contacter le support.",
+  "com_nav_admin": "Administration"
 }
