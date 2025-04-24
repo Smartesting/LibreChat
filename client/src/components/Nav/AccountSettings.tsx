@@ -9,6 +9,7 @@ import { useAuthContext } from '~/hooks/AuthContext';
 import useAvatar from '~/hooks/Messages/useAvatar';
 import { UserIcon } from '~/components/svg';
 import { useLocalize, useSmaLocalize } from '~/hooks';
+import { SystemRoles } from 'librechat-data-provider';
 import Settings from './Settings';
 import store from '~/store';
 
@@ -112,14 +113,16 @@ function AccountSettings() {
           <GearIcon className="icon-md" aria-hidden="true" />
           {localize('com_nav_settings')}
         </Select.SelectItem>
-        <Select.SelectItem
-          value=""
-          onClick={() => (window.location.href = '/admin')}
-          className="select-item text-sm"
-        >
-          <UserIcon aria-hidden="true" />
-          {smaLocalize('com_nav_admin')}
-        </Select.SelectItem>
+        {user?.role === SystemRoles.ADMIN && (
+          <Select.SelectItem
+            value=""
+            onClick={() => (window.location.href = '/admin')}
+            className="select-item text-sm"
+          >
+            <UserIcon aria-hidden="true" />
+            {smaLocalize('com_nav_admin')}
+          </Select.SelectItem>
+        )}
         <DropdownMenuSeparator />
         <Select.SelectItem
           aria-selected={true}
