@@ -8,9 +8,10 @@ const {
   getListTrainingOrganizations,
   acceptAdminInvitation,
 } = require('~/server/controllers/TrainingOrganizationController');
+const { checkAdmin } = require('~/server/middleware/roles');
 
-router.post('/', requireJwtAuth, createTrainingOrganization);
-router.get('/', requireJwtAuth, getListTrainingOrganizations);
+router.post('/', requireJwtAuth, checkAdmin, createTrainingOrganization);
+router.get('/', requireJwtAuth, checkAdmin, getListTrainingOrganizations);
 router.post('/accept-admin-invitation', acceptAdminInvitation);
 
 module.exports = router;
