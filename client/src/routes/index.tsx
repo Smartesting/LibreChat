@@ -18,7 +18,7 @@ import ShareRoute from './ShareRoute';
 import ChatRoute from './ChatRoute';
 import Search from './Search';
 import Root from './Root';
-import SuperAdmin from '~/components/SuperAdmin/SuperAdmin';
+import SuperAdminRoute from './SuperAdminRoute';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -28,11 +28,6 @@ const AuthLayout = () => (
 );
 
 export const router = createBrowserRouter([
-  {
-    path: 'admin',
-    element: <SuperAdmin/>,
-    errorElement: <RouteErrorBoundary/>,
-  },
   {
     path: 'share/:shareId',
     element: <ShareRoute/>,
@@ -70,6 +65,11 @@ export const router = createBrowserRouter([
     element: <AuthLayout/>,
     errorElement: <RouteErrorBoundary/>,
     children: [
+      {
+        path: 'admin',
+        element: <SuperAdminRoute/>,
+        errorElement: <RouteErrorBoundary/>,
+      },
       {
         path: '/',
         element: <LoginLayout/>,
