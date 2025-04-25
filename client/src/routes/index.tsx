@@ -1,8 +1,8 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import {
-  OrgAdminInvite,
   ApiErrorWatcher,
   Login,
+  OrgAdminInvite,
   Registration,
   RequestPasswordReset,
   ResetPassword,
@@ -18,88 +18,88 @@ import ShareRoute from './ShareRoute';
 import ChatRoute from './ChatRoute';
 import Search from './Search';
 import Root from './Root';
-import SuperAdminRoute from './SuperAdminRoute';
+import SuperAdmin from '~/components/SuperAdmin/SuperAdmin';
 
 const AuthLayout = () => (
   <AuthContextProvider>
-    <Outlet/>
-    <ApiErrorWatcher/>
+    <Outlet />
+    <ApiErrorWatcher />
   </AuthContextProvider>
 );
 
 export const router = createBrowserRouter([
   {
     path: 'share/:shareId',
-    element: <ShareRoute/>,
-    errorElement: <RouteErrorBoundary/>,
+    element: <ShareRoute />,
+    errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/',
-    element: <StartupLayout/>,
-    errorElement: <RouteErrorBoundary/>,
+    element: <StartupLayout />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
         path: 'register',
-        element: <Registration/>,
+        element: <Registration />,
       },
       {
         path: 'forgot-password',
-        element: <RequestPasswordReset/>,
+        element: <RequestPasswordReset />,
       },
       {
         path: 'reset-password',
-        element: <ResetPassword/>,
+        element: <ResetPassword />,
       },
       {
         path: 'org-admin-invite',
-        element: <OrgAdminInvite/>,
+        element: <OrgAdminInvite />,
       },
     ],
   },
   {
     path: 'verify',
-    element: <VerifyEmail/>,
-    errorElement: <RouteErrorBoundary/>,
+    element: <VerifyEmail />,
+    errorElement: <RouteErrorBoundary />,
   },
   {
-    element: <AuthLayout/>,
-    errorElement: <RouteErrorBoundary/>,
+    element: <AuthLayout />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       {
         path: 'admin',
-        element: <SuperAdminRoute/>,
-        errorElement: <RouteErrorBoundary/>,
+        element: <SuperAdmin />,
+        errorElement: <RouteErrorBoundary />,
       },
       {
         path: '/',
-        element: <LoginLayout/>,
+        element: <LoginLayout />,
         children: [
           {
             path: 'login',
-            element: <Login/>,
+            element: <Login />,
           },
           {
             path: 'login/2fa',
-            element: <TwoFactorScreen/>,
+            element: <TwoFactorScreen />,
           },
         ],
       },
       dashboardRoutes,
       {
         path: '/',
-        element: <Root/>,
+        element: <Root />,
         children: [
           {
             index: true,
-            element: <Navigate to="/c/new" replace={true}/>,
+            element: <Navigate to="/c/new" replace={true} />,
           },
           {
             path: 'c/:conversationId?',
-            element: <ChatRoute/>,
+            element: <ChatRoute />,
           },
           {
             path: 'search',
-            element: <Search/>,
+            element: <Search />,
           },
         ],
       },

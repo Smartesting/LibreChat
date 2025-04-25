@@ -4,9 +4,21 @@ import { TooltipAnchor } from '~/components';
 import useSmaLocalize from '~/hooks/useSmaLocalize';
 import OrgCreationModal from '~/components/SuperAdmin/OrgCreationModal';
 import OrgList from '~/components/SuperAdmin/OrgList';
+import { useAuthContext } from '~/hooks';
+import { SystemRoles } from 'librechat-data-provider';
+import { Navigate } from 'react-router-dom';
 
 const SuperAdmin: FC = () => {
   const [isOrgCreationModalOpened, setIsOrgCreationModalOpened] = React.useState(false);
+  const { user, isAuthenticated } = useAuthContext();
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  if (user?.role !== SystemRoles.ADMIN) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div>
