@@ -5,6 +5,7 @@ const {
   getListTrainingOrganizations,
   updateTrainingOrganizationAdmin,
   deleteTrainingOrganization,
+  getTrainingOrganizationById,
 } = require('~/models/TrainingOrganization');
 const { processAdministrators } = require('~/server/services/TrainingOrganizationService');
 const { registerUser } = require('~/server/services/AuthService');
@@ -189,9 +190,40 @@ const deleteTrainingOrganizationHandler = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves a training organization by ID.
+ * @route GET /training-organizations/:id
+ * @param {ServerRequest} req - The request object.
+ * @param {Object} req.params - The request parameters.
+ * @param {string} req.params.id - The ID of the training organization to retrieve.
+ * @param {ServerResponse} res - The response object.
+ * @returns {Promise<TrainingOrganization>} 200 - success response - application/json
+ */
+const getTrainingOrganizationByIdHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Missing organization ID' });
+    }
+
+    const trainingOrganization = await getTrainingOrganizationById(id);
+
+    if (!trainingOrganization) {
+      return res.status(404).json({ error: 'Training organization not found' });
+    }
+
+    return res.json(trainingOrganization);
+  } catch (error) {
+    logger.error(`[/training-organizations/${req.params.id}] Error retrieving training organization`, error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createTrainingOrganization: createTrainingOrganizationHandler,
   getListTrainingOrganizations: getListTrainingOrganizationsHandler,
   acceptAdminInvitation: acceptAdminInvitationHandler,
   deleteTrainingOrganization: deleteTrainingOrganizationHandler,
+  getTrainingOrganizationById: getTrainingOrganizationByIdHandler,
 };
