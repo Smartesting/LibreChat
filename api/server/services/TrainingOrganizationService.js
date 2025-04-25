@@ -1,5 +1,6 @@
 const { webcrypto } = require('node:crypto');
 const bcrypt = require('bcryptjs');
+const { SystemRoles } = require('librechat-data-provider');
 const { findUser } = require('~/models/userMethods');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
@@ -32,10 +33,10 @@ const processAdministrators = async (administrators, orgName) => {
 
   for (const email of uniqueAdministrators) {
     // Check if user exists
-    const existingUser = await findUser({ email }, 'email _id name username');
+    const existingUser = await findUser({ email }, 'email _id name username role');
 
-    if (existingUser) {
-      // User exists, set status to active
+    if (existingUser && existingUser.role === SystemRoles.ORGADMIN) {
+      // User exists with ORGADMIN role, set status to active
       processedAdmins.push({
         email,
         userId: existingUser._id,
@@ -45,7 +46,9 @@ const processAdministrators = async (administrators, orgName) => {
 
       // Send notification email to existing user
       await sendNotificationEmail(existingUser, orgName);
-    } else {
+    }
+
+    if (!existingUser) {
       // User doesn't exist, generate invitation token
       const [invitationToken, tokenHash] = createTokenHash();
       const invitationExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days

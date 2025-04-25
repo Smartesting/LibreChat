@@ -1,5 +1,6 @@
 const { logger } = require('~/config');
 const bcrypt = require('bcryptjs');
+const { SystemRoles } = require('librechat-data-provider');
 const {
   createTrainingOrganization,
   getListTrainingOrganizations,
@@ -138,7 +139,7 @@ const acceptAdminInvitationHandler = async (req, res) => {
       username: username || '',
     };
 
-    const registerResult = await registerUser(userData, { emailVerified: true });
+    const registerResult = await registerUser(userData, { emailVerified: true, role: SystemRoles.ORGADMIN });
 
     if (registerResult.status !== 200) {
       return res.status(registerResult.status).json({ error: registerResult.message });
