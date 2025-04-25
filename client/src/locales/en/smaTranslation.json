@@ -23,5 +23,6 @@
   "com_superadmin_delete_organization_confirm_button": "Delete",
   "com_superadmin_error_create_organization": "An error occurred while creating the training organization. Please try again.",
   "com_nav_admin": "Administration",
-  "com_superadmin_no_administrators": "No administrators added yet. Click the plus button to add one."
+  "com_superadmin_no_administrators": "No administrators added yet. Click the plus button to add one.",
+  "com_orgadmin_error_loading_organization": "Error loading training organization."
 }

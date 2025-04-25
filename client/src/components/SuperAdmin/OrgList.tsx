@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useListTrainingOrganizationsQuery } from '~/data-provider/TrainingOrganizations/queries';
 import { useDeleteTrainingOrganizationMutation } from '~/data-provider/TrainingOrganizations/mutations';
 import { TooltipAnchor } from '~/components';
@@ -64,7 +65,12 @@ const OrgList: FC = () => {
           return (
             <li key={trainingOrganization._id} className="mb-2 flex flex-col text-text-primary">
               <div className="flex items-center">
-                <span>{trainingOrganization.name}</span>
+                <Link
+                  to={`/training-organizations/${trainingOrganization._id}`}
+                  className="hover:underline"
+                >
+                  {trainingOrganization.name}
+                </Link>
                 <TooltipAnchor
                   aria-label={smaLocalize('com_superadmin_delete_organization')}
                   description={smaLocalize('com_superadmin_delete_organization')}

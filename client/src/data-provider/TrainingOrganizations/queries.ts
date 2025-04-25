@@ -4,10 +4,6 @@ import type { QueryObserverResult } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
 
 /**
- * AGENTS
- */
-
-/**
  * Hook for listing all training organizations
  */
 export const useListTrainingOrganizationsQuery = <
@@ -22,6 +18,26 @@ export const useListTrainingOrganizationsQuery = <
       refetchOnReconnect: false,
       refetchOnMount: false,
       retry: false,
+    },
+  );
+};
+
+/**
+ * Hook for fetching a single training organization by ID
+ */
+export const useTrainingOrganizationByIdQuery = <
+  TData = t.TrainingOrganization,
+>(id: t.TrainingOrganization['_id']): QueryObserverResult<TData> => {
+  return useQuery<t.TrainingOrganization, unknown, TData>(
+    [QueryKeys.trainingOrganizations, id],
+    () => dataService.getTrainingOrganizationById(id),
+    {
+      staleTime: 1000 * 5,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      enabled: !!id,
     },
   );
 };

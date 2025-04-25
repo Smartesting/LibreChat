@@ -730,8 +730,12 @@ export const listTrainingOrganizations = (): Promise<q.TrainingOrganization[]> =
   return request.get(endpoints.trainingOrganizations());
 };
 
-export const deleteTrainingOrganization = (id: string): Promise<void> => {
+export const deleteTrainingOrganization = (id: q.TrainingOrganization['_id']): Promise<void> => {
   return request.delete(endpoints.trainingOrganizations(id));
+};
+
+export const getTrainingOrganizationById = (id: q.TrainingOrganization['_id']): Promise<q.TrainingOrganization> => {
+  return request.get(endpoints.trainingOrganizations(id));
 };
 
 /* Tags */

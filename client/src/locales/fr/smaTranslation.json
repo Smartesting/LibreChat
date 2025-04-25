@@ -23,5 +23,6 @@
   "com_superadmin_delete_organization_confirm_button": "Supprimer",
   "com_superadmin_error_create_organization": "Une erreur s'est produite lors de la création de l'organisation de formation. Veuillez réessayer.",
   "com_nav_admin": "Administration",
-  "com_superadmin_no_administrators": "Aucun administrateur ajouté. Cliquez sur le bouton plus pour en ajouter un."
+  "com_superadmin_no_administrators": "Aucun administrateur ajouté. Cliquez sur le bouton plus pour en ajouter un.",
+  "com_orgadmin_error_loading_organization": "Erreur lors du chargement de l'organisme de formation."
 }
