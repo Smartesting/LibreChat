@@ -15,5 +15,11 @@
   "com_superadmin_admin_invite_error": "Une erreur s'est produite lors du traitement de votre invitation. Veuillez réessayer ou contacter le support.",
   "com_superadmin_delete_organization": "Supprimer l'organisme de formation",
   "com_superadmin_delete_organization_error": "Une erreur s'est produite lors de la suppression de l'organisme de formation. Veuillez réessayer.",
+  "com_superadmin_delete_organization_confirm": "Confirmer la suppression",
+  "com_superadmin_delete_organization_warning": "Cette action ne peut pas être annulée. Cela supprimera définitivement l'organisme de formation et toutes les données associées.",
+  "com_superadmin_delete_organization_type_name": "Veuillez saisir le nom de l'organisme \"{{name}}\" pour confirmer la suppression :",
+  "com_superadmin_delete_organization_name_placeholder": "Saisissez le nom de l'organisme ici",
+  "com_superadmin_delete_organization_name_mismatch": "Le nom que vous avez saisi ne correspond pas au nom de l'organisme",
+  "com_superadmin_delete_organization_confirm_button": "Supprimer",
   "com_nav_admin": "Administration"
 }
