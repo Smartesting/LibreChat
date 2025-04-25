@@ -36,7 +36,7 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
     formState: { errors },
   } = methods;
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, prepend, remove } = useFieldArray({
     control,
     name: 'administrators' as never,
   });
@@ -87,7 +87,7 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
         className="scrollbar-gutter-stable h-auto w-full flex-shrink-0 overflow-x-hidden"
         aria-label="Agent configuration form"
       >
-        <div className="max-h-[550px] overflow-auto px-6 md:max-h-[400px] md:min-h-[400px] md:w-[680px]">
+        <div className="max-h-[550px] overflow-auto px-6 md:max-h-[400px] md:min-h-[400px] md:w-[680px] flex flex-col">
           <div className="mb-4">
             <label className={labelClass} htmlFor="name">
               {smaLocalize('com_superadmin_organization_name')}
@@ -120,9 +120,24 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
             />
           </div>
 
-          <div className="mb-4">
-            <label className={labelClass}>{smaLocalize('com_superadmin_administrators')}</label>
-            <div className="space-y-2">
+          <div className="mb-4 flex-1">
+            <div className="flex items-center mb-2">
+              <label className={labelClass}>{smaLocalize('com_superadmin_administrators')}</label>
+              <button
+                type="button"
+                onClick={() => prepend('')}
+                className="text-token-text-secondary flex mb-2 ml-2 h-6 w-6 items-center justify-center rounded-md border border-border-light bg-surface-secondary hover:bg-surface-tertiary"
+                aria-label="Add administrator"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-2 max-h-[200px] overflow-y-auto p-1">
+              {fields.length === 0 && (
+                <div className="text-token-text-secondary text-center py-2">
+                  {smaLocalize('com_superadmin_no_administrators')}
+                </div>
+              )}
               {fields.map((field, index) => (
                 <div key={field.id} className="flex items-center gap-2">
                   <Controller
@@ -162,14 +177,6 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
                   </button>
                 </div>
               ))}
-              <button
-                type="button"
-                onClick={() => append('')}
-                className="text-token-text-secondary flex items-center gap-2 rounded-md border border-border-light bg-surface-secondary px-3 py-2 text-sm hover:bg-surface-tertiary"
-              >
-                <Plus className="h-4 w-4" />
-                {smaLocalize('com_superadmin_add_administrator')}
-              </button>
             </div>
           </div>
           <div className="flex gap-4">
