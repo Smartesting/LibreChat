@@ -57,7 +57,7 @@ const createTrainingOrganizationHandler = async (req, res) => {
 };
 
 /**
- * Retrieves all training organizations.
+ * Retrieves all training organizations that the user can administer.
  * @route GET /training-organizations
  * @param {object} req - Express Request
  * @param {ServerResponse} res - The response object.
@@ -65,7 +65,7 @@ const createTrainingOrganizationHandler = async (req, res) => {
  */
 const getListTrainingOrganizationsHandler = async (req, res) => {
   try {
-    const trainingOrganizations = await getListTrainingOrganizations();
+    const trainingOrganizations = await getListTrainingOrganizations(req.user);
     return res.json(trainingOrganizations);
   } catch (error) {
     logger.error('[/training-organizations] Error listing training organizations', error);

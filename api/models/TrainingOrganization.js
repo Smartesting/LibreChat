@@ -14,11 +14,25 @@ const createTrainingOrganization = async (trainingOrgData) => {
 };
 
 /**
- * Get all training organizations.
+ * Get all training organizations that the user can administer.
+ * @param {Object} [user] - The user object. If provided, returns only organizations the user can administer.
  * @returns {Promise<TrainingOrganization[]>} A promise that resolves to an array of training organizations.
  */
-const getListTrainingOrganizations = async () => {
-  return (await TrainingOrganization.find({}).lean());
+const getListTrainingOrganizations = async (user) => {
+  // If no user is provided or user is an admin, return all organizations
+  if (!user || user.role === 'ADMIN') {
+    return (await TrainingOrganization.find({}).lean());
+  }
+
+  // Otherwise, return only organizations where the user is an active administrator
+  return (await TrainingOrganization.find({
+    'administrators': {
+      $elemMatch: {
+        'userId': user.id,
+        'status': 'active',
+      },
+    },
+  }).lean());
 };
 
 /**
