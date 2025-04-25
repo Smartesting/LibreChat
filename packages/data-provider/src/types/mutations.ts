@@ -130,6 +130,11 @@ export type CreateTrainingOrganizationMutationOptions = MutationOptions<
   TrainingOrganizationCreateParams
 >;
 
+export type DeleteTrainingOrganizationMutationOptions = MutationOptions<
+  void,
+  TrainingOrganization['_id']
+>;
+
 export type UpdateAgentVariables = {
   agent_id: string;
   data: AgentUpdateParams;

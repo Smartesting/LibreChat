@@ -47,9 +47,19 @@ const updateTrainingOrganizationAdmin = async (orgId, email, updateData) => {
   ).lean());
 };
 
+/**
+ * Delete a training organization by ID
+ * @param {string} orgId - The ID of the training organization to delete
+ * @returns {Promise<Object|null>} The deleted training organization document or null if not found
+ */
+const deleteTrainingOrganization = async (orgId) => {
+  return (await TrainingOrganization.findByIdAndDelete(orgId).lean());
+};
+
 module.exports = {
   TrainingOrganization,
   createTrainingOrganization,
   getListTrainingOrganizations,
   updateTrainingOrganizationAdmin,
+  deleteTrainingOrganization,
 };

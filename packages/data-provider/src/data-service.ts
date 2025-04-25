@@ -730,6 +730,10 @@ export const listTrainingOrganizations = (): Promise<q.TrainingOrganization[]> =
   return request.get(endpoints.trainingOrganizations());
 };
 
+export const deleteTrainingOrganization = (id: string): Promise<void> => {
+  return request.delete(endpoints.trainingOrganizations(id));
+};
+
 /* Tags */
 export function getConversationTags(): Promise<t.TConversationTagsResponse> {
   return request.get(endpoints.conversationTags());
