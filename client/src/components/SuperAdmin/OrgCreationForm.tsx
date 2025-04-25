@@ -1,12 +1,14 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import { cn, defaultTextProps, removeFocusOutlines } from '~/utils';
-import { Controller, FormProvider, useForm, useFieldArray } from 'react-hook-form';
+import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useLocalize, useSmaLocalize } from '~/hooks';
-import { OrgForm } from '~/common';
+import { NotificationSeverity, OrgForm } from '~/common';
 import { defaultOrgFormValues } from 'librechat-data-provider';
 import { Button } from '~/components';
 import { useCreateTrainingOrganizationMutation } from '~/data-provider/TrainingOrganizations';
-import { X, Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
+import { useToastContext } from '~/Providers/ToastContext';
+import { AxiosError } from 'axios';
 
 const labelClass = 'mb-2 text-token-text-primary block font-medium';
 const inputClass = cn(
@@ -21,6 +23,8 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
 }) => {
   const smaLocalize = useSmaLocalize();
   const localize = useLocalize();
+  const { showToast } = useToastContext();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const methods = useForm<OrgForm>({
     defaultValues: defaultOrgFormValues,
     mode: 'onChange',
@@ -48,14 +52,32 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
         return;
       }
 
-      create.mutate({
-        name: name.trim(),
-        administrators,
-      });
-
-      onSubmit();
+      setIsSubmitting(true);
+      create.mutate(
+        {
+          name: name.trim(),
+          administrators,
+        },
+        {
+          onSuccess: () => {
+            setIsSubmitting(false);
+            onSubmit();
+          },
+          onError: (error) => {
+            setIsSubmitting(false);
+            if (error instanceof AxiosError && error.response?.data?.error) {
+              showToast({
+                message: `${smaLocalize('com_superadmin_error_create_organization')} ${error.response.data.error}`,
+                severity: NotificationSeverity.ERROR,
+                showIcon: true,
+                duration: 5000,
+              });
+            }
+          },
+        },
+      );
     },
-    [create, onSubmit],
+    [create, onSubmit, showToast, smaLocalize],
   );
 
   return (
@@ -99,9 +121,7 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
           </div>
 
           <div className="mb-4">
-            <label className={labelClass}>
-              {smaLocalize('com_superadmin_administrators')}
-            </label>
+            <label className={labelClass}>{smaLocalize('com_superadmin_administrators')}</label>
             <div className="space-y-2">
               {fields.map((field, index) => (
                 <div key={field.id} className="flex items-center gap-2">
@@ -135,7 +155,7 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
                   <button
                     type="button"
                     onClick={() => remove(index)}
-                    className="flex h-9 w-9 items-center justify-center rounded-md border border-border-light bg-surface-secondary text-token-text-secondary hover:bg-surface-tertiary"
+                    className="text-token-text-secondary flex h-9 w-9 items-center justify-center rounded-md border border-border-light bg-surface-secondary hover:bg-surface-tertiary"
                     aria-label="Remove administrator"
                   >
                     <X className="h-4 w-4" />
@@ -145,7 +165,7 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
               <button
                 type="button"
                 onClick={() => append('')}
-                className="flex items-center gap-2 rounded-md border border-border-light bg-surface-secondary px-3 py-2 text-sm text-token-text-secondary hover:bg-surface-tertiary"
+                className="text-token-text-secondary flex items-center gap-2 rounded-md border border-border-light bg-surface-secondary px-3 py-2 text-sm hover:bg-surface-tertiary"
               >
                 <Plus className="h-4 w-4" />
                 {smaLocalize('com_superadmin_add_administrator')}
@@ -163,10 +183,11 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
               {localize('com_ui_cancel')}
             </Button>
             <button
-              className="btn btn-primary focus:shadow-outline flex h-9 w-full items-center justify-center px-4 py-2 font-semibold text-white hover:bg-green-600 focus:border-green-500"
+              className="btn btn-primary focus:shadow-outline flex h-9 w-full items-center justify-center px-4 py-2 font-semibold text-white hover:bg-green-600 focus:border-green-500 disabled:opacity-50"
               type="submit"
+              disabled={isSubmitting}
             >
-              {localize('com_ui_create')}
+              {isSubmitting ? localize('com_ui_loading') : localize('com_ui_create')}
             </button>
           </div>
         </div>

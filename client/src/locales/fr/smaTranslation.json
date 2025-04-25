@@ -21,5 +21,6 @@
   "com_superadmin_delete_organization_name_placeholder": "Saisissez le nom de l'organisme ici",
   "com_superadmin_delete_organization_name_mismatch": "Le nom que vous avez saisi ne correspond pas au nom de l'organisme",
   "com_superadmin_delete_organization_confirm_button": "Supprimer",
+  "com_superadmin_error_create_organization": "Une erreur s'est produite lors de la création de l'organisation de formation. Veuillez réessayer.",
   "com_nav_admin": "Administration"
 }

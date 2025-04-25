@@ -23,6 +23,16 @@ const createTrainingOrganizationHandler = async (req, res) => {
   try {
     const { name, administrators } = req.body;
 
+    // Check if a training organization with the same name already exists
+    const existingOrganizations = await getListTrainingOrganizations();
+    const existingOrg = existingOrganizations.find(
+      (org) => org.name.toLowerCase() === name.toLowerCase(),
+    );
+
+    if (existingOrg) {
+      return res.status(400).json({ error: 'A training organization with this name already exists' });
+    }
+
     // Process administrators (check if they exist, generate tokens, send emails)
     const processedAdministrators = await processAdministrators(administrators, name);
 
