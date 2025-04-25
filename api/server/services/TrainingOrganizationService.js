@@ -25,9 +25,12 @@ const processAdministrators = async (administrators, orgName) => {
     return [];
   }
 
+  // Remove duplicate administrators
+  const uniqueAdministrators = Array.from(new Set(administrators.map(email => email.toLowerCase())));
+
   const processedAdmins = [];
 
-  for (const email of administrators) {
+  for (const email of uniqueAdministrators) {
     // Check if user exists
     const existingUser = await findUser({ email }, 'email _id name username');
 

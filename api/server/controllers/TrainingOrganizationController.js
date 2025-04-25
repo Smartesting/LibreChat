@@ -33,7 +33,7 @@ const createTrainingOrganizationHandler = async (req, res) => {
       return res.status(400).json({ error: 'A training organization with this name already exists' });
     }
 
-    // Process administrators (check if they exist, generate tokens, send emails)
+    // Process administrators (check if they exist, remove duplicates, generate tokens, send emails)
     const processedAdministrators = await processAdministrators(administrators, name);
 
     // Create the training organization with processed administrators
