@@ -18,7 +18,7 @@ const TrainingOrganizationsView: FC<{
     <ul className="space-y-2">
       {trainingOrganizations.map((organization) => (
         <li key={organization._id} className="text-text-primary">
-          <TrainingOrganizationView organization={organization} />
+          <TrainingOrganizationView trainingOrganization={organization} />
         </li>
       ))}
     </ul>
