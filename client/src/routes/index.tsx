@@ -20,6 +20,7 @@ import Search from './Search';
 import Root from './Root';
 import TrainingOrganizationRoute from '~/routes/TrainingOrganizationRoute';
 import SuperAdminRoute from '~/routes/SuperAdminRoute';
+import TrainingOrganizationsRoute from '~/routes/TrainingOrganizationsRoute';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -69,6 +70,11 @@ export const router = createBrowserRouter([
       {
         path: 'admin',
         element: <SuperAdminRoute />,
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
+        path: 'training-organizations',
+        element: <TrainingOrganizationsRoute />,
         errorElement: <RouteErrorBoundary />,
       },
       {
