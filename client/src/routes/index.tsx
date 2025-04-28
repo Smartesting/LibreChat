@@ -19,7 +19,7 @@ import ChatRoute from './ChatRoute';
 import Search from './Search';
 import Root from './Root';
 import SuperAdmin from '~/components/SuperAdmin/SuperAdmin';
-import TrainingOrganization from '~/components/TrainingOrganization/TrainingOrganization';
+import TrainingOrganizationRoute from '~/routes/TrainingOrganizationRoute';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -73,7 +73,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'training-organizations/:orgId',
-        element: <TrainingOrganization />,
+        element: <TrainingOrganizationRoute />,
         errorElement: <RouteErrorBoundary />,
       },
       {

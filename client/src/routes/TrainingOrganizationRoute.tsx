@@ -5,8 +5,9 @@ import { useAuthContext, useSmaLocalize } from '~/hooks';
 import { SystemRoles } from 'librechat-data-provider';
 import { NotificationSeverity } from '~/common';
 import { useToastContext } from '~/Providers';
+import TrainingOrganizationView from '~/components/TrainingOrganization/TrainingOrganizationView';
 
-const TrainingOrganization: FC = () => {
+const TrainingOrganizationRoute: FC = () => {
   const { orgId } = useParams<{ orgId: string }>();
   const { data: organization, isLoading, error } = useTrainingOrganizationByIdQuery(orgId || '');
   const { user, isAuthenticated } = useAuthContext();
@@ -39,11 +40,7 @@ const TrainingOrganization: FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-text-primary">{organization!.name}</h1>
-    </div>
-  );
+  return <TrainingOrganizationView organization={organization!} />;
 };
 
-export default TrainingOrganization;
+export default TrainingOrganizationRoute;
