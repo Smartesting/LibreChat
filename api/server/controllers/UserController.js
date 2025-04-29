@@ -19,6 +19,7 @@ const { processDeleteRequest } = require('~/server/services/Files/process');
 const { deleteAllSharedLinks } = require('~/models/Share');
 const { deleteToolCalls } = require('~/models/ToolCall');
 const { Transaction } = require('~/models/Transaction');
+const { processSuperAdminInvitation } = require('~/server/services/AdminInvitationService');
 const { logger } = require('~/config');
 
 const getUserController = async (req, res) => {
@@ -197,6 +198,34 @@ const getAdminUsersController = async (req, res) => {
   }
 };
 
+/**
+ * Controller function to invite a user to be an admin
+ * @param {Object} req - Express request object with email in the body
+ * @param {Object} res - Express response object
+ */
+const assignAdminRoleController = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    // Process the invitation
+    const result = await processAdminInvitation(email, req.user.id);
+
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+
+    logger.info(`Admin invitation sent to ${email} by ${req.user.id}`);
+    res.status(result.status).json({ message: result.message });
+  } catch (error) {
+    logger.error('Error sending admin invitation:', error);
+    res.status(500).json({ message: 'Error sending admin invitation' });
+  }
+};
+
 module.exports = {
   getUserController,
   getTermsStatusController,
@@ -206,4 +235,5 @@ module.exports = {
   updateUserPluginsController,
   resendVerificationController,
   getAdminUsersController,
+  assignAdminRoleController,
 };
