@@ -10,6 +10,7 @@ const { getListTrainingOrganizations, updateTrainingOrganizationAdmin } = requir
 const { registerUser } = require('../server/services/AuthService');
 const { findUser } = require('../models/userMethods');
 const { logger } = require('../config');
+const { SystemRoles } = require('librechat-data-provider');
 
 // Mock dependencies
 jest.mock('../models/TrainingOrganization');
@@ -182,7 +183,7 @@ describe('TrainingOrganizationController - acceptAdminInvitationHandler', () => 
       confirm_password: 'Password123!',
       name: 'Test User',
       username: 'testuser',
-    }, { emailVerified: true });
+    }, { emailVerified: true, role: SystemRoles.ORGADMIN });
 
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: 'Registration failed' });
