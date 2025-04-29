@@ -40,21 +40,17 @@ export default function useBuildMessageTree() {
           );
         }
       } else {
-        let message = messages[0];
-        if (messages.length > 1) {
-          const siblingIdx = await getSiblingIdx(messageId);
-          message = messages[messages.length - siblingIdx - 1];
+        for (const message of messages) {
+          children.push(
+            (await buildMessageTree({
+              messageId: message?.messageId,
+              message: message as TMessage,
+              messages: message?.children || [],
+              branches,
+              recursive,
+            })) as TMessage,
+          );
         }
-
-        children = [
-          (await buildMessageTree({
-            messageId: message?.messageId,
-            message: message as TMessage,
-            messages: message?.children || [],
-            branches,
-            recursive,
-          })) as TMessage,
-        ];
       }
     }
 

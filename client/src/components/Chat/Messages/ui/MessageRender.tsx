@@ -1,7 +1,7 @@
 import { useRecoilValue } from 'recoil';
-import { useCallback, useMemo, memo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import type { TMessage } from 'librechat-data-provider';
-import type { TMessageProps, TMessageIcon } from '~/common';
+import type { TMessageIcon, TMessageProps } from '~/common';
 import MessageContent from '~/components/Chat/Messages/Content/MessageContent';
 import PlaceholderRow from '~/components/Chat/Messages/ui/PlaceholderRow';
 import SiblingSwitch from '~/components/Chat/Messages/SiblingSwitch';
@@ -11,7 +11,7 @@ import { Plugin } from '~/components/Messages/Content';
 import SubRow from '~/components/Chat/Messages/SubRow';
 import { MessageContext } from '~/Providers';
 import { useMessageActions } from '~/hooks';
-import { cn, logger } from '~/utils';
+import { cn } from '~/utils';
 import store from '~/store';
 
 type MessageRenderProps = {
@@ -49,7 +49,6 @@ const MessageRender = memo(
       latestMessage,
       handleContinue,
       copyToClipboard,
-      setLatestMessage,
       regenerateMessage,
     } = useMessageActions({
       message: msg,
@@ -67,9 +66,6 @@ const MessageRender = memo(
       () => hasNoChildren && (msg?.depth === latestMessage?.depth || msg?.depth === -1),
       [hasNoChildren, msg?.depth, latestMessage?.depth],
     );
-    const isLatestMessage = msg?.messageId === latestMessage?.messageId;
-    const showCardRender = isLast && !isSubmittingFamily && isCard;
-    const isLatestCard = isCard && !isSubmittingFamily && isLatestMessage;
 
     const iconData: TMessageIcon = useMemo(
       () => ({
@@ -90,18 +86,6 @@ const MessageRender = memo(
       ],
     );
 
-    const clickHandler = useMemo(
-      () =>
-        showCardRender && !isLatestMessage
-          ? () => {
-            logger.log(`Message Card click: Setting ${msg?.messageId} as latest message`);
-            logger.dir(msg);
-            setLatestMessage(msg!);
-          }
-          : undefined,
-      [showCardRender, isLatestMessage, msg, setLatestMessage],
-    );
-
     if (!msg) {
       return null;
     }
@@ -114,12 +98,6 @@ const MessageRender = memo(
         : 'md:max-w-[47rem] xl:max-w-[55rem]',
     };
 
-    const conditionalClasses = {
-      latestCard: isLatestCard ? 'bg-surface-secondary' : '',
-      cardRender: showCardRender ? 'cursor-pointer transition-colors duration-300' : '',
-      focus: 'focus:outline-none focus:ring-2 focus:ring-border-xheavy',
-    };
-
     return (
       <div
         id={msg.messageId}
@@ -127,24 +105,9 @@ const MessageRender = memo(
         className={cn(
           baseClasses.common,
           isCard ? baseClasses.card : baseClasses.chat,
-          conditionalClasses.latestCard,
-          conditionalClasses.cardRender,
-          conditionalClasses.focus,
           'message-render',
         )}
-        onClick={clickHandler}
-        onKeyDown={(e) => {
-          if ((e.key === 'Enter' || e.key === ' ') && clickHandler) {
-            clickHandler();
-          }
-        }}
-        role={showCardRender ? 'button' : undefined}
-        tabIndex={showCardRender ? 0 : undefined}
       >
-        {isLatestCard && (
-          <div className="absolute right-0 top-0 m-2 h-3 w-3 rounded-full bg-text-primary" />
-        )}
-
         <div className="relative flex flex-shrink-0 flex-col items-center">
           <div className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full">
             <MessageIcon iconData={iconData} assistant={assistant} agent={agent} />

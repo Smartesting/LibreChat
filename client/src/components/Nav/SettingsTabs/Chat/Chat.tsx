@@ -76,6 +76,13 @@ const toggleSwitchConfigs = [
     hoverCardText: undefined,
     key: 'modularChat',
   },
+  {
+    stateAtom: store.fork,
+    localizationKey: 'com_nav_enable_fork',
+    switchId: 'fork',
+    hoverCardText: undefined,
+    key: 'fork',
+  },
 ];
 
 function Chat() {

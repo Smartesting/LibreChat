@@ -40,6 +40,7 @@ export default function HoverButtons({
   const endpoint = endpointType ?? _endpoint;
   const [isCopied, setIsCopied] = useState(false);
   const [TextToSpeech] = useRecoilState<boolean>(store.textToSpeech);
+  const [fork] = useRecoilState<boolean>(store.fork);
 
   const {
     hideEditButton,
@@ -147,13 +148,15 @@ export default function HoverButtons({
         {isCopied ? <CheckMark className="h-[18px] w-[18px]" /> : <Clipboard size="19" />}
       </button>
       {renderRegenerate()}
-      <Fork
-        isLast={isLast}
-        messageId={message.messageId}
-        conversationId={conversation.conversationId}
-        forkingSupported={forkingSupported}
-        latestMessageId={latestMessage?.messageId}
-      />
+      {fork && (
+        <Fork
+          isLast={isLast}
+          messageId={message.messageId}
+          conversationId={conversation.conversationId}
+          forkingSupported={forkingSupported}
+          latestMessageId={latestMessage?.messageId}
+        />
+      )}
       {continueSupported === true ? (
         <button
           className={cn(

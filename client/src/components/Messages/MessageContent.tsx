@@ -2,7 +2,6 @@ import React from 'react';
 import { useMessageProcess } from '~/hooks';
 import type { TMessageProps } from '~/common';
 // eslint-disable-next-line import/no-cycle
-import MultiMessage from '~/components/Chat/Messages/MultiMessage';
 import ContentRender from './ContentRender';
 
 const MessageContainer = React.memo(
@@ -26,21 +25,13 @@ const MessageContainer = React.memo(
 );
 
 export default function MessageContent(props: TMessageProps) {
-  const {
-    showSibling,
-    conversation,
-    handleScroll,
-    siblingMessage,
-    latestMultiMessage,
-    isSubmittingFamily,
-  } = useMessageProcess({ message: props.message });
-  const { message, currentEditId, setCurrentEditId } = props;
+  const { showSibling, handleScroll, siblingMessage, latestMultiMessage, isSubmittingFamily } =
+    useMessageProcess({ message: props.message });
+  const { message } = props;
 
   if (!message || typeof message !== 'object') {
     return null;
   }
-
-  const { children, messageId = null } = message;
 
   return (
     <>
@@ -64,19 +55,11 @@ export default function MessageContent(props: TMessageProps) {
             </div>
           </div>
         ) : (
-          <div className="m-auto justify-center p-4 py-2 md:gap-6 ">
+          <div className="m-auto flex justify-center p-4 py-2 md:gap-6">
             <ContentRender {...props} />
           </div>
         )}
       </MessageContainer>
-      <MultiMessage
-        key={messageId}
-        messageId={messageId}
-        conversation={conversation}
-        messagesTree={children ?? []}
-        currentEditId={currentEditId}
-        setCurrentEditId={setCurrentEditId}
-      />
     </>
   );
 }
