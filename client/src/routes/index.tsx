@@ -1,12 +1,13 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import {
+  ApiErrorWatcher,
   Login,
+  OrgAdminInvite,
   Registration,
   RequestPasswordReset,
   ResetPassword,
-  VerifyEmail,
-  ApiErrorWatcher,
   TwoFactorScreen,
+  VerifyEmail,
 } from '~/components/Auth';
 import { AuthContextProvider } from '~/hooks/AuthContext';
 import RouteErrorBoundary from './RouteErrorBoundary';
@@ -17,6 +18,9 @@ import ShareRoute from './ShareRoute';
 import ChatRoute from './ChatRoute';
 import Search from './Search';
 import Root from './Root';
+import TrainingOrganizationRoute from '~/routes/TrainingOrganizationRoute';
+import SuperAdminRoute from '~/routes/SuperAdminRoute';
+import TrainingOrganizationsRoute from '~/routes/TrainingOrganizationsRoute';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -48,6 +52,10 @@ export const router = createBrowserRouter([
         path: 'reset-password',
         element: <ResetPassword />,
       },
+      {
+        path: 'org-admin-invite',
+        element: <OrgAdminInvite />,
+      },
     ],
   },
   {
@@ -59,6 +67,21 @@ export const router = createBrowserRouter([
     element: <AuthLayout />,
     errorElement: <RouteErrorBoundary />,
     children: [
+      {
+        path: 'admin',
+        element: <SuperAdminRoute />,
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
+        path: 'training-organizations',
+        element: <TrainingOrganizationsRoute />,
+        errorElement: <RouteErrorBoundary />,
+      },
+      {
+        path: 'training-organizations/:orgId',
+        element: <TrainingOrganizationRoute />,
+        errorElement: <RouteErrorBoundary />,
+      },
       {
         path: '/',
         element: <LoginLayout />,

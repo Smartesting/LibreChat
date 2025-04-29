@@ -103,3 +103,21 @@ export type VerifyToolAuthResponse = { authenticated: boolean; message?: string 
 
 export type GetToolCallParams = { conversationId: string };
 export type ToolCallResults = a.ToolCallResult[];
+
+export type TrainingOrgAdmin = {
+  userId?: string;
+  email: string;
+  invitationToken?: string;
+  invitationExpires?: Date;
+  status: 'active' | 'invited';
+  invitedAt?: Date;
+  activatedAt?: Date;
+};
+
+export type TrainingOrganization = {
+  _id: string;
+  name: string;
+  administrators: TrainingOrgAdmin[];
+};
+
+export type TrainingOrganizationCreateParams = TrainingOrganization;

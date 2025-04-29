@@ -193,6 +193,9 @@ export const agents = ({ path = '', options }: { path?: string; options?: object
   return url;
 };
 
+export const trainingOrganizations = (id?: string) =>
+  `/api/training-organizations${id ? `/${id}` : ''}`;
+
 export const files = () => '/api/files';
 
 export const images = () => `${files()}/images`;

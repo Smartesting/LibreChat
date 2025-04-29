@@ -23,6 +23,10 @@ export enum SystemRoles {
    * The default user role
    */
   USER = 'USER',
+  /**
+   * The organization admin role
+   */
+  ORGADMIN = 'ORGADMIN',
 }
 
 // The role schema now only needs to reference the permissions schema.
@@ -68,6 +72,10 @@ const defaultRolesSchema = z.object({
     name: z.literal(SystemRoles.USER),
     permissions: permissionsSchema,
   }),
+  [SystemRoles.ORGADMIN]: roleSchema.extend({
+    name: z.literal(SystemRoles.ORGADMIN),
+    permissions: permissionsSchema,
+  }),
 });
 
 export const roleDefaults = defaultRolesSchema.parse({
@@ -107,6 +115,33 @@ export const roleDefaults = defaultRolesSchema.parse({
       [PermissionTypes.MULTI_CONVO]: {},
       [PermissionTypes.TEMPORARY_CHAT]: {},
       [PermissionTypes.RUN_CODE]: {},
+    },
+  },
+  [SystemRoles.ORGADMIN]: {
+    name: SystemRoles.ORGADMIN,
+    permissions: {
+      [PermissionTypes.PROMPTS]: {
+        [Permissions.SHARED_GLOBAL]: false,
+        [Permissions.USE]: false,
+        [Permissions.CREATE]: false,
+      },
+      [PermissionTypes.BOOKMARKS]: {
+        [Permissions.USE]: false,
+      },
+      [PermissionTypes.AGENTS]: {
+        [Permissions.SHARED_GLOBAL]: false,
+        [Permissions.USE]: false,
+        [Permissions.CREATE]: false,
+      },
+      [PermissionTypes.MULTI_CONVO]: {
+        [Permissions.USE]: false,
+      },
+      [PermissionTypes.TEMPORARY_CHAT]: {
+        [Permissions.USE]: false,
+      },
+      [PermissionTypes.RUN_CODE]: {
+        [Permissions.USE]: false,
+      },
     },
   },
 });

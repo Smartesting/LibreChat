@@ -181,7 +181,7 @@ async function updateAccessPermissions(roleName, permissionsUpdate) {
  * @returns {Promise<void>}
  */
 const initializeRoles = async function () {
-  for (const roleName of [SystemRoles.ADMIN, SystemRoles.USER]) {
+  for (const roleName of [SystemRoles.ADMIN, SystemRoles.ORGADMIN, SystemRoles.USER]) {
     let role = await Role.findOne({ name: roleName });
     const defaultPerms = roleDefaults[roleName].permissions;
 

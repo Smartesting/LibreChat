@@ -29,11 +29,13 @@ import translationHu from './hu/translation.json';
 import translationFi from './fi/translation.json';
 import translationZh_Hans from './zh-Hans/translation.json';
 import translationZh_Hant from './zh-Hant/translation.json';
+import smaTranslationEn from './en/smaTranslation.json';
+import smaTranslationFr from './fr/smaTranslation.json';
 
 export const defaultNS = 'translation';
 
 export const resources = {
-  en: { translation: translationEn },
+  en: { translation: translationEn, sma: smaTranslationEn },
   ar: { translation: translationAr },
   'zh-Hans': { translation: translationZh_Hans },
   'zh-Hant': { translation: translationZh_Hant },
@@ -41,7 +43,7 @@ export const resources = {
   es: { translation: translationEs },
   et: { translation: translationEt },
   fa: { translation: translationFa },
-  fr: { translation: translationFr },
+  fr: { translation: translationFr, sma: smaTranslationFr },
   it: { translation: translationIt },
   pl: { translation: translationPl },
   'pt-BR': { translation: translationPt_BR },
@@ -72,7 +74,7 @@ i18n
       default: ['en'],
     },
     fallbackNS: 'translation',
-    ns: ['translation'],
+    ns: ['translation', 'sma'],
     debug: false,
     defaultNS,
     resources,

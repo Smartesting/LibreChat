@@ -25,6 +25,7 @@ export { default as useToast } from './useToast';
 export { default as useTimeout } from './useTimeout';
 export { default as useNewConvo } from './useNewConvo';
 export { default as useLocalize } from './useLocalize';
+export { default as useSmaLocalize } from './useSmaLocalize';
 export { default as useMediaQuery } from './useMediaQuery';
 export { default as useChatBadges } from './useChatBadges';
 export { default as useScrollToRef } from './useScrollToRef';

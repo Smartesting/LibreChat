@@ -719,6 +719,25 @@ export function updateAgentPermissions(
   return request.put(endpoints.updateAgentPermissions(variables.roleName), variables.updates);
 }
 
+/* Training organizations */
+export const createTrainingOrganization = ({
+  ...data
+}: q.TrainingOrganizationCreateParams): Promise<q.TrainingOrganization> => {
+  return request.post(endpoints.trainingOrganizations(), data);
+};
+
+export const listTrainingOrganizations = (): Promise<q.TrainingOrganization[]> => {
+  return request.get(endpoints.trainingOrganizations());
+};
+
+export const deleteTrainingOrganization = (id: q.TrainingOrganization['_id']): Promise<void> => {
+  return request.delete(endpoints.trainingOrganizations(id));
+};
+
+export const getTrainingOrganizationById = (id: q.TrainingOrganization['_id']): Promise<q.TrainingOrganization> => {
+  return request.get(endpoints.trainingOrganizations(id));
+};
+
 /* Tags */
 export function getConversationTags(): Promise<t.TConversationTagsResponse> {
   return request.get(endpoints.conversationTags());
@@ -736,6 +755,7 @@ export function updateConversationTag(
 ): Promise<t.TConversationTagResponse> {
   return request.put(endpoints.conversationTags(tag), payload);
 }
+
 export function deleteConversationTag(tag: string): Promise<t.TConversationTagResponse> {
   return request.delete(endpoints.conversationTags(tag));
 }
@@ -746,6 +766,7 @@ export function addTagToConversation(
 ): Promise<t.TTagConversationResponse> {
   return request.put(endpoints.addTagToConversation(conversationId), payload);
 }
+
 export function rebuildConversationTags(): Promise<t.TConversationTagsResponse> {
   return request.post(endpoints.conversationTags('rebuild'));
 }

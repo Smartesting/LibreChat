@@ -1,19 +1,21 @@
-import { useState, memo } from 'react';
+import { memo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import * as Select from '@ariakit/react/select';
 import { FileText, LogOut } from 'lucide-react';
-import { LinkIcon, GearIcon, DropdownMenuSeparator } from '~/components';
+import { DropdownMenuSeparator, GearIcon, LinkIcon } from '~/components';
 import { useGetStartupConfig, useGetUserBalance } from '~/data-provider';
 import FilesView from '~/components/Chat/Input/Files/FilesView';
 import { useAuthContext } from '~/hooks/AuthContext';
 import useAvatar from '~/hooks/Messages/useAvatar';
 import { UserIcon } from '~/components/svg';
-import { useLocalize } from '~/hooks';
+import { useLocalize, useSmaLocalize } from '~/hooks';
+import { SystemRoles } from 'librechat-data-provider';
 import Settings from './Settings';
 import store from '~/store';
 
 function AccountSettings() {
   const localize = useLocalize();
+  const smaLocalize = useSmaLocalize();
   const { user, isAuthenticated, logout } = useAuthContext();
   const { data: startupConfig } = useGetStartupConfig();
   const balanceQuery = useGetUserBalance({
@@ -111,6 +113,16 @@ function AccountSettings() {
           <GearIcon className="icon-md" aria-hidden="true" />
           {localize('com_nav_settings')}
         </Select.SelectItem>
+        {user?.role === SystemRoles.ADMIN && (
+          <Select.SelectItem
+            value=""
+            onClick={() => (window.location.href = '/admin')}
+            className="select-item text-sm"
+          >
+            <UserIcon aria-hidden="true" />
+            {smaLocalize('com_nav_admin')}
+          </Select.SelectItem>
+        )}
         <DropdownMenuSeparator />
         <Select.SelectItem
           aria-selected={true}
