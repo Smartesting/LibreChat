@@ -4,6 +4,7 @@ import { TooltipAnchor } from '~/components';
 import useSmaLocalize from '~/hooks/useSmaLocalize';
 import OrgCreationModal from '~/components/Admin/SuperAdmin/OrgCreationModal';
 import OrgList from '~/components/Admin/SuperAdmin/OrgList';
+import UtilityButtons from '~/components/Admin/UtilityButtons';
 
 const SuperAdminView: FC = () => {
   const [isOrgCreationModalOpened, setIsOrgCreationModalOpened] = React.useState(false);
@@ -14,6 +15,7 @@ const SuperAdminView: FC = () => {
         isOpen={isOrgCreationModalOpened}
         onClose={() => setIsOrgCreationModalOpened(false)}
       />
+      <UtilityButtons />
       <TrainingOrganizationsTitle onAddIconClick={() => setIsOrgCreationModalOpened(true)} />
       <OrgList />
     </div>

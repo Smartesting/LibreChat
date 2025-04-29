@@ -33,6 +33,8 @@ const TrainingOrganizationRoute: FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  return <TrainingOrganizationView trainingOrganization={trainingOrganization!} />;
+  return (
+    <TrainingOrganizationView trainingOrganization={trainingOrganization!} showUtilityButtons />
+  );
 };
 export default TrainingOrganizationRoute;
