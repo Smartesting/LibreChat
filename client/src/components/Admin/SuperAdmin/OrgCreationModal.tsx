@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { cn } from '~/utils';
-import OrgCreationForm from '~/components/SuperAdmin/OrgCreationForm';
+import OrgCreationForm from '~/components/Admin/SuperAdmin/OrgCreationForm';
 import { useLocalize, useSmaLocalize } from '~/hooks';
 
 const OrgCreationModal: FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {

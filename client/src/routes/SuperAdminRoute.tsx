@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuthContext } from '~/hooks';
 import { SystemRoles } from 'librechat-data-provider';
-import SuperAdminView from '~/components/SuperAdmin/SuperAdminView';
+import SuperAdminView from '~/components/Admin/SuperAdmin/SuperAdminView';
 
 const SuperAdminRoute: FC = () => {
   const { user, isAuthenticated } = useAuthContext();

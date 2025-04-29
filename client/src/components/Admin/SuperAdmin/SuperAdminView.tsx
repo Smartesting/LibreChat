@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { TooltipAnchor } from '~/components';
 import useSmaLocalize from '~/hooks/useSmaLocalize';
-import OrgCreationModal from '~/components/SuperAdmin/OrgCreationModal';
-import OrgList from '~/components/SuperAdmin/OrgList';
+import OrgCreationModal from '~/components/Admin/SuperAdmin/OrgCreationModal';
+import OrgList from '~/components/Admin/SuperAdmin/OrgList';
 
 const SuperAdminView: FC = () => {
   const [isOrgCreationModalOpened, setIsOrgCreationModalOpened] = React.useState(false);

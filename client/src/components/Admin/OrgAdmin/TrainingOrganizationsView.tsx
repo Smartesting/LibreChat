@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { TrainingOrganization } from 'librechat-data-provider';
 import { useSmaLocalize } from '~/hooks';
-import TrainingOrganizationView from '../TrainingOrganization/TrainingOrganizationView';
+import TrainingOrganizationView from '../TrainingOrganizationView';
 
 const TrainingOrganizationsView: FC<{
   trainingOrganizations: ReadonlyArray<TrainingOrganization>;
