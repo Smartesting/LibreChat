@@ -21,6 +21,7 @@ import Root from './Root';
 import TrainingOrganizationRoute from '~/routes/TrainingOrganizationRoute';
 import SuperAdminRoute from '~/routes/SuperAdminRoute';
 import TrainingOrganizationsRoute from '~/routes/TrainingOrganizationsRoute';
+import OrgAdminProtectedRoute from './OrgAdminProtectedRoute';
 
 const AuthLayout = () => (
   <AuthContextProvider>
@@ -68,11 +69,6 @@ export const router = createBrowserRouter([
     errorElement: <RouteErrorBoundary />,
     children: [
       {
-        path: 'admin',
-        element: <SuperAdminRoute />,
-        errorElement: <RouteErrorBoundary />,
-      },
-      {
         path: 'training-organizations',
         element: <TrainingOrganizationsRoute />,
         errorElement: <RouteErrorBoundary />,
@@ -96,22 +92,33 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      dashboardRoutes,
+      // Protected routes - not accessible to ORGADMIN users
       {
-        path: '/',
-        element: <Root />,
+        element: <OrgAdminProtectedRoute />,
         children: [
           {
-            index: true,
-            element: <Navigate to="/c/new" replace={true} />,
+            path: 'admin',
+            element: <SuperAdminRoute />,
+            errorElement: <RouteErrorBoundary />,
           },
+          dashboardRoutes,
           {
-            path: 'c/:conversationId?',
-            element: <ChatRoute />,
-          },
-          {
-            path: 'search',
-            element: <Search />,
+            path: '/',
+            element: <Root />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="/c/new" replace={true} />,
+              },
+              {
+                path: 'c/:conversationId?',
+                element: <ChatRoute />,
+              },
+              {
+                path: 'search',
+                element: <Search />,
+              },
+            ],
           },
         ],
       },
