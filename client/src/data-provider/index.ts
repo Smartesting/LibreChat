@@ -5,6 +5,7 @@ export * from './Files';
 export * from './Messages';
 export * from './Misc';
 export * from './Tools';
+export * from './User';
 export * from './connection';
 export * from './mutations';
 export * from './prompts';

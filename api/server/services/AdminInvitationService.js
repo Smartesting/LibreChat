@@ -50,7 +50,6 @@ const processAdminInvitation = async (email, invitedBy) => {
     const { invitation, token } = await createAdminInvitation({
       email,
       invitedBy,
-      role: SystemRoles.ADMIN,
     });
 
     // Send invitation email

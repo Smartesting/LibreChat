@@ -19,8 +19,8 @@ const { processDeleteRequest } = require('~/server/services/Files/process');
 const { deleteAllSharedLinks } = require('~/models/Share');
 const { deleteToolCalls } = require('~/models/ToolCall');
 const { Transaction } = require('~/models/Transaction');
-const { processSuperAdminInvitation } = require('~/server/services/AdminInvitationService');
 const { logger } = require('~/config');
+const { processAdminInvitation } = require('~/server/services/AdminInvitationService');
 
 const getUserController = async (req, res) => {
   /** @type {MongoUser} */

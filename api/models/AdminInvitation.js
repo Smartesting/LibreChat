@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { webcrypto } = require('node:crypto');
 const bcrypt = require('bcryptjs');
 const { logger } = require('~/config');
-const adminInvitationSchema = require('@librechat/data-schemas');
+const { adminInvitationSchema } = require('@librechat/data-schemas');
 
 const AdminInvitation = mongoose.model('AdminInvitation', adminInvitationSchema);
 
@@ -23,6 +23,7 @@ const createAdminInvitation = async (invitationData) => {
     // Set expiration to 7 days from now
     const invitationExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
+    console.log(invitationData.email);
     // Create the invitation
     const invitation = await AdminInvitation.create({
       email: invitationData.email,
@@ -38,6 +39,21 @@ const createAdminInvitation = async (invitationData) => {
   }
 };
 
+/**
+ * Finds an admin invitation by email
+ * @param {string} email - The email to search for
+ * @returns {Promise<Object|null>} - The found invitation or null if not found
+ */
+const findAdminInvitationByEmail = async (email) => {
+  try {
+    return await AdminInvitation.findOne({ email });
+  } catch (error) {
+    logger.error('[findAdminInvitationByEmail] Error finding admin invitation', error);
+    throw error;
+  }
+};
+
 module.exports = {
   createAdminInvitation,
+  findAdminInvitationByEmail,
 };
