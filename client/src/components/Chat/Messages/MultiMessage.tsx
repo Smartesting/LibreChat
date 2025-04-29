@@ -19,7 +19,9 @@ const flattenMessageTree = (
   const currentLevelMessages: TMessage[] = [];
 
   for (const message of messagesTree) {
-    if (!message) continue;
+    if (!message) {
+      continue;
+    }
 
     const messageWithDepth = { ...message, depth, parentId };
     currentLevelMessages.push(messageWithDepth);
@@ -29,7 +31,9 @@ const flattenMessageTree = (
     messagesByDepth.push(currentLevelMessages);
   }
   for (const message of messagesTree) {
-    if (!message || !message.children || !message.children.length) continue;
+    if (!message || !message.children || !message.children.length) {
+      continue;
+    }
 
     const childrenGroups = flattenMessageTree(message.children, depth + 1, message.messageId);
     messagesByDepth.push(...childrenGroups);

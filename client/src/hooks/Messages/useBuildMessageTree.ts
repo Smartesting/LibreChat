@@ -3,17 +3,9 @@ import type { TMessage } from 'librechat-data-provider';
 import store from '~/store';
 
 export default function useBuildMessageTree() {
-  const getSiblingIdx = useRecoilCallback(
-    ({ snapshot }) =>
-      async (messageId: string | null | undefined) =>
-        await snapshot.getPromise(store.messagesSiblingIdxFamily(messageId)),
-    [],
-  );
-
   // return an object or an array based on branches and recursive option
   // messageId is used to get siblindIdx from recoil snapshot
   const buildMessageTree = async ({
-    messageId,
     message,
     messages,
     branches = false,
@@ -25,7 +17,7 @@ export default function useBuildMessageTree() {
     branches?: boolean;
     recursive?: boolean;
   }): Promise<TMessage | Array<Partial<TMessage> | undefined>> => {
-    let children: Array<Partial<TMessage> | undefined> = [];
+    const children: Array<Partial<TMessage> | undefined> = [];
     if (messages?.length != null && messages.length > 0) {
       if (branches) {
         for (const message of messages) {

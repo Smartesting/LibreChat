@@ -13,8 +13,7 @@ import store from '~/store';
 
 export default function Message(props: TMessageProps) {
   const localize = useLocalize();
-  const { message, siblingIdx, siblingCount, setSiblingIdx, currentEditId, setCurrentEditId } =
-    props;
+  const { message, siblingIdx, siblingCount, setSiblingIdx } = props;
 
   const {
     edit,
