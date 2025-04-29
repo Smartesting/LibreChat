@@ -1,5 +1,6 @@
 const express = require('express');
 const { requireJwtAuth, canDeleteAccount, verifyEmailLimiter } = require('~/server/middleware');
+const { checkAdmin } = require('~/server/middleware/roles');
 const {
   getUserController,
   deleteUserController,
@@ -8,6 +9,7 @@ const {
   resendVerificationController,
   getTermsStatusController,
   acceptTermsController,
+  getAdminUsersController,
 } = require('~/server/controllers/UserController');
 
 const router = express.Router();
@@ -19,5 +21,6 @@ router.post('/plugins', requireJwtAuth, updateUserPluginsController);
 router.delete('/delete', requireJwtAuth, canDeleteAccount, deleteUserController);
 router.post('/verify', verifyEmailController);
 router.post('/verify/resend', verifyEmailLimiter, resendVerificationController);
+router.get('/admins', requireJwtAuth, checkAdmin, getAdminUsersController);
 
 module.exports = router;

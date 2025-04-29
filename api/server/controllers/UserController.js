@@ -1,4 +1,4 @@
-const { FileSources } = require('librechat-data-provider');
+const { FileSources, SystemRoles } = require('librechat-data-provider');
 const {
   Balance,
   getFiles,
@@ -182,6 +182,21 @@ const resendVerificationController = async (req, res) => {
   }
 };
 
+/**
+ * Controller function to get all users with ADMIN role
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getAdminUsersController = async (req, res) => {
+  try {
+    const adminUsers = await User.find({ role: SystemRoles.ADMIN }, { password: 0, totpSecret: 0 });
+    res.status(200).json(adminUsers);
+  } catch (error) {
+    logger.error('Error fetching admin users:', error);
+    res.status(500).json({ message: 'Error fetching admin users' });
+  }
+};
+
 module.exports = {
   getUserController,
   getTermsStatusController,
@@ -190,4 +205,5 @@ module.exports = {
   verifyEmailController,
   updateUserPluginsController,
   resendVerificationController,
+  getAdminUsersController,
 };
