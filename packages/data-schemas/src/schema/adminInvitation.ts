@@ -1,11 +1,9 @@
-import { Schema, Document, Types } from 'mongoose';
+import { Schema, Document } from 'mongoose';
 
 export interface IAdminInvitation extends Omit<Document, 'model'> {
   email: string;
   invitationToken: string;
   invitationExpires: Date;
-  status: 'pending' | 'accepted' | 'expired';
-  invitedBy: Types.ObjectId;
   acceptedAt?: Date;
 }
 
@@ -24,16 +22,6 @@ const adminInvitationSchema = new Schema<IAdminInvitation>(
     },
     invitationExpires: {
       type: Date,
-      required: true,
-    },
-    status: {
-      type: String,
-      enum: ['pending', 'accepted', 'expired'],
-      default: 'pending',
-    },
-    invitedBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
       required: true,
     },
     acceptedAt: {

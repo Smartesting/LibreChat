@@ -1,19 +1,17 @@
-const { SystemRoles } = require('librechat-data-provider');
 const { findUser } = require('~/models/userMethods');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
 const {
   createAdminInvitation,
-  findAdminInvitationByEmail,
+  findPendingAdminInvitationByEmail,
 } = require('~/models/AdminInvitation');
 
 /**
  * Process an admin invitation
  * @param {string} email - The email to invite
- * @param {string} invitedBy - The user ID of the inviter
  * @returns {Promise<Object>} - The result of the invitation process
  */
-const processAdminInvitation = async (email, invitedBy) => {
+const processAdminInvitation = async (email) => {
   try {
     // Check if email is valid
     if (!email || !email.match(/\S+@\S+\.\S+/)) {
@@ -35,10 +33,10 @@ const processAdminInvitation = async (email, invitedBy) => {
       };
     }
 
-    // Check if there's already an invitation for this email
-    const existingInvitation = await findAdminInvitationByEmail(email);
+    // Check if there's already a pending invitation for this email
+    const existingInvitation = await findPendingAdminInvitationByEmail(email);
 
-    if (existingInvitation && existingInvitation.status === 'pending') {
+    if (existingInvitation) {
       return {
         success: false,
         status: 400,
@@ -49,7 +47,6 @@ const processAdminInvitation = async (email, invitedBy) => {
     // Create a new invitation
     const { invitation, token } = await createAdminInvitation({
       email,
-      invitedBy,
     });
 
     // Send invitation email
@@ -89,7 +86,7 @@ const sendAdminInvitationEmail = async (email, token) => {
 
     await sendEmail({
       email,
-      subject: `Invitation to join as an Administrator`,
+      subject: 'Invitation to join as an Administrator',
       payload: {
         appName: process.env.APP_TITLE || 'LibreChat',
         name: email,

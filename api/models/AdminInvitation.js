@@ -10,8 +10,6 @@ const AdminInvitation = mongoose.model('AdminInvitation', adminInvitationSchema)
  * Creates a new admin invitation
  * @param {Object} invitationData - The invitation data
  * @param {string} invitationData.email - The email to invite
- * @param {string} invitationData.invitedBy - The user ID of the inviter
- * @param {string} invitationData.role - The role to assign
  * @returns {Promise<Object>} - The created invitation and the plain token
  */
 const createAdminInvitation = async (invitationData) => {
@@ -23,13 +21,11 @@ const createAdminInvitation = async (invitationData) => {
     // Set expiration to 7 days from now
     const invitationExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    console.log(invitationData.email);
     // Create the invitation
     const invitation = await AdminInvitation.create({
       email: invitationData.email,
       invitationToken: tokenHash,
       invitationExpires,
-      invitedBy: invitationData.invitedBy,
     });
 
     return { invitation, token };
@@ -40,20 +36,25 @@ const createAdminInvitation = async (invitationData) => {
 };
 
 /**
- * Finds an admin invitation by email
+ * Finds a pending admin invitation by email (not accepted and not expired)
  * @param {string} email - The email to search for
- * @returns {Promise<Object|null>} - The found invitation or null if not found
+ * @returns {Promise<Object|null>} - The found pending invitation or null if not found
  */
-const findAdminInvitationByEmail = async (email) => {
+const findPendingAdminInvitationByEmail = async (email) => {
   try {
-    return await AdminInvitation.findOne({ email });
+    const now = new Date();
+    return await AdminInvitation.findOne({
+      email,
+      acceptedAt: { $exists: false },
+      invitationExpires: { $gt: now },
+    });
   } catch (error) {
-    logger.error('[findAdminInvitationByEmail] Error finding admin invitation', error);
+    logger.error('[findPendingAdminInvitationByEmail] Error finding pending admin invitation', error);
     throw error;
   }
 };
 
 module.exports = {
   createAdminInvitation,
-  findAdminInvitationByEmail,
+  findPendingAdminInvitationByEmail,
 };

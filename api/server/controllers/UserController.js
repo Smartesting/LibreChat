@@ -212,13 +212,13 @@ const assignAdminRoleController = async (req, res) => {
     }
 
     // Process the invitation
-    const result = await processAdminInvitation(email, req.user.id);
+    const result = await processAdminInvitation(email);
 
     if (!result.success) {
       return res.status(result.status).json({ message: result.message });
     }
 
-    logger.info(`Admin invitation sent to ${email} by ${req.user.id}`);
+    logger.info(`Admin invitation sent to ${email}`);
     res.status(result.status).json({ message: result.message });
   } catch (error) {
     logger.error('Error sending admin invitation:', error);
