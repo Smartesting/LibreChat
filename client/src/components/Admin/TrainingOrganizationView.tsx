@@ -177,14 +177,16 @@ const TrainingOrganizationView: FC<{
 
       <div className="flex flex-col gap-6 md:flex-row">
         <div className="md:w-1/3">
-          <GenericList
-            title={smaLocalize('com_orgadmin_administrators')}
-            items={administrators}
-            getKey={(user) => user.email}
-            renderItem={(user) => `${user.email}`}
-            handleRemoveItem={(user) => handleRemoveAdmin(user.email)}
-            handleAddItem={handleAddAdmin}
-          />
+          <div className="mb-6">
+            <GenericList
+              title={smaLocalize('com_orgadmin_administrators')}
+              items={administrators}
+              getKey={(user) => user.email}
+              renderItem={(user) => `${user.email}`}
+              handleRemoveItem={(user) => handleRemoveAdmin(user.email)}
+              handleAddItem={handleAddAdmin}
+            />
+          </div>
 
           <GenericList
             title={smaLocalize('com_orgadmin_trainers')}

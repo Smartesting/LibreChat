@@ -9,6 +9,7 @@ type ListProps<T> = {
   renderItem: (item: T) => React.ReactNode;
   handleRemoveItem?: (item: T) => void;
   handleAddItem?: (value: string) => void;
+  onAddButtonClick?: () => void;
 };
 
 const GenericList = <T,>({
@@ -18,6 +19,7 @@ const GenericList = <T,>({
   renderItem,
   handleRemoveItem,
   handleAddItem,
+  onAddButtonClick,
 }: ListProps<T>) => {
   const localize = useLocalize();
   const [showNewItemInput, setShowNewItemInput] = useState(false);
@@ -25,12 +27,15 @@ const GenericList = <T,>({
   const [newItemValue, setNewItemValue] = useState('');
 
   return (
-    <div className="mb-6">
+    <div>
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
-        {handleAddItem && (
+        {(handleAddItem || onAddButtonClick) && (
           <button
-            onClick={() => setShowNewItemInput(true)}
+            onClick={() => {
+              setShowNewItemInput(true);
+              onAddButtonClick && onAddButtonClick();
+            }}
             className="rounded-full bg-surface-primary p-1 hover:bg-surface-secondary"
             aria-label={localize('com_ui_add')}
             disabled={isUpdatingItems}

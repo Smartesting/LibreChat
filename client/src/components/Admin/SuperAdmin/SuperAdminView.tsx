@@ -1,56 +1,30 @@
-import React, { FC, useState } from 'react';
-import { PlusCircle } from 'lucide-react';
-import { TooltipAnchor } from '~/components';
-import useSmaLocalize from '~/hooks/useSmaLocalize';
-import { useGetAdminUsersQuery } from '~/data-provider/User/queries';
-import OrgCreationModal from '~/components/Admin/SuperAdmin/OrgCreationModal';
+import React, { FC } from 'react';
 import OrgList from '~/components/Admin/SuperAdmin/OrgList';
 import UtilityButtons from '~/components/Admin/UtilityButtons';
-import GenericList from '~/components/ui/GenericList';
+import AdminList from '~/components/Admin/SuperAdmin/AdminList';
+import { useSmaLocalize } from '~/hooks';
 
 const SuperAdminView: FC = () => {
-  const [isOrgCreationModalOpened, setIsOrgCreationModalOpened] = useState(false);
-  const { data: adminUsers = [] } = useGetAdminUsersQuery();
   const smaLocalize = useSmaLocalize();
 
   return (
-    <div>
-      <OrgCreationModal
-        isOpen={isOrgCreationModalOpened}
-        onClose={() => setIsOrgCreationModalOpened(false)}
-      />
+    <div className="p-6">
       <UtilityButtons />
-      <TrainingOrganizationsTitle onAddIconClick={() => setIsOrgCreationModalOpened(true)} />
-      <OrgList />
-      <GenericList
-        title={smaLocalize('com_superadmin_administrators')}
-        items={adminUsers}
-        getKey={(user) => user.email}
-        renderItem={(user) => `${user.email} (${user.name})`}
-      />
+      <div className="mb-6 flex items-center">
+        <h1 className="text-2xl font-bold text-text-primary">
+          {smaLocalize('com_superadmin_admin_panel')}
+        </h1>
+      </div>
+      <div className="flex flex-col gap-6 md:flex-row">
+        <div className="md:w-1/3">
+          <AdminList />
+        </div>
+        <div className="md:w-2/3">
+          <OrgList />
+        </div>
+      </div>
     </div>
   );
 };
 
 export default SuperAdminView;
-
-const TrainingOrganizationsTitle: FC<{ onAddIconClick: () => void }> = ({ onAddIconClick }) => {
-  const smaLocalize = useSmaLocalize();
-
-  return (
-    <div className="flex items-center">
-      <h1 className="py-6 pl-6 pr-2 text-3xl font-semibold text-black dark:text-white">
-        {smaLocalize('com_superadmin_training_organizations')}
-      </h1>
-      <TooltipAnchor
-        aria-label={smaLocalize('com_superadmin_create_organization')}
-        description={smaLocalize('com_superadmin_create_organization')}
-        role="button"
-        onClick={onAddIconClick}
-        className="inline-flex size-10 flex-shrink-0 items-center justify-center rounded-xl border border-border-light bg-transparent text-text-primary transition-all ease-in-out hover:bg-surface-tertiary disabled:pointer-events-none disabled:opacity-50 radix-state-open:bg-surface-tertiary"
-      >
-        <PlusCircle size={24} aria-label="Plus Icon" />
-      </TooltipAnchor>
-    </div>
-  );
-};
