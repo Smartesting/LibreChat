@@ -48,7 +48,8 @@ export enum QueryKeys {
   banner = 'banner',
   session = 'session',
   trainingOrganizations = 'trainingOrganizations',
-  trainingOrganization = 'trainingOrganization'
+  trainingOrganization = 'trainingOrganization',
+  adminUsers = 'adminUsers'
 }
 
 export enum MutationKeys {

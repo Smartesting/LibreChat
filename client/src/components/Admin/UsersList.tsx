@@ -1,13 +1,12 @@
 import { Plus, X } from 'lucide-react';
 import { FC, useState } from 'react';
 import { useLocalize } from '~/hooks';
-import { User } from 'librechat-data-provider';
 
 const UsersList: FC<{
   title: string;
-  users: User[];
-  handleRemoveUser: (email: string) => void;
-  handleAddUser: (email: string) => void;
+  users: { email: string; name?: string }[];
+  handleRemoveUser?: (email: string) => void;
+  handleAddUser?: (email: string) => void;
 }> = ({ title, users, handleRemoveUser, handleAddUser }) => {
   const localize = useLocalize();
 
@@ -19,14 +18,16 @@ const UsersList: FC<{
     <div className="mb-6">
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
-        <button
-          onClick={() => setShowNewUserInput(true)}
-          className="rounded-full bg-surface-primary p-1 hover:bg-surface-secondary"
-          aria-label={localize('com_ui_add')}
-          disabled={isUpdatingUsers}
-        >
-          <Plus size={16} className="text-text-primary" />
-        </button>
+        {handleAddUser && (
+          <button
+            onClick={() => setShowNewUserInput(true)}
+            className="rounded-full bg-surface-primary p-1 hover:bg-surface-secondary"
+            aria-label={localize('com_ui_add')}
+            disabled={isUpdatingUsers}
+          >
+            <Plus size={16} className="text-text-primary" />
+          </button>
+        )}
       </div>
 
       <ul className="space-y-2">
@@ -36,23 +37,25 @@ const UsersList: FC<{
             className="flex items-center justify-between rounded bg-surface-tertiary p-2"
           >
             <span className="text-text-primary">{user.email}</span>
-            <button
-              onClick={() => {
-                setIsUpdatingUsers(true);
-                handleRemoveUser(user.email);
-                setNewUserEmail('');
-                setIsUpdatingUsers(false);
-              }}
-              className="rounded-full p-1 hover:bg-surface-secondary"
-              aria-label={localize('com_ui_delete')}
-              disabled={isUpdatingUsers}
-            >
-              <X size={16} className="text-text-primary" />
-            </button>
+            {handleRemoveUser && (
+              <button
+                onClick={() => {
+                  setIsUpdatingUsers(true);
+                  handleRemoveUser(user.email);
+                  setNewUserEmail('');
+                  setIsUpdatingUsers(false);
+                }}
+                className="rounded-full p-1 hover:bg-surface-secondary"
+                aria-label={localize('com_ui_delete')}
+                disabled={isUpdatingUsers}
+              >
+                <X size={16} className="text-text-primary" />
+              </button>
+            )}
           </li>
         ))}
 
-        {showNewUserInput && (
+        {handleAddUser && showNewUserInput && (
           <li className="flex items-center rounded bg-surface-tertiary p-2">
             <input
               type="email"

@@ -1,13 +1,17 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { PlusCircle } from 'lucide-react';
 import { TooltipAnchor } from '~/components';
 import useSmaLocalize from '~/hooks/useSmaLocalize';
+import { useGetAdminUsersQuery } from '~/data-provider/User/queries';
+import UsersList from '~/components/Admin/UsersList';
 import OrgCreationModal from '~/components/Admin/SuperAdmin/OrgCreationModal';
 import OrgList from '~/components/Admin/SuperAdmin/OrgList';
 import UtilityButtons from '~/components/Admin/UtilityButtons';
 
 const SuperAdminView: FC = () => {
-  const [isOrgCreationModalOpened, setIsOrgCreationModalOpened] = React.useState(false);
+  const [isOrgCreationModalOpened, setIsOrgCreationModalOpened] = useState(false);
+  const { data: adminUsers = [] } = useGetAdminUsersQuery();
+  const smaLocalize = useSmaLocalize();
 
   return (
     <div>
@@ -18,6 +22,7 @@ const SuperAdminView: FC = () => {
       <UtilityButtons />
       <TrainingOrganizationsTitle onAddIconClick={() => setIsOrgCreationModalOpened(true)} />
       <OrgList />
+      <UsersList title={smaLocalize('com_superadmin_administrators')} users={adminUsers} />
     </div>
   );
 };

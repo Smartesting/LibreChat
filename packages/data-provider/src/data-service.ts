@@ -850,3 +850,7 @@ export function verifyTwoFactorTemp(
 export function inviteAdmin(data: { email: string }): Promise<{ message: string }> {
   return request.post(endpoints.inviteAdmin(), data);
 }
+
+export function getAdminUsers(): Promise<t.TUser[]> {
+  return request.get(endpoints.adminUsers());
+}

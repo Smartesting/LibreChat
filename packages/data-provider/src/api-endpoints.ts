@@ -25,6 +25,8 @@ export const session = () => '/api/session';
 
 export const user = () => '/api/user';
 
+export const adminUsers = () => '/api/user/admins';
+
 export const balance = () => '/api/balance';
 
 export const userPlugins = () => '/api/user/plugins';
