@@ -36,7 +36,10 @@ const UsersList: FC<{
             key={user.email}
             className="flex items-center justify-between rounded bg-surface-tertiary p-2"
           >
-            <span className="text-text-primary">{user.email}</span>
+            <span className="text-text-primary">
+              {user.email}
+              {user.name ? ` (${user.name})` : ''}
+            </span>
             {handleRemoveUser && (
               <button
                 onClick={() => {
