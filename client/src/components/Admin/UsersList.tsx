@@ -25,7 +25,7 @@ const UsersList: FC<{
           aria-label={localize('com_ui_add')}
           disabled={isUpdatingUsers}
         >
-          <Plus size={16} />
+          <Plus size={16} className="text-text-primary" />
         </button>
       </div>
 
@@ -35,7 +35,7 @@ const UsersList: FC<{
             key={user.email}
             className="flex items-center justify-between rounded bg-surface-tertiary p-2"
           >
-            <span>{user.email}</span>
+            <span className="text-text-primary">{user.email}</span>
             <button
               onClick={() => {
                 setIsUpdatingUsers(true);
@@ -47,7 +47,7 @@ const UsersList: FC<{
               aria-label={localize('com_ui_delete')}
               disabled={isUpdatingUsers}
             >
-              <X size={16} />
+              <X size={16} className="text-text-primary" />
             </button>
           </li>
         ))}
@@ -59,7 +59,7 @@ const UsersList: FC<{
               value={newUserEmail}
               onChange={(e) => setNewUserEmail(e.target.value)}
               placeholder="Email"
-              className="flex-1 border-none bg-transparent focus:outline-none"
+              className="flex-1 border-none bg-surface-tertiary text-text-primary placeholder:text-text-secondary focus:outline-none"
               disabled={isUpdatingUsers}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !isUpdatingUsers) {
@@ -81,7 +81,7 @@ const UsersList: FC<{
               aria-label={localize('com_ui_confirm') + ' ' + localize('com_ui_add')}
               disabled={isUpdatingUsers}
             >
-              {isUpdatingUsers ? '...' : <Plus size={16} />}
+              {isUpdatingUsers ? '...' : <Plus size={16} className="text-text-primary" />}
             </button>
             <button
               onClick={() => {
@@ -92,7 +92,7 @@ const UsersList: FC<{
               aria-label={localize('com_ui_cancel') + ' ' + localize('com_ui_add')}
               disabled={isUpdatingUsers}
             >
-              <X size={16} />
+              <X size={16} className="text-text-primary" />
             </button>
           </li>
         )}
