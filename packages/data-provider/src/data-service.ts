@@ -816,3 +816,7 @@ export function verifyTwoFactorTemp(
 ): Promise<t.TVerify2FATempResponse> {
   return request.post(endpoints.verifyTwoFactorTemp(), payload);
 }
+
+export function inviteAdmin(data: { email: string }): Promise<{ message: string }> {
+  return request.post(endpoints.inviteAdmin(), data);
+}

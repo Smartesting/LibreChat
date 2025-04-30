@@ -1,4 +1,4 @@
-const { FileSources } = require('librechat-data-provider');
+const { FileSources, SystemRoles } = require('librechat-data-provider');
 const {
   Balance,
   getFiles,
@@ -20,6 +20,7 @@ const { deleteAllSharedLinks } = require('~/models/Share');
 const { deleteToolCalls } = require('~/models/ToolCall');
 const { Transaction } = require('~/models/Transaction');
 const { logger } = require('~/config');
+const { processAdminInvitation } = require('~/server/services/AdminInvitationService');
 
 const getUserController = async (req, res) => {
   /** @type {MongoUser} */
@@ -182,6 +183,49 @@ const resendVerificationController = async (req, res) => {
   }
 };
 
+/**
+ * Controller function to get all users with ADMIN role
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getAdminUsersController = async (req, res) => {
+  try {
+    const adminUsers = await User.find({ role: SystemRoles.ADMIN }, { password: 0, totpSecret: 0 });
+    res.status(200).json(adminUsers);
+  } catch (error) {
+    logger.error('Error fetching admin users:', error);
+    res.status(500).json({ message: 'Error fetching admin users' });
+  }
+};
+
+/**
+ * Controller function to invite a user to be an admin
+ * @param {Object} req - Express request object with email in the body
+ * @param {Object} res - Express response object
+ */
+const assignAdminRoleController = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    // Process the invitation
+    const result = await processAdminInvitation(email, req.user.id);
+
+    if (!result.success) {
+      return res.status(result.status).json({ message: result.message });
+    }
+
+    logger.info(`Admin invitation sent to ${email} by ${req.user.id}`);
+    res.status(result.status).json({ message: result.message });
+  } catch (error) {
+    logger.error('Error sending admin invitation:', error);
+    res.status(500).json({ message: 'Error sending admin invitation' });
+  }
+};
+
 module.exports = {
   getUserController,
   getTermsStatusController,
@@ -190,4 +234,6 @@ module.exports = {
   verifyEmailController,
   updateUserPluginsController,
   resendVerificationController,
+  getAdminUsersController,
+  assignAdminRoleController,
 };
