@@ -292,7 +292,6 @@ export const addTagToConversation = (conversationId: string) =>
 
 export const userTerms = () => '/api/user/terms';
 export const acceptUserTerms = () => '/api/user/terms/accept';
-export const inviteAdmin = () => '/api/user/give-admin-access';
 export const banner = () => '/api/banner';
 
 // Two-Factor Endpoints
@@ -302,3 +301,6 @@ export const confirmTwoFactor = () => '/api/auth/2fa/confirm';
 export const disableTwoFactor = () => '/api/auth/2fa/disable';
 export const regenerateBackupCodes = () => '/api/auth/2fa/backup/regenerate';
 export const verifyTwoFactorTemp = () => '/api/auth/2fa/verify-temp';
+
+/* Admin Invitations */
+export const inviteAdmin = () => '/api/admin-invitations/invite';
