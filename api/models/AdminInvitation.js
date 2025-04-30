@@ -54,7 +54,61 @@ const findPendingAdminInvitationByEmail = async (email) => {
   }
 };
 
+/**
+ * Finds a pending admin invitation by email and token
+ * @param {string} email - The email to search for
+ * @param {string} token - The plain token to verify
+ * @returns {Promise<Object|null>} - The found pending invitation or null if not found
+ */
+const findPendingAdminInvitationByEmailAndToken = async (email, token) => {
+  try {
+    const now = new Date();
+    const invitation = await AdminInvitation.findOne({
+      email,
+      acceptedAt: { $exists: false },
+      invitationExpires: { $gt: now },
+    });
+
+    if (!invitation || !invitation.invitationToken) {
+      return null;
+    }
+
+    // Verify the token using bcrypt
+    const isValidToken = bcrypt.compareSync(token, invitation.invitationToken);
+    if (!isValidToken) {
+      return null;
+    }
+
+    return invitation;
+  } catch (error) {
+    logger.error('[findPendingAdminInvitationByEmailAndToken] Error finding pending admin invitation', error);
+    throw error;
+  }
+};
+
+/**
+ * Updates an admin invitation to mark it as accepted
+ * @param {string} invitationId - The ID of the invitation to update
+ * @returns {Promise<Object|null>} - The updated invitation or null if not found
+ */
+const updateAdminInvitationAsAccepted = async (invitationId) => {
+  try {
+    return await AdminInvitation.findByIdAndUpdate(
+      invitationId,
+      {
+        acceptedAt: new Date(),
+      },
+      { new: true },
+    );
+  } catch (error) {
+    logger.error('[updateAdminInvitationAsAccepted] Error updating admin invitation', error);
+    throw error;
+  }
+};
+
 module.exports = {
   createAdminInvitation,
   findPendingAdminInvitationByEmail,
+  findPendingAdminInvitationByEmailAndToken,
+  updateAdminInvitationAsAccepted,
 };

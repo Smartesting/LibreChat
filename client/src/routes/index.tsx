@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import {
+  AdminInvite,
   ApiErrorWatcher,
   Login,
   OrgAdminInvite,
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
       {
         path: 'org-admin-invite',
         element: <OrgAdminInvite />,
+      },
+      {
+        path: 'admin-invite',
+        element: <AdminInvite />,
       },
     ],
   },

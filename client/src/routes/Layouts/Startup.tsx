@@ -9,6 +9,7 @@ const headerMap: Record<string, TranslationKeys> = {
   '/login': 'com_auth_welcome_back',
   '/register': 'com_auth_create_account',
   '/org-admin-invite': 'com_auth_create_account',
+  '/admin-invite': 'com_auth_create_account',
   '/forgot-password': 'com_auth_reset_password',
   '/reset-password': 'com_auth_reset_password',
   '/login/2fa': 'com_auth_verify_your_identity',
