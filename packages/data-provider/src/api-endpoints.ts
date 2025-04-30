@@ -193,8 +193,23 @@ export const agents = ({ path = '', options }: { path?: string; options?: object
   return url;
 };
 
-export const trainingOrganizations = (id?: string) =>
-  `/api/training-organizations${id ? `/${id}` : ''}`;
+export const trainingOrganizations = (id?: string, path?: string, email?: string) => {
+  let url = '/api/training-organizations';
+
+  if (id) {
+    url += `/${id}`;
+
+    if (path) {
+      url += `/${path}`;
+
+      if (email && (path === 'administrators' || path === 'trainers')) {
+        url += `/${email}`;
+      }
+    }
+  }
+
+  return url;
+};
 
 export const files = () => '/api/files';
 

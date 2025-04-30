@@ -104,7 +104,7 @@ export type VerifyToolAuthResponse = { authenticated: boolean; message?: string 
 export type GetToolCallParams = { conversationId: string };
 export type ToolCallResults = a.ToolCallResult[];
 
-export type TrainingOrgAdmin = {
+export type User = {
   userId?: string;
   email: string;
   invitationToken?: string;
@@ -117,7 +117,8 @@ export type TrainingOrgAdmin = {
 export type TrainingOrganization = {
   _id: string;
   name: string;
-  administrators: TrainingOrgAdmin[];
+  administrators: User[];
+  trainers: User[];
 };
 
 export type TrainingOrganizationCreateParams = TrainingOrganization;

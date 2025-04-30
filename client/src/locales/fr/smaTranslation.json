@@ -37,6 +37,7 @@
   "com_orgadmin_timezone": "Fuseau horaire",
   "com_orgadmin_start_date": "Date de début",
   "com_orgadmin_end_date": "Date de fin",
+  "com_orgadmin_participants": "participants",
   "com_ui_back": "Retour",
   "com_ui_added": "ajouté",
   "com_ui_error_adding": "Erreur lors de l'ajout",

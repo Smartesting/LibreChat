@@ -1,11 +1,11 @@
 import { Plus, X } from 'lucide-react';
 import { FC, useState } from 'react';
 import { useLocalize } from '~/hooks';
-import { TrainingOrgAdmin } from 'librechat-data-provider';
+import { User } from 'librechat-data-provider';
 
 const UsersList: FC<{
   title: string;
-  users: TrainingOrgAdmin[];
+  users: User[];
   handleRemoveUser: (email: string) => void;
   handleAddUser: (email: string) => void;
 }> = ({ title, users, handleRemoveUser, handleAddUser }) => {
@@ -64,7 +64,7 @@ const UsersList: FC<{
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !isUpdatingUsers) {
                   setIsUpdatingUsers(true);
-                  handleAddUser(e.target.value);
+                  handleAddUser(newUserEmail);
                   setNewUserEmail('');
                   setIsUpdatingUsers(false);
                 }

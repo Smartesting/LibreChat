@@ -734,8 +734,38 @@ export const deleteTrainingOrganization = (id: q.TrainingOrganization['_id']): P
   return request.delete(endpoints.trainingOrganizations(id));
 };
 
-export const getTrainingOrganizationById = (id: q.TrainingOrganization['_id']): Promise<q.TrainingOrganization> => {
+export const getTrainingOrganizationById = (
+  id: q.TrainingOrganization['_id'],
+): Promise<q.TrainingOrganization> => {
   return request.get(endpoints.trainingOrganizations(id));
+};
+
+export const addAdministratorToOrganization = (
+  id: q.TrainingOrganization['_id'],
+  email: string,
+): Promise<q.TrainingOrganization> => {
+  return request.post(endpoints.trainingOrganizations(id, 'administrators'), { email });
+};
+
+export const removeAdministratorFromOrganization = (
+  id: q.TrainingOrganization['_id'],
+  email: string,
+): Promise<q.TrainingOrganization> => {
+  return request.delete(endpoints.trainingOrganizations(id, 'administrators', email));
+};
+
+export const addTrainerToOrganization = (
+  id: q.TrainingOrganization['_id'],
+  email: string,
+): Promise<q.TrainingOrganization> => {
+  return request.post(endpoints.trainingOrganizations(id, 'trainers'), { email });
+};
+
+export const removeTrainerFromOrganization = (
+  id: q.TrainingOrganization['_id'],
+  email: string,
+): Promise<q.TrainingOrganization> => {
+  return request.delete(endpoints.trainingOrganizations(id, 'trainers', email));
 };
 
 /* Tags */

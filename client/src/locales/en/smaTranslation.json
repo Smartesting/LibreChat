@@ -37,6 +37,7 @@
   "com_orgadmin_timezone": "Timezone",
   "com_orgadmin_start_date": "Start Date",
   "com_orgadmin_end_date": "End Date",
+  "com_orgadmin_participants": "participants",
   "com_ui_back": "Back",
   "com_ui_added": "added",
   "com_ui_error_adding": "Error adding",

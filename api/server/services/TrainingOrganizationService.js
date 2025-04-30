@@ -138,8 +138,124 @@ const sendInvitationEmail = async (email, token, orgName) => {
   }
 };
 
+/**
+ * Process trainers for a training organization
+ * @param {Array} trainers - Array of trainer emails
+ * @param {string} orgName - The name of the training organization
+ * @returns {Promise<Array>} - Array of processed trainer objects
+ */
+const processTrainers = async (trainers, orgName) => {
+  if (!trainers || !Array.isArray(trainers)) {
+    return [];
+  }
+
+  const uniqueTrainers = Array.from(new Set(trainers.map(email => email.toLowerCase())));
+
+  const processedTrainers = [];
+  for (const email of uniqueTrainers) {
+    const existingUser = await findUser({ email }, 'email _id name username role');
+    if (existingUser) {
+      processedTrainers.push({
+        email,
+        userId: existingUser._id,
+        status: 'active',
+        activatedAt: new Date(),
+      });
+
+      await sendTrainerNotificationEmail(existingUser, orgName);
+    }
+
+    if (!existingUser) {
+      const [invitationToken, tokenHash] = createTokenHash();
+      const invitationExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+      processedTrainers.push({
+        email,
+        invitationToken: tokenHash,
+        invitationExpires,
+        status: 'invited',
+        invitedAt: new Date(),
+      });
+
+      await sendTrainerInvitationEmail(email, invitationToken, orgName);
+    }
+  }
+
+  return processedTrainers;
+};
+
+/**
+ * Send notification email to existing user who is added as a trainer
+ * @param {Object} user - User object with email, name, and username
+ * @param {string} orgName - The name of the training organization
+ * @returns {Promise<void>}
+ */
+const sendTrainerNotificationEmail = async (user, orgName) => {
+  try {
+    const loginLink = `${process.env.DOMAIN_CLIENT}/login`;
+
+    if (!checkEmailConfig()) {
+      logger.info(`[sendTrainerNotificationEmail] Email configuration not available. Cannot send notification to [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
+      return;
+    }
+
+    await sendEmail({
+      email: user.email,
+      subject: `You are now a trainer of ${orgName}`,
+      payload: {
+        appName: process.env.APP_TITLE || 'LibreChat',
+        name: user.name || user.username || user.email,
+        orgName,
+        loginLink,
+      },
+      template: 'trainerNotification.handlebars',
+    });
+
+    logger.info(`[sendTrainerNotificationEmail] Trainer notification sent. [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
+  } catch (error) {
+    logger.error(`[sendTrainerNotificationEmail] Error sending notification: ${error.message}`);
+  }
+};
+
+/**
+ * Send invitation email to new trainer
+ * @param {string} email - The email address to send the invitation to
+ * @param {string} token - The invitation token
+ * @param {string} orgName - The name of the training organization
+ * @returns {Promise<void>}
+ */
+const sendTrainerInvitationEmail = async (email, token, orgName) => {
+  try {
+    const inviteLink = `${process.env.DOMAIN_CLIENT}/trainer-invite?token=${token}&email=${encodeURIComponent(email)}&orgName=${encodeURIComponent(orgName)}`;
+
+    if (!checkEmailConfig()) {
+      logger.info(`[sendTrainerInvitationEmail] Email configuration not available. Cannot send invitation to [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
+      return;
+    }
+
+    await sendEmail({
+      email,
+      subject: `Invitation to join ${orgName} as a trainer`,
+      payload: {
+        appName: process.env.APP_TITLE || 'LibreChat',
+        name: email,
+        orgName: orgName,
+        inviteLink,
+      },
+      template: 'trainerInvite.handlebars',
+    });
+
+    logger.info(`[sendTrainerInvitationEmail] Invitation sent. [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
+  } catch (error) {
+    logger.error(`[sendTrainerInvitationEmail] Error sending invitation: ${error.message}`);
+  }
+};
+
 module.exports = {
   processAdministrators,
+  processTrainers,
   sendNotificationEmail,
   sendInvitationEmail,
+  sendTrainerNotificationEmail,
+  sendTrainerInvitationEmail,
 };

@@ -11,6 +11,15 @@ export interface ITrainingOrganization extends Omit<Document, 'model'> {
     invitedAt?: Date;
     activatedAt?: Date;
   }>;
+  trainers: Array<{
+    userId?: Types.ObjectId;
+    email: string;
+    invitationToken?: string;
+    invitationExpires?: Date;
+    status: 'active' | 'invited';
+    invitedAt?: Date;
+    activatedAt?: Date;
+  }>;
 }
 
 const OrgAdminSchema = new Schema(
@@ -64,6 +73,10 @@ const trainingOrganizationSchema = new Schema<ITrainingOrganization>(
       },
     },
     administrators: {
+      type: [OrgAdminSchema],
+      default: [],
+    },
+    trainers: {
       type: [OrgAdminSchema],
       default: [],
     },
