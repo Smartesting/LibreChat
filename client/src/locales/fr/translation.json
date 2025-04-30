@@ -494,6 +494,7 @@
   "com_ui_close_menu": "Fermer le menu",
   "com_ui_code": "Code",
   "com_ui_collapse_chat": "Réduire la discussion",
+  "com_ui_confirm": "Confirmer",
   "com_ui_command_placeholder": "Facultatif : Saisissez une commande pour l'invite ou le nom sera utilisé",
   "com_ui_command_usage_placeholder": "Sélectionnez un prompt par commande ou par nom",
   "com_ui_confirm_action": "Confirmer l'action",
