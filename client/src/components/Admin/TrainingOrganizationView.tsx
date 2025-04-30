@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrainingOrganization } from 'librechat-data-provider';
 import { ArrowLeft, ChevronDown, ChevronUp, Edit, Plus, Trash2, User } from 'lucide-react';
@@ -11,7 +11,7 @@ import {
   useRemoveAdministratorMutation,
   useRemoveTrainerMutation,
 } from '~/data-provider/TrainingOrganizations';
-import UsersList from './UsersList';
+import GenericList from '~/components/ui/GenericList';
 
 const mockTrainings = [
   {
@@ -177,18 +177,22 @@ const TrainingOrganizationView: FC<{
 
       <div className="flex flex-col gap-6 md:flex-row">
         <div className="md:w-1/3">
-          <UsersList
+          <GenericList
             title={smaLocalize('com_orgadmin_administrators')}
-            users={administrators}
-            handleRemoveUser={handleRemoveAdmin}
-            handleAddUser={handleAddAdmin}
+            items={administrators}
+            getKey={(user) => user.email}
+            renderItem={(user) => `${user.email}`}
+            handleRemoveItem={(user) => handleRemoveAdmin(user.email)}
+            handleAddItem={handleAddAdmin}
           />
 
-          <UsersList
+          <GenericList
             title={smaLocalize('com_orgadmin_trainers')}
-            users={trainers}
-            handleRemoveUser={handleRemoveTrainer}
-            handleAddUser={handleAddTrainer}
+            items={trainers}
+            getKey={(user) => user.email}
+            renderItem={(user) => `${user.email}`}
+            handleRemoveItem={(user) => handleRemoveTrainer(user.email)}
+            handleAddItem={handleAddTrainer}
           />
         </div>
 
