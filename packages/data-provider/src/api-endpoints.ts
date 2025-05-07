@@ -213,6 +213,11 @@ export const trainingOrganizations = (id?: string, path?: string, email?: string
   return url;
 };
 
+export const trainings = () => '/api/trainings';
+
+export const trainingsByOrganization = (organizationId: string) =>
+  `${trainings()}/organization/${organizationId}`;
+
 export const files = () => '/api/files';
 
 export const images = () => `${files()}/images`;

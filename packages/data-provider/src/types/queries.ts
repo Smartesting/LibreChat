@@ -121,4 +121,19 @@ export type TrainingOrganization = {
   trainers: User[];
 };
 
+export type Training = {
+  _id: string;
+  name: string;
+  description?: string;
+  timezone: string;
+  startDateTime: Date;
+  endDateTime: Date;
+  participantCount: number;
+  location: string;
+  trainers: string[];
+  trainingOrganizationId: string;
+};
+
 export type TrainingOrganizationCreateParams = TrainingOrganization;
+
+export type TrainingCreateParams = Omit<Training, '_id'>;

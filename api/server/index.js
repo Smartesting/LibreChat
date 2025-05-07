@@ -112,6 +112,7 @@ const startServer = async () => {
   app.use('/api/banner', routes.banner);
   app.use('/api/bedrock', routes.bedrock);
   app.use('/api/training-organizations', routes.trainingOrganizations);
+  app.use('/api/trainings', routes.trainings);
   app.use('/api/admin-invitations', routes.adminInvitations);
 
   app.use('/api/tags', routes.tags);

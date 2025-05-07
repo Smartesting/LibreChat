@@ -70,5 +70,8 @@ export type { IUser } from './schema/user';
 export { default as trainingOrganizationSchema } from './schema/trainingOrganization';
 export type { ITrainingOrganization } from './schema/trainingOrganization';
 
+export { default as trainingSchema } from './schema/training';
+export type { ITraining } from './schema/training';
+
 export { default as adminInvitationSchema } from './schema/adminInvitation';
 export type { IAdminInvitation } from './schema/adminInvitation';

@@ -41,3 +41,23 @@ export const useTrainingOrganizationByIdQuery = <
     },
   );
 };
+
+/**
+ * Hook for fetching trainings by organization ID
+ */
+export const useTrainingsByOrganizationQuery = <
+  TData = t.Training[],
+>(organizationId: string): QueryObserverResult<TData> => {
+  return useQuery<t.Training[], unknown, TData>(
+    [QueryKeys.trainingOrganizations, organizationId, 'trainings'],
+    () => dataService.getTrainingsByOrganization(organizationId),
+    {
+      staleTime: 1000 * 5,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      enabled: !!organizationId,
+    },
+  );
+};

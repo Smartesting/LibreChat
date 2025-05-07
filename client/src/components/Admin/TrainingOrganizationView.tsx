@@ -8,37 +8,13 @@ import { useToastContext } from '~/Providers';
 import {
   useAddAdministratorMutation,
   useAddTrainerMutation,
+  useDeleteTrainingMutation,
   useRemoveAdministratorMutation,
   useRemoveTrainerMutation,
+  useTrainingsByOrganizationQuery,
 } from '~/data-provider/TrainingOrganizations';
 import GenericList from '~/components/ui/GenericList';
-
-const mockTrainings = [
-  {
-    _id: '1',
-    name: 'Introduction to React',
-    description: 'Learn the basics of React',
-    timezone: 'Europe/Paris',
-    startDateTime: new Date('2023-12-01T09:00:00'),
-    endDateTime: new Date('2023-12-01T17:00:00'),
-    participantCount: 15,
-    location: 'Paris',
-    trainers: [],
-    trainingOrganizationId: '123',
-  },
-  {
-    _id: '2',
-    name: 'Advanced JavaScript',
-    description: 'Deep dive into JavaScript concepts',
-    timezone: 'Europe/London',
-    startDateTime: new Date('2023-12-15T10:00:00'),
-    endDateTime: new Date('2023-12-16T16:00:00'),
-    participantCount: 8,
-    location: 'London',
-    trainers: [],
-    trainingOrganizationId: '123',
-  },
-];
+import TrainingCreationModal from '~/components/Admin/TrainingCreationModal';
 
 const TrainingOrganizationView: FC<{
   trainingOrganization: TrainingOrganization;
@@ -50,6 +26,13 @@ const TrainingOrganizationView: FC<{
   const [administrators, setAdministrators] = useState(trainingOrganization.administrators || []);
   const [trainers, setTrainers] = useState(trainingOrganization.trainers || []);
   const [expandedTrainingId, setExpandedTrainingId] = useState<string | null>(null);
+  const [isTrainingModalOpen, setIsTrainingModalOpen] = useState(false);
+  const [trainingToDelete, setTrainingToDelete] = useState<string | null>(null);
+  const [trainingToEdit, setTrainingToEdit] = useState<t.Training | null>(null);
+
+  const { data: trainings = [], isLoading: isLoadingTrainings } = useTrainingsByOrganizationQuery(
+    trainingOrganization._id,
+  );
 
   const handleGoBack = () => {
     navigate(-1);
@@ -152,6 +135,38 @@ const TrainingOrganizationView: FC<{
     removeTrainerMutation.mutate({ id: trainingOrganization._id, email });
   };
 
+  const deleteTrainingMutation = useDeleteTrainingMutation({
+    onSuccess: () => {
+      showToast({
+        message: smaLocalize('com_orgadmin_training_deleted'),
+        status: 'success',
+      });
+      setTrainingToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Error deleting training:', error);
+      showToast({
+        message: error.response?.data?.error || smaLocalize('com_orgadmin_error_delete_training'),
+        status: 'error',
+      });
+      setTrainingToDelete(null);
+    },
+  });
+
+  const handleDeleteTraining = (trainingId: string) => {
+    setTrainingToDelete(trainingId);
+  };
+
+  const confirmDeleteTraining = () => {
+    if (trainingToDelete) {
+      deleteTrainingMutation.mutate(trainingToDelete);
+    }
+  };
+
+  const cancelDeleteTraining = () => {
+    setTrainingToDelete(null);
+  };
+
   const toggleTrainingExpand = (trainingId: string) => {
     setExpandedTrainingId(expandedTrainingId === trainingId ? null : trainingId);
   };
@@ -163,6 +178,42 @@ const TrainingOrganizationView: FC<{
   return (
     <div className="p-6">
       {showUtilityButtons && <UtilityButtons />}
+      <TrainingCreationModal
+        isOpen={isTrainingModalOpen}
+        onClose={() => {
+          setIsTrainingModalOpen(false);
+          setTrainingToEdit(null);
+        }}
+        organizationId={trainingOrganization._id}
+        training={trainingToEdit || undefined}
+      />
+
+      {trainingToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md rounded-lg bg-surface-primary p-6 shadow-xl">
+            <h3 className="mb-4 text-lg font-medium text-text-primary">
+              {smaLocalize('com_orgadmin_confirm_delete_training')}
+            </h3>
+            <p className="mb-6 text-text-secondary">
+              {smaLocalize('com_orgadmin_delete_training_warning')}
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={cancelDeleteTraining}
+                className="rounded-lg border border-border-light px-4 py-2 text-text-primary hover:bg-surface-tertiary"
+              >
+                {smaLocalize('com_ui_cancel')}
+              </button>
+              <button
+                onClick={confirmDeleteTraining}
+                className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+              >
+                {smaLocalize('com_ui_delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="mb-6 flex items-center">
         <button
           onClick={handleGoBack}
@@ -209,101 +260,115 @@ const TrainingOrganizationView: FC<{
                 aria-label={
                   smaLocalize('com_ui_add') + ' ' + smaLocalize('com_orgadmin_upcoming_trainings')
                 }
+                onClick={() => setIsTrainingModalOpen(true)}
               >
                 <Plus size={16} className="text-text-primary" />
               </button>
             </div>
 
             <ul className="space-y-2">
-              {mockTrainings.map((training) => (
-                <li key={training._id} className="overflow-hidden rounded bg-surface-tertiary">
-                  <div
-                    className="flex cursor-pointer items-center justify-between p-3"
-                    onClick={() => toggleTrainingExpand(training._id)}
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium text-text-primary">{training.name}</div>
-                      <div className="flex items-center text-sm text-text-secondary">
-                        <User size={14} className="mr-1 text-text-secondary" />
-                        <span>
-                          {training.participantCount} {smaLocalize('com_orgadmin_participants')}
-                        </span>
+              {isLoadingTrainings ? (
+                <div className="p-4 text-center text-text-secondary">
+                  {smaLocalize('com_ui_loading')}
+                </div>
+              ) : trainings.length === 0 ? (
+                <div className="p-4 text-center text-text-secondary">
+                  {smaLocalize('com_orgadmin_no_trainings')}
+                </div>
+              ) : (
+                trainings.map((training) => (
+                  <li key={training._id} className="overflow-hidden rounded bg-surface-tertiary">
+                    <div
+                      className="flex cursor-pointer items-center justify-between p-3"
+                      onClick={() => toggleTrainingExpand(training._id)}
+                    >
+                      <div className="flex flex-1 items-center">
+                        <span className="mr-2 font-medium text-text-primary">{training.name}</span>
                         <span className="mx-2">•</span>
-                        <span>{formatDate(training.startDateTime)}</span>
+                        <span className="text-sm text-text-secondary">
+                          {training.participantCount}
+                        </span>
+                        <User size={14} className="mx-1 text-text-secondary" />
+                        <span className="mx-2">•</span>
+                        <span className="text-sm text-text-secondary">
+                          {formatDate(training.startDateTime)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center">
+                        <button
+                          className="mr-1 rounded-full p-1 hover:bg-surface-secondary"
+                          aria-label={smaLocalize('com_ui_edit')}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTrainingToEdit(training);
+                            setIsTrainingModalOpen(true);
+                          }}
+                        >
+                          <Edit size={16} className="text-text-primary" />
+                        </button>
+                        <button
+                          className="mr-2 rounded-full p-1 hover:bg-surface-secondary"
+                          aria-label={smaLocalize('com_ui_delete')}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteTraining(training._id);
+                          }}
+                        >
+                          <Trash2 size={16} className="text-text-primary" />
+                        </button>
+                        {expandedTrainingId === training._id ? (
+                          <ChevronUp size={20} className="text-text-primary" />
+                        ) : (
+                          <ChevronDown size={20} className="text-text-primary" />
+                        )}
                       </div>
                     </div>
-
-                    <div className="flex items-center">
-                      <button
-                        className="mr-1 rounded-full p-1 hover:bg-surface-secondary"
-                        aria-label={smaLocalize('com_ui_edit')}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Edit functionality would go here
-                        }}
-                      >
-                        <Edit size={16} className="text-text-primary" />
-                      </button>
-                      <button
-                        className="mr-2 rounded-full p-1 hover:bg-surface-secondary"
-                        aria-label={smaLocalize('com_ui_delete')}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Delete functionality would go here
-                        }}
-                      >
-                        <Trash2 size={16} className="text-text-primary" />
-                      </button>
-                      {expandedTrainingId === training._id ? (
-                        <ChevronUp size={20} className="text-text-primary" />
-                      ) : (
-                        <ChevronDown size={20} className="text-text-primary" />
-                      )}
-                    </div>
-                  </div>
-
-                  {expandedTrainingId === training._id && (
-                    <div className="border-t border-border-light p-3 pt-0">
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div>
-                          <div className="font-medium text-text-primary">
-                            {smaLocalize('com_orgadmin_description')}
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        expandedTrainingId === training._id
+                          ? 'max-h-96 opacity-100'
+                          : 'max-h-0 opacity-0'
+                      }`}
+                    >
+                      <div className="border-l-4 border-t border-border-light p-3 pb-4 pl-8 pt-4">
+                        <div className="flex flex-col gap-1 text-sm">
+                          <div className="text-text-primary">
+                            <span className="font-bold">
+                              {smaLocalize('com_orgadmin_description')} :
+                            </span>{' '}
+                            {training.description}
                           </div>
-                          <div className="text-text-secondary">{training.description}</div>
-                        </div>
-                        <div>
-                          <div className="font-medium text-text-primary">
-                            {smaLocalize('com_orgadmin_location')}
+                          <div className="text-text-primary">
+                            <span className="font-bold">
+                              {smaLocalize('com_orgadmin_location')} :{' '}
+                            </span>{' '}
+                            {training.location}
                           </div>
-                          <div className="text-text-secondary">{training.location}</div>
-                        </div>
-                        <div>
-                          <div className="font-medium text-text-primary">
-                            {smaLocalize('com_orgadmin_timezone')}
+                          <div className="text-text-primary">
+                            <span className="font-bold">
+                              {smaLocalize('com_orgadmin_timezone')} :{' '}
+                            </span>{' '}
+                            {training.timezone}
                           </div>
-                          <div className="text-text-secondary">{training.timezone}</div>
-                        </div>
-                        <div>
-                          <div className="font-medium text-text-primary">
-                            {smaLocalize('com_orgadmin_start_date')}
-                          </div>
-                          <div className="text-text-secondary">
+                          <div className="text-text-primary">
+                            <span className="font-bold">
+                              {smaLocalize('com_orgadmin_start_date')} :{' '}
+                            </span>{' '}
                             {new Date(training.startDateTime).toLocaleString()}
                           </div>
-                        </div>
-                        <div>
-                          <div className="font-medium text-text-primary">
-                            {smaLocalize('com_orgadmin_end_date')}
-                          </div>
-                          <div className="text-text-secondary">
+                          <div className="text-text-primary">
+                            <span className="font-bold">
+                              {smaLocalize('com_orgadmin_end_date')} :{' '}
+                            </span>{' '}
                             {new Date(training.endDateTime).toLocaleString()}
                           </div>
                         </div>
                       </div>
                     </div>
-                  )}
-                </li>
-              ))}
+                  </li>
+                ))
+              )}
             </ul>
           </div>
         </div>

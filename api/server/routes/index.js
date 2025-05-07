@@ -28,6 +28,7 @@ const ask = require('./ask');
 const banner = require('./banner');
 const session = require('./session');
 const trainingOrganizations = require('./trainingOrganizations');
+const trainings = require('./trainings');
 const adminInvitations = require('./adminInvitations');
 
 module.exports = {
@@ -62,4 +63,5 @@ module.exports = {
   session,
   trainingOrganizations,
   adminInvitations,
+  trainings,
 };

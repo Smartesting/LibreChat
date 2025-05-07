@@ -10,6 +10,7 @@ type ListProps<T> = {
   handleRemoveItem?: (item: T) => void;
   handleAddItem?: (value: string) => void;
   onAddButtonClick?: () => void;
+  maxEntries?: number;
 };
 
 const GenericList = <T,>({
@@ -20,6 +21,7 @@ const GenericList = <T,>({
   handleRemoveItem,
   handleAddItem,
   onAddButtonClick,
+  maxEntries,
 }: ListProps<T>) => {
   const localize = useLocalize();
   const [showNewItemInput, setShowNewItemInput] = useState(false);
@@ -38,7 +40,7 @@ const GenericList = <T,>({
             }}
             className="rounded-full bg-surface-primary p-1 hover:bg-surface-secondary"
             aria-label={localize('com_ui_add')}
-            disabled={isUpdatingItems}
+            disabled={isUpdatingItems || (maxEntries !== undefined && items.length >= maxEntries)}
           >
             <Plus size={16} className="text-text-primary" />
           </button>
@@ -70,7 +72,7 @@ const GenericList = <T,>({
           </li>
         ))}
 
-        {handleAddItem && showNewItemInput && (
+        {handleAddItem && showNewItemInput && (maxEntries === undefined || items.length < maxEntries) && (
           <li className="flex items-center rounded bg-surface-tertiary p-2">
             <input
               type="text"

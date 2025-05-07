@@ -768,6 +768,22 @@ export const removeTrainerFromOrganization = (
   return request.delete(endpoints.trainingOrganizations(id, 'trainers', email));
 };
 
+export const getTrainingsByOrganization = (organizationId: string): Promise<q.Training[]> => {
+  return request.get(endpoints.trainingsByOrganization(organizationId));
+};
+
+export const createTraining = (data: q.TrainingCreateParams): Promise<q.Training> => {
+  return request.post(endpoints.trainings(), data);
+};
+
+export const deleteTraining = (id: string): Promise<void> => {
+  return request.delete(`${endpoints.trainings()}/${id}`);
+};
+
+export const updateTraining = (id: string, data: Partial<q.Training>): Promise<q.Training> => {
+  return request.put(`${endpoints.trainings()}/${id}`, data);
+};
+
 /* Tags */
 export function getConversationTags(): Promise<t.TConversationTagsResponse> {
   return request.get(endpoints.conversationTags());

@@ -164,3 +164,77 @@ export const useRemoveTrainerMutation = (
     getOrgMutationOptions(useQueryClient(), options),
   );
 };
+
+/**
+ * TRAININGS
+ */
+
+/**
+ * Create a new training
+ */
+export const useCreateTrainingMutation = (
+  options?: t.CreateTrainingMutationOptions,
+): UseMutationResult<t.Training, Error, t.TrainingCreateParams> => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    (newTrainingData: t.TrainingCreateParams) => dataService.createTraining(newTrainingData),
+    {
+      onMutate: (variables) => options?.onMutate?.(variables),
+      onError: (error, variables, context) => options?.onError?.(error, variables, context),
+      onSuccess: (newTraining, variables, context) => {
+        queryClient.invalidateQueries([
+          QueryKeys.trainingOrganizations,
+          variables.trainingOrganizationId,
+          'trainings',
+        ]);
+        return options?.onSuccess?.(newTraining, variables, context);
+      },
+    },
+  );
+};
+
+/**
+ * Delete a training
+ */
+export const useDeleteTrainingMutation = (
+  options?: t.DeleteTrainingMutationOptions,
+): UseMutationResult<void, Error, string> => {
+  const queryClient = useQueryClient();
+  return useMutation((id: string) => dataService.deleteTraining(id), {
+    onMutate: (trainingId) => options?.onMutate?.(trainingId),
+    onError: (error, trainingId, context) => options?.onError?.(error, trainingId, context),
+    onSuccess: (data, trainingId, context) => {
+      queryClient.invalidateQueries([QueryKeys.trainingOrganizations]);
+      return options?.onSuccess?.(data, trainingId, context);
+    },
+  });
+};
+
+/**
+ * Update a training
+ */
+export const useUpdateTrainingMutation = (
+  options?: t.UpdateTrainingMutationOptions,
+): UseMutationResult<t.Training, Error, { id: string; data: Partial<t.Training> }> => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({ id, data }: { id: string; data: Partial<t.Training> }) =>
+      dataService.updateTraining(id, data),
+    {
+      onMutate: (variables) => options?.onMutate?.(variables),
+      onError: (error, variables, context) => options?.onError?.(error, variables, context),
+      onSuccess: (updatedTraining, variables, context) => {
+        if (updatedTraining.trainingOrganizationId) {
+          queryClient.invalidateQueries([
+            QueryKeys.trainingOrganizations,
+            updatedTraining.trainingOrganizationId,
+            'trainings',
+          ]);
+        } else {
+          queryClient.invalidateQueries([QueryKeys.trainingOrganizations]);
+        }
+        return options?.onSuccess?.(updatedTraining, variables, context);
+      },
+    },
+  );
+};
