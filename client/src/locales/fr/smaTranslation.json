@@ -15,8 +15,8 @@
   "com_superadmin_invite_error": "Une erreur s'est produite lors du traitement de votre invitation. Veuillez réessayer ou contacter le support.",
   "com_superadmin_add_admin_success": "Administrateur ajouté avec succès",
   "com_superadmin_add_admin_error": "Une erreur s'est produite lors de l'ajout du nouvel administrateur.",
-  "com_superadmin_remove_admin_success": "Administrateur supprimé avec succès",
-  "com_superadmin_remove_admin_error": "Une erreur s'est produite lors de la suppression de l'administrateur.",
+  "com_superadmin_revoke_admin_success": "Administrateur révoqué avec succès",
+  "com_superadmin_revoke_admin_error": "Une erreur s'est produite lors de la suppression de l'administrateur.",
   "com_superadmin_invited": "invité",
   "com_superadmin_delete_organization": "Supprimer l'organisme de formation",
   "com_superadmin_delete_organization_error": "Une erreur s'est produite lors de la suppression de l'organisme de formation. Veuillez réessayer.",
@@ -54,6 +54,7 @@
   "com_ui_delete": "Supprimer",
   "com_ui_cancel": "Annuler",
   "com_ui_loading": "Chargement...",
+  "com_ui_revoke": "Révoquer",
   "com_orgadmin_create_training": "Créer une nouvelle formation",
   "com_orgadmin_training_name": "Nom de la formation",
   "com_orgadmin_training_name_placeholder": "Nom de la formation",
@@ -77,5 +78,7 @@
   "com_orgadmin_training_updated": "Formation mise à jour.",
   "com_orgadmin_error_update_training": "Une erreur est survenue lors de la mise à jour. Réessayez.",
   "com_orgadmin_error_name_required": "Nom requis",
-  "com_orgadmin_error_name_not_empty": "Le nom ne peut pas être vide"
+  "com_orgadmin_error_name_not_empty": "Le nom ne peut pas être vide",
+  "com_superadmin_confirm_admin_revocation": "Confirmer la révocation des droits d'administrateur",
+  "com_superadmin_admin_revocation_message": "Êtes-vous sûr de vouloir révoquer les droits d'administrateur de {{email}} ({{name}}) ?"
 }

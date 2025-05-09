@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import useSmaLocalize from '../../../hooks/useSmaLocalize';
 import GenericList from '~/components/ui/GenericList';
 import { useToastContext } from '~/Providers';
@@ -9,12 +9,16 @@ import {
   useRevokeAdminAccessMutation,
 } from '~/data-provider';
 import { AxiosError } from 'axios';
+import AdminRevokeConfirmationModal from './AdminRevokeConfirmationModal';
 
 const AdminList: FC = () => {
   const { data: adminUsers = [] } = useGetAdminUsersQuery();
   const { data: pendingInvitations = [] } = useGetPendingAdminInvitationsQuery();
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
+
+  const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
+  const [adminToRevoke, setAdminToRevoke] = useState<{ email: string; name: string } | null>(null);
 
   const existingAndInvitedAdmins = useMemo(() => {
     const invitedUsers = pendingInvitations.map((invitation) => ({
@@ -45,14 +49,14 @@ const AdminList: FC = () => {
   const revokeAdminAccessMutation = useRevokeAdminAccessMutation({
     onSuccess: () => {
       showToast({
-        message: smaLocalize('com_superadmin_remove_admin_success'),
+        message: smaLocalize('com_superadmin_revoke_admin_success'),
         status: 'success',
       });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response?.data?.message) {
         showToast({
-          message: `${smaLocalize('com_superadmin_remove_admin_error')} ${error.response.data.message}`,
+          message: `${smaLocalize('com_superadmin_revoke_admin_error')} ${error.response.data.message}`,
           status: 'error',
         });
       }
@@ -72,20 +76,33 @@ const AdminList: FC = () => {
     grantAdminAccessMutation.mutate({ email: email.trim() });
   };
 
-  const handleRemoveAdmin = (item: { email: string; name: string }) => {
-    revokeAdminAccessMutation.mutate({ email: item.email });
+  const handleRevokeAdmin = (item: { email: string; name: string }) => {
+    setAdminToRevoke(item);
+    setIsRevokeModalOpen(true);
+  };
+
+  const confirmRevokeAdmin = (admin: { email: string; name: string }) => {
+    revokeAdminAccessMutation.mutate({ email: admin.email });
   };
 
   return (
-    <GenericList
-      title={smaLocalize('com_superadmin_administrators')}
-      items={existingAndInvitedAdmins}
-      getKey={(item) => item.email}
-      renderItem={(item) => `${item.email} (${item.name})`}
-      handleAddItem={handleAddAdmin}
-      handleRemoveItem={handleRemoveAdmin}
-      placeholder={smaLocalize('com_superadmin_admin_email_placeholder')}
-    />
+    <>
+      <AdminRevokeConfirmationModal
+        isOpen={isRevokeModalOpen}
+        onClose={() => setIsRevokeModalOpen(false)}
+        admin={adminToRevoke}
+        onConfirm={confirmRevokeAdmin}
+      />
+      <GenericList
+        title={smaLocalize('com_superadmin_administrators')}
+        items={existingAndInvitedAdmins}
+        getKey={(item) => item.email}
+        renderItem={(item) => `${item.email} (${item.name})`}
+        handleAddItem={handleAddAdmin}
+        handleRemoveItem={handleRevokeAdmin}
+        placeholder={smaLocalize('com_superadmin_admin_email_placeholder')}
+      />
+    </>
   );
 };
 
