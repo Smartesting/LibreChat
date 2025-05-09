@@ -5,6 +5,7 @@ const {
   inviteAdminController,
   acceptAdminInvitationController,
   getPendingAdminInvitationsController,
+  removeAdminRoleController,
 } = require('~/server/controllers/AdminInvitationController');
 
 const router = express.Router();
@@ -12,5 +13,6 @@ const router = express.Router();
 router.post('/invite', requireJwtAuth, checkAdmin, inviteAdminController);
 router.post('/accept', acceptAdminInvitationController);
 router.get('/pending', requireJwtAuth, checkAdmin, getPendingAdminInvitationsController);
+router.post('/remove-admin', requireJwtAuth, checkAdmin, removeAdminRoleController);
 
 module.exports = router;

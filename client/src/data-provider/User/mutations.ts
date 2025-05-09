@@ -28,3 +28,33 @@ export const useInviteAdminMutation = (
     },
   );
 };
+
+/**
+ * Remove admin role from a user
+ */
+export const useRemoveAdminRoleMutation = (
+  options?: {
+    onMutate?: (variables: { email: string }) => void;
+    onError?: (error: Error, variables: { email: string }, context: unknown) => void;
+    onSuccess?: (data: { message: string }, variables: { email: string }, context: unknown) => void;
+  },
+): UseMutationResult<{ message: string }, Error, { email: string }> => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (data: { email: string }) => {
+      return dataService.removeAdminRole(data);
+    },
+    {
+      onMutate: (variables) => options?.onMutate?.(variables),
+      onError: (error, variables, context) => options?.onError?.(error, variables, context),
+      onSuccess: (data, variables, context) => {
+        // Invalidate the pendingAdminInvitations query to refresh the list
+        queryClient.invalidateQueries([QueryKeys.pendingAdminInvitations]);
+        // Invalidate the adminUsers query to refresh the list
+        queryClient.invalidateQueries([QueryKeys.adminUsers]);
+        options?.onSuccess?.(data, variables, context);
+      },
+    },
+  );
+};

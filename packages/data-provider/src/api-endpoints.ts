@@ -311,4 +311,5 @@ export const verifyTwoFactorTemp = () => '/api/auth/2fa/verify-temp';
 
 /* Admin Invitations */
 export const inviteAdmin = () => '/api/admin-invitations/invite';
+export const removeAdminRole = () => '/api/admin-invitations/remove-admin';
 export const pendingAdminInvitations = () => '/api/admin-invitations/pending';
