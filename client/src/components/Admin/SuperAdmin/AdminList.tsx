@@ -33,9 +33,9 @@ const AdminList: FC = () => {
       });
     },
     onError: (error) => {
-      if (error instanceof AxiosError && error.response?.data?.error) {
+      if (error instanceof AxiosError && error.response?.data?.message) {
         showToast({
-          message: `${smaLocalize('com_superadmin_add_admin_error')} ${error.response.data.error}`,
+          message: `${smaLocalize('com_superadmin_add_admin_error')} ${error.response.data.message}`,
           status: 'error',
         });
       }
@@ -50,10 +50,12 @@ const AdminList: FC = () => {
       });
     },
     onError: (error) => {
-      showToast({
-        message: `${smaLocalize('com_superadmin_remove_admin_error')} ${error.message}`,
-        status: 'error',
-      });
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        showToast({
+          message: `${smaLocalize('com_superadmin_remove_admin_error')} ${error.response.data.message}`,
+          status: 'error',
+        });
+      }
     },
   });
 
