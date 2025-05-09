@@ -6,7 +6,7 @@ const { findUser, updateUser } = require('~/models/userMethods');
 const {
   findPendingAdminInvitationByEmailAndToken,
   updateAdminInvitationAsAccepted, findAllPendingAdminInvitations,
-  findPendingAdminInvitationByEmail,
+  findPendingAdminInvitationByEmail, deleteAdminInvitationById,
 } = require('~/models/AdminInvitation');
 const AdminInvitation = require('~/models/AdminInvitation');
 
@@ -149,7 +149,7 @@ const removeAdminRoleController = async (req, res) => {
 
       if (pendingInvitation) {
         // Delete the pending invitation
-        await AdminInvitation.deleteOne({ _id: pendingInvitation._id });
+        await deleteAdminInvitationById(pendingInvitation._id);
         logger.info(`Admin invitation deleted for ${email}`);
         return res.status(200).json({ message: 'Admin invitation deleted successfully' });
       } else {

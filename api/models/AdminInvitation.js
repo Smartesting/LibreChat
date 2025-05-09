@@ -49,7 +49,10 @@ const findPendingAdminInvitationByEmail = async (email) => {
       invitationExpires: { $gt: now },
     });
   } catch (error) {
-    logger.error('[findPendingAdminInvitationByEmail] Error finding pending admin invitation', error);
+    logger.error(
+      '[findPendingAdminInvitationByEmail] Error finding pending admin invitation',
+      error,
+    );
     throw error;
   }
 };
@@ -81,7 +84,10 @@ const findPendingAdminInvitationByEmailAndToken = async (email, token) => {
 
     return invitation;
   } catch (error) {
-    logger.error('[findPendingAdminInvitationByEmailAndToken] Error finding pending admin invitation', error);
+    logger.error(
+      '[findPendingAdminInvitationByEmailAndToken] Error finding pending admin invitation',
+      error,
+    );
     throw error;
   }
 };
@@ -123,10 +129,25 @@ const findAllPendingAdminInvitations = async () => {
   }
 };
 
+/**
+ * Deletes an admin invitation by ID
+ * @param {string} invitationId - The ID of the invitation to delete
+ * @returns {Promise<Object>} - The deletion result
+ */
+const deleteAdminInvitationById = async (invitationId) => {
+  try {
+    await AdminInvitation.deleteOne({ _id: invitationId });
+  } catch (error) {
+    logger.error('[deleteAdminInvitationById] Error deleting admin invitation', error);
+    throw error;
+  }
+};
+
 module.exports = {
   createAdminInvitation,
   findPendingAdminInvitationByEmail,
   findPendingAdminInvitationByEmailAndToken,
   updateAdminInvitationAsAccepted,
   findAllPendingAdminInvitations,
+  deleteAdminInvitationById,
 };
