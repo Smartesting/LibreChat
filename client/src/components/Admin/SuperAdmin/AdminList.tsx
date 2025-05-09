@@ -1,12 +1,12 @@
 import React, { FC, useMemo } from 'react';
-import {
-  useGetAdminUsersQuery,
-  useGetPendingAdminInvitationsQuery,
-} from '~/data-provider/User/queries';
-import { useInviteAdminMutation, useRemoveAdminRoleMutation } from '~/data-provider/User/mutations';
 import useSmaLocalize from '../../../hooks/useSmaLocalize';
 import GenericList from '~/components/ui/GenericList';
 import { useToastContext } from '~/Providers';
+import {
+  useGetAdminUsersQuery,
+  useGetPendingAdminInvitationsQuery,
+  useGrantAdminAccessMutation, useRevokeAdminAccessMutation,
+} from '~/data-provider';
 
 const AdminList: FC = () => {
   const { data: adminUsers = [] } = useGetAdminUsersQuery();
@@ -23,7 +23,7 @@ const AdminList: FC = () => {
     return [...adminUsers, ...invitedUsers];
   }, [adminUsers, pendingInvitations, smaLocalize]);
 
-  const inviteAdminMutation = useInviteAdminMutation({
+  const grantAdminAccessMutation = useGrantAdminAccessMutation({
     onSuccess: () => {
       showToast({
         message: smaLocalize('com_superadmin_add_admin_success'),
@@ -32,13 +32,13 @@ const AdminList: FC = () => {
     },
     onError: (error) => {
       showToast({
-        message: `${smaLocalize('com_superadmin_add_admin_invite_error')} ${error.message}`,
+        message: `${smaLocalize('com_superadmin_add_admin_error')} ${error.message}`,
         status: 'error',
       });
     },
   });
 
-  const removeAdminMutation = useRemoveAdminRoleMutation({
+  const revokeAdminAccessMutation = useRevokeAdminAccessMutation({
     onSuccess: () => {
       showToast({
         message: smaLocalize('com_superadmin_remove_admin_success'),
@@ -63,11 +63,11 @@ const AdminList: FC = () => {
       return;
     }
 
-    inviteAdminMutation.mutate({ email: email.trim() });
+    grantAdminAccessMutation.mutate({ email: email.trim() });
   };
 
   const handleRemoveAdmin = (item: { email: string; name: string }) => {
-    removeAdminMutation.mutate({ email: item.email });
+    revokeAdminAccessMutation.mutate({ email: item.email });
   };
 
   return (

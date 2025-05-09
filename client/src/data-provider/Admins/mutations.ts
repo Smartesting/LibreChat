@@ -2,20 +2,18 @@ import { useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-
 import { dataService, QueryKeys } from 'librechat-data-provider';
 
 /**
- * Invite a user to be an admin
+ * Grant admin access
  */
-export const useInviteAdminMutation = (
-  options?: {
-    onMutate?: (variables: { email: string }) => void;
-    onError?: (error: Error, variables: { email: string }, context: unknown) => void;
-    onSuccess?: (data: { message: string }, variables: { email: string }, context: unknown) => void;
-  },
-): UseMutationResult<{ message: string }, Error, { email: string }> => {
+export const useGrantAdminAccessMutation = (options?: {
+  onMutate?: (variables: { email: string }) => void;
+  onError?: (error: Error, variables: { email: string }, context: unknown) => void;
+  onSuccess?: (data: { message: string }, variables: { email: string }, context: unknown) => void;
+}): UseMutationResult<{ message: string }, Error, { email: string }> => {
   const queryClient = useQueryClient();
 
   return useMutation(
     (data: { email: string }) => {
-      return dataService.inviteAdmin(data);
+      return dataService.grantAdminAccess(data);
     },
     {
       onMutate: (variables) => options?.onMutate?.(variables),
@@ -30,20 +28,18 @@ export const useInviteAdminMutation = (
 };
 
 /**
- * Remove admin role from a user
+ * Revoke admin access
  */
-export const useRemoveAdminRoleMutation = (
-  options?: {
-    onMutate?: (variables: { email: string }) => void;
-    onError?: (error: Error, variables: { email: string }, context: unknown) => void;
-    onSuccess?: (data: { message: string }, variables: { email: string }, context: unknown) => void;
-  },
-): UseMutationResult<{ message: string }, Error, { email: string }> => {
+export const useRevokeAdminAccessMutation = (options?: {
+  onMutate?: (variables: { email: string }) => void;
+  onError?: (error: Error, variables: { email: string }, context: unknown) => void;
+  onSuccess?: (data: { message: string }, variables: { email: string }, context: unknown) => void;
+}): UseMutationResult<{ message: string }, Error, { email: string }> => {
   const queryClient = useQueryClient();
 
   return useMutation(
     (data: { email: string }) => {
-      return dataService.removeAdminRole(data);
+      return dataService.revokeAdminAccess(data);
     },
     {
       onMutate: (variables) => options?.onMutate?.(variables),

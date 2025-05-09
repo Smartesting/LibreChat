@@ -863,18 +863,18 @@ export function verifyTwoFactorTemp(
   return request.post(endpoints.verifyTwoFactorTemp(), payload);
 }
 
-export function inviteAdmin(data: { email: string }): Promise<{ message: string }> {
-  return request.post(endpoints.inviteAdmin(), data);
-}
-
-export function removeAdminRole(data: { email: string }): Promise<{ message: string }> {
-  return request.post(endpoints.removeAdminRole(), data);
-}
-
-export function getPendingAdminInvitations(): Promise<any[]> {
+export function getPendingAdminInvitations(): Promise<q.AdminInvitation[]> {
   return request.get(endpoints.pendingAdminInvitations());
 }
 
+export function grantAdminAccess(data: { email: string }): Promise<{ message: string }> {
+  return request.post(endpoints.grantAdminAccess(), data);
+}
+
+export function revokeAdminAccess(data: { email: string }): Promise<{ message: string }> {
+  return request.post(endpoints.revokeAdminAccess(), data);
+}
+
 export function getAdminUsers(): Promise<t.TUser[]> {
-  return request.get(endpoints.adminUsers());
+  return request.get(endpoints.admins());
 }

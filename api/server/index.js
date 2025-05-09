@@ -114,6 +114,7 @@ const startServer = async () => {
   app.use('/api/training-organizations', routes.trainingOrganizations);
   app.use('/api/trainings', routes.trainings);
   app.use('/api/admin-invitations', routes.adminInvitations);
+  app.use('/api/admins', routes.admins);
 
   app.use('/api/tags', routes.tags);
 

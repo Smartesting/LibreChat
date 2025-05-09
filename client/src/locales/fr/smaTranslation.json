@@ -14,7 +14,7 @@
   "com_superadmin_invite_success": "Vous avez accepté l'invitation avec succès. Vous pouvez maintenant vous connecter en tant qu'administrateur.",
   "com_superadmin_invite_error": "Une erreur s'est produite lors du traitement de votre invitation. Veuillez réessayer ou contacter le support.",
   "com_superadmin_add_admin_success": "Administrateur ajouté avec succès",
-  "com_superadmin_add_admin_invite_error": "Une erreur s'est produite lors de l'ajout du nouvel administrateur.",
+  "com_superadmin_add_admin_error": "Une erreur s'est produite lors de l'ajout du nouvel administrateur.",
   "com_superadmin_remove_admin_success": "Administrateur supprimé avec succès",
   "com_superadmin_remove_admin_error": "Une erreur s'est produite lors de la suppression de l'administrateur.",
   "com_superadmin_invited": "invité",

@@ -137,3 +137,10 @@ export type Training = {
 export type TrainingOrganizationCreateParams = TrainingOrganization;
 
 export type TrainingCreateParams = Omit<Training, '_id'>;
+
+export type AdminInvitation = {
+  _id: string;
+  email: string;
+  invitationExpires: string;
+  createdAt: string;
+};
