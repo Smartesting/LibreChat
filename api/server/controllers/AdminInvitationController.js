@@ -1,11 +1,11 @@
 const { logger } = require('~/config');
 const { SystemRoles } = require('librechat-data-provider');
-const { processAdminInvitation } = require('~/server/services/AdminInvitationService');
+const { processAdminInvitation, getPendingAdminInvitations } = require('~/server/services/AdminInvitationService');
 const { registerUser } = require('~/server/services/AuthService');
 const { findUser } = require('~/models/userMethods');
 const {
   findPendingAdminInvitationByEmailAndToken,
-  updateAdminInvitationAsAccepted,
+  updateAdminInvitationAsAccepted, findAllPendingAdminInvitations,
 } = require('~/models/AdminInvitation');
 
 /**
@@ -98,7 +98,23 @@ const acceptAdminInvitationController = async (req, res) => {
   }
 };
 
+/**
+ * Controller function to get all pending admin invitations
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getPendingAdminInvitationsController = async (req, res) => {
+  try {
+    const pendingInvitations = await findAllPendingAdminInvitations();
+    res.status(200).json({ pendingInvitations });
+  } catch (error) {
+    logger.error('[/admin-invitations/pending] Error getting pending invitations', error);
+    res.status(500).json({ message: 'Error retrieving pending admin invitations' });
+  }
+};
+
 module.exports = {
   inviteAdminController,
   acceptAdminInvitationController,
+  getPendingAdminInvitationsController,
 };

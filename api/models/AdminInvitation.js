@@ -106,9 +106,27 @@ const updateAdminInvitationAsAccepted = async (invitationId) => {
   }
 };
 
+/**
+ * Finds all pending admin invitations (not accepted and not expired)
+ * @returns {Promise<Array>} - Array of pending admin invitations
+ */
+const findAllPendingAdminInvitations = async () => {
+  try {
+    const now = new Date();
+    return await AdminInvitation.find({
+      acceptedAt: { $exists: false },
+      invitationExpires: { $gt: now },
+    }).sort({ createdAt: -1 });
+  } catch (error) {
+    logger.error('[findAllPendingAdminInvitations] Error finding pending admin invitations', error);
+    throw error;
+  }
+};
+
 module.exports = {
   createAdminInvitation,
   findPendingAdminInvitationByEmail,
   findPendingAdminInvitationByEmailAndToken,
   updateAdminInvitationAsAccepted,
+  findAllPendingAdminInvitations,
 };

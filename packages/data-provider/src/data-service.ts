@@ -867,6 +867,10 @@ export function inviteAdmin(data: { email: string }): Promise<{ message: string 
   return request.post(endpoints.inviteAdmin(), data);
 }
 
+export function getPendingAdminInvitations(): Promise<any[]> {
+  return request.get(endpoints.pendingAdminInvitations());
+}
+
 export function getAdminUsers(): Promise<t.TUser[]> {
   return request.get(endpoints.adminUsers());
 }
