@@ -1,4 +1,4 @@
-const { processGrantAdminAccess } = require('./AdminService');
+const { processGrantAdminAccess, sendAdminRoleGrantedEmail } = require('./AdminService');
 const { findUser } = require('~/models/userMethods');
 const { updateUser } = require('~/models');
 const { createAdminInvitation, findPendingAdminInvitationByEmail } = require('~/models/AdminInvitation');
@@ -56,13 +56,17 @@ describe('AdminService', () => {
       expect(sendEmail).not.toHaveBeenCalled();
     });
 
-    it('should grant admin role if user exists but is not an admin', async () => {
+    it('should grant admin role if user exists but is not an admin and send notification email', async () => {
       const email = 'test@example.com';
       const userId = 'user-id';
       const updatedUser = { _id: userId, email, role: SystemRoles.ADMIN };
 
       findUser.mockResolvedValue({ _id: userId, email, role: SystemRoles.USER });
       updateUser.mockResolvedValue(updatedUser);
+      checkEmailConfig.mockReturnValue(true);
+      sendEmail.mockResolvedValue({});
+
+      process.env.DOMAIN_CLIENT = 'http://localhost:3000';
 
       const result = await processGrantAdminAccess(email);
 
@@ -77,9 +81,48 @@ describe('AdminService', () => {
       expect(updateUser).toHaveBeenCalledWith(userId, { role: SystemRoles.ADMIN });
       expect(findPendingAdminInvitationByEmail).not.toHaveBeenCalled();
       expect(createAdminInvitation).not.toHaveBeenCalled();
-      expect(checkEmailConfig).not.toHaveBeenCalled();
+      expect(checkEmailConfig).toHaveBeenCalled();
+      expect(sendEmail).toHaveBeenCalledWith({
+        email,
+        subject: 'You have been granted Administrator access',
+        payload: {
+          appName: expect.any(String),
+          name: email,
+          loginLink: 'http://localhost:3000/login',
+        },
+        template: 'adminRoleGranted.handlebars',
+      });
+      expect(logger.info).toHaveBeenCalledWith(`User ${email} has been granted admin role`);
+    });
+
+    it('should grant admin role if user exists but is not an admin and not send email if email config is not available', async () => {
+      const email = 'test@example.com';
+      const userId = 'user-id';
+      const updatedUser = { _id: userId, email, role: SystemRoles.ADMIN };
+
+      findUser.mockResolvedValue({ _id: userId, email, role: SystemRoles.USER });
+      updateUser.mockResolvedValue(updatedUser);
+      checkEmailConfig.mockReturnValue(false);
+
+      process.env.DOMAIN_CLIENT = 'http://localhost:3000';
+
+      const result = await processGrantAdminAccess(email);
+
+      expect(result).toEqual({
+        success: true,
+        status: 200,
+        message: 'Admin role granted successfully',
+        user: updatedUser,
+      });
+
+      expect(findUser).toHaveBeenCalledWith({ email }, 'email _id role');
+      expect(updateUser).toHaveBeenCalledWith(userId, { role: SystemRoles.ADMIN });
+      expect(findPendingAdminInvitationByEmail).not.toHaveBeenCalled();
+      expect(createAdminInvitation).not.toHaveBeenCalled();
+      expect(checkEmailConfig).toHaveBeenCalled();
       expect(sendEmail).not.toHaveBeenCalled();
       expect(logger.info).toHaveBeenCalledWith(`User ${email} has been granted admin role`);
+      expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('Email configuration not available'));
     });
 
     it('should return error if user already has admin role', async () => {

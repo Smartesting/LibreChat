@@ -49,6 +49,9 @@ const processGrantAdminAccess = async (email) => {
 
       logger.info(`User ${email} has been granted admin role`);
 
+      // Send notification email to the user
+      await sendAdminRoleGrantedEmail(email);
+
       return {
         success: true,
         status: 200,
@@ -129,7 +132,44 @@ const sendAdminInvitationEmail = async (email, token) => {
   }
 };
 
+/**
+ * Send notification email to existing user who has been granted admin access
+ * @param {string} email - The email address to send the notification to
+ * @returns {Promise<void>}
+ */
+const sendAdminRoleGrantedEmail = async (email) => {
+  try {
+    const loginLink = `${process.env.DOMAIN_CLIENT}/login`;
+
+    // Check if email configuration is available
+    if (!checkEmailConfig()) {
+      logger.info(
+        `[sendAdminRoleGrantedEmail] Email configuration not available. Cannot send notification to [Email: ${email}]`,
+      );
+      return;
+    }
+
+    await sendEmail({
+      email,
+      subject: 'You have been granted Administrator access',
+      payload: {
+        appName: process.env.APP_TITLE || 'LibreChat',
+        name: email,
+        loginLink,
+      },
+      template: 'adminRoleGranted.handlebars',
+    });
+
+    logger.info(
+      `[sendAdminRoleGrantedEmail] Notification sent. [Email: ${email}]`,
+    );
+  } catch (error) {
+    logger.error(`[sendAdminRoleGrantedEmail] Error sending notification: ${error.message}`);
+  }
+};
+
 module.exports = {
   processGrantAdminAccess,
   sendAdminInvitationEmail,
+  sendAdminRoleGrantedEmail,
 };
