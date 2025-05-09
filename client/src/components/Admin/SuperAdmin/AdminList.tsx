@@ -1,5 +1,8 @@
-import React, { FC } from 'react';
-import { useGetAdminUsersQuery } from '~/data-provider/User/queries';
+import React, { FC, useMemo } from 'react';
+import {
+  useGetAdminUsersQuery,
+  useGetPendingAdminInvitationsQuery,
+} from '~/data-provider/User/queries';
 import { useInviteAdminMutation } from '~/data-provider/User/mutations';
 import useSmaLocalize from '../../../hooks/useSmaLocalize';
 import GenericList from '~/components/ui/GenericList';
@@ -7,8 +10,19 @@ import { useToastContext } from '~/Providers';
 
 const AdminList: FC = () => {
   const { data: adminUsers = [] } = useGetAdminUsersQuery();
+  const { data: pendingInvitations = [] } = useGetPendingAdminInvitationsQuery();
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
+
+  const existingAndInvitedAdmins = useMemo(() => {
+    console.log(pendingInvitations)
+    const invitedUsers = pendingInvitations.map((invitation) => ({
+      email: invitation.email,
+      name: smaLocalize('com_superadmin_invited'),
+    }));
+
+    return [...adminUsers, ...invitedUsers];
+  }, [adminUsers, pendingInvitations, smaLocalize]);
 
   const inviteAdminMutation = useInviteAdminMutation({
     onSuccess: () => {
@@ -41,9 +55,9 @@ const AdminList: FC = () => {
   return (
     <GenericList
       title={smaLocalize('com_superadmin_administrators')}
-      items={adminUsers}
-      getKey={(user) => user.email}
-      renderItem={(user) => `${user.email} (${user.name})`}
+      items={existingAndInvitedAdmins}
+      getKey={(item) => item.email}
+      renderItem={(item) => `${item.email} (${item.name})`}
       handleAddItem={handleAddAdmin}
     />
   );

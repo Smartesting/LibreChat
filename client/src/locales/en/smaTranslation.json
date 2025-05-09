@@ -16,6 +16,7 @@
   "com_superadmin_admin_invite_error": "There was an error processing your invitation. Please try again or contact support.",
   "com_superadmin_send_admin_invite_success": "Administrator added successfully",
   "com_superadmin_send_admin_invite_error": "An error occurred while adding the new administrator.",
+  "com_superadmin_invited": "invited",
   "com_superadmin_delete_organization": "Delete training organization",
   "com_superadmin_delete_organization_error": "An error occurred while deleting the training organization. Please try again.",
   "com_superadmin_delete_organization_confirm": "Confirm deletion",
