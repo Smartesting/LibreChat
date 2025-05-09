@@ -1,5 +1,5 @@
-import { useMutation, UseMutationResult } from '@tanstack/react-query';
-import { dataService } from 'librechat-data-provider';
+import { useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
+import { dataService, QueryKeys } from 'librechat-data-provider';
 
 /**
  * Invite a user to be an admin
@@ -11,6 +11,8 @@ export const useInviteAdminMutation = (
     onSuccess?: (data: { message: string }, variables: { email: string }, context: unknown) => void;
   },
 ): UseMutationResult<{ message: string }, Error, { email: string }> => {
+  const queryClient = useQueryClient();
+
   return useMutation(
     (data: { email: string }) => {
       return dataService.inviteAdmin(data);
@@ -18,7 +20,11 @@ export const useInviteAdminMutation = (
     {
       onMutate: (variables) => options?.onMutate?.(variables),
       onError: (error, variables, context) => options?.onError?.(error, variables, context),
-      onSuccess: (data, variables, context) => options?.onSuccess?.(data, variables, context),
+      onSuccess: (data, variables, context) => {
+        // Invalidate the pendingAdminInvitations query to refresh the list
+        queryClient.invalidateQueries([QueryKeys.pendingAdminInvitations]);
+        options?.onSuccess?.(data, variables, context);
+      },
     },
   );
 };
