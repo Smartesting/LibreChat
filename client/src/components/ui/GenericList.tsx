@@ -11,6 +11,7 @@ type ListProps<T> = {
   handleAddItem?: (value: string) => void;
   onAddButtonClick?: () => void;
   maxEntries?: number;
+  placeholder?: string;
 };
 
 const GenericList = <T,>({
@@ -22,6 +23,7 @@ const GenericList = <T,>({
   handleAddItem,
   onAddButtonClick,
   maxEntries,
+  placeholder,
 }: ListProps<T>) => {
   const localize = useLocalize();
   const [showNewItemInput, setShowNewItemInput] = useState(false);
@@ -78,7 +80,7 @@ const GenericList = <T,>({
               type="text"
               value={newItemValue}
               onChange={(e) => setNewItemValue(e.target.value)}
-              placeholder="Value"
+              placeholder={placeholder}
               className="flex-1 border-none bg-surface-tertiary text-text-primary placeholder:text-text-secondary focus:outline-none"
               disabled={isUpdatingItems}
               onKeyDown={(e) => {

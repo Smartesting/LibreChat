@@ -78,6 +78,7 @@ const AdminList: FC = () => {
       renderItem={(item) => `${item.email} (${item.name})`}
       handleAddItem={handleAddAdmin}
       handleRemoveItem={handleRemoveAdmin}
+      placeholder={smaLocalize('com_superadmin_admin_email_placeholder')}
     />
   );
 };
