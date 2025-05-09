@@ -73,7 +73,7 @@ function AdminInvite() {
     <>
       {errorMessage && (
         <ErrorMessage>
-          {smaLocalize('com_superadmin_admin_invite_error')} {errorMessage}
+          {smaLocalize('com_superadmin_invite_error')} {errorMessage}
         </ErrorMessage>
       )}
       {acceptAdminInvitation.isSuccess && countdown > 0 && (
@@ -82,7 +82,7 @@ function AdminInvite() {
             className="relative mb-8 mt-4 rounded-2xl border border-green-400 bg-green-100 px-4 py-3 text-center text-green-700 dark:bg-gray-900 dark:text-white"
             role="alert"
           >
-            {smaLocalize('com_superadmin_admin_invite_success')}{' '}
+            {smaLocalize('com_superadmin_invite_success')}{' '}
             {' ' + localize('com_auth_email_verification_redirecting', { 0: countdown.toString() })}
           </div>
         </>

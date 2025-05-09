@@ -26,13 +26,13 @@ const AdminList: FC = () => {
   const inviteAdminMutation = useInviteAdminMutation({
     onSuccess: () => {
       showToast({
-        message: smaLocalize('com_superadmin_send_admin_invite_success'),
+        message: smaLocalize('com_superadmin_add_admin_success'),
         status: 'success',
       });
     },
     onError: (error) => {
       showToast({
-        message: `${smaLocalize('com_superadmin_send_admin_invite_error')} ${error.message}`,
+        message: `${smaLocalize('com_superadmin_add_admin_invite_error')} ${error.message}`,
         status: 'error',
       });
     },

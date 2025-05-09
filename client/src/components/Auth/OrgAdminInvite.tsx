@@ -74,7 +74,7 @@ function OrgAdminInvite() {
     <>
       {errorMessage && (
         <ErrorMessage>
-          {smaLocalize('com_superadmin_admin_invite_error')} {errorMessage}
+          {smaLocalize('com_superadmin_invite_error')} {errorMessage}
         </ErrorMessage>
       )}
       {acceptAdminInvitation.isSuccess && countdown > 0 && (
@@ -84,8 +84,8 @@ function OrgAdminInvite() {
             role="alert"
           >
             {organizationName
-              ? smaLocalize('com_superadmin_admin_invite_success_with_org', { organizationName })
-              : smaLocalize('com_superadmin_admin_invite_success')}{' '}
+              ? smaLocalize('com_orgadmin_invite_success', { organizationName })
+              : smaLocalize('com_superadmin_invite_success')}{' '}
             {' ' + localize('com_auth_email_verification_redirecting', { 0: countdown.toString() })}
           </div>
         </>
