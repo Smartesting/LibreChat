@@ -5,8 +5,10 @@ import { useToastContext } from '~/Providers';
 import {
   useGetAdminUsersQuery,
   useGetPendingAdminInvitationsQuery,
-  useGrantAdminAccessMutation, useRevokeAdminAccessMutation,
+  useGrantAdminAccessMutation,
+  useRevokeAdminAccessMutation,
 } from '~/data-provider';
+import { AxiosError } from 'axios';
 
 const AdminList: FC = () => {
   const { data: adminUsers = [] } = useGetAdminUsersQuery();
@@ -31,10 +33,12 @@ const AdminList: FC = () => {
       });
     },
     onError: (error) => {
-      showToast({
-        message: `${smaLocalize('com_superadmin_add_admin_error')} ${error.message}`,
-        status: 'error',
-      });
+      if (error instanceof AxiosError && error.response?.data?.error) {
+        showToast({
+          message: `${smaLocalize('com_superadmin_add_admin_error')} ${error.response.data.error}`,
+          status: 'error',
+        });
+      }
     },
   });
 
