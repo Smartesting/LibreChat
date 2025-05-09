@@ -5,7 +5,9 @@ const {
   findPendingAdminInvitationByEmail,
   deleteAdminInvitationById,
 } = require('~/models/AdminInvitation');
-const { processAdminInvitation } = require('~/server/services/AdminInvitationService');
+const {
+  processGrantAdminAccess,
+} = require('~/server/services/AdminService');
 const User = require('~/models/User');
 
 /**
@@ -21,8 +23,7 @@ const grantAdminAccessController = async (req, res) => {
       return res.status(400).json({ message: 'Email is required' });
     }
 
-    // Process the invitation
-    const result = await processAdminInvitation(email);
+    const result = await processGrantAdminAccess(email);
 
     if (!result.success) {
       return res.status(result.status).json({ message: result.message });

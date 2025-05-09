@@ -21,6 +21,8 @@ export const useGrantAdminAccessMutation = (options?: {
       onSuccess: (data, variables, context) => {
         // Invalidate the pendingAdminInvitations query to refresh the list
         queryClient.invalidateQueries([QueryKeys.pendingAdminInvitations]);
+        // Invalidate the adminUsers query to refresh the list
+        queryClient.invalidateQueries([QueryKeys.adminUsers]);
         options?.onSuccess?.(data, variables, context);
       },
     },

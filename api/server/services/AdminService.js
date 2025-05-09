@@ -1,17 +1,19 @@
 const { findUser } = require('~/models/userMethods');
+const { updateUser } = require('~/models');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
+const { SystemRoles } = require('librechat-data-provider');
 const {
   createAdminInvitation,
   findPendingAdminInvitationByEmail,
 } = require('~/models/AdminInvitation');
 
 /**
- * Process an admin invitation
- * @param {string} email - The email to invite
- * @returns {Promise<Object>} - The result of the invitation process
+ * Grant admin access
+ * @param {string} email - The email of the new admin
+ * @returns {Promise<Object>} - The result of the grant access process
  */
-const processAdminInvitation = async (email) => {
+const processGrantAdminAccess = async (email) => {
   try {
     // Check if email is valid
     if (!email || !email.match(/\S+@\S+\.\S+/)) {
@@ -26,10 +28,32 @@ const processAdminInvitation = async (email) => {
     const existingUser = await findUser({ email }, 'email _id role');
 
     if (existingUser) {
+      // If user already exists and already has ADMIN role, return an error
+      if (existingUser.role === SystemRoles.ADMIN) {
+        return {
+          success: false,
+          status: 400,
+          message: 'User already has admin role',
+        };
+      }
+
+      const updatedUser = await updateUser(existingUser._id, { role: SystemRoles.ADMIN });
+
+      if (!updatedUser) {
+        return {
+          success: false,
+          status: 500,
+          message: 'Failed to update user role',
+        };
+      }
+
+      logger.info(`User ${email} has been granted admin role`);
+
       return {
-        success: false,
-        status: 400,
-        message: 'A user with this email already exists',
+        success: true,
+        status: 200,
+        message: 'Admin role granted successfully',
+        user: updatedUser,
       };
     }
 
@@ -59,7 +83,7 @@ const processAdminInvitation = async (email) => {
       invitation,
     };
   } catch (error) {
-    logger.error('[processAdminInvitation] Error processing admin invitation', error);
+    logger.error('[processGrantAdminAccess] Error processing admin invitation', error);
     return {
       success: false,
       status: 500,
@@ -80,7 +104,9 @@ const sendAdminInvitationEmail = async (email, token) => {
 
     // Check if email configuration is available
     if (!checkEmailConfig()) {
-      logger.info(`[sendAdminInvitationEmail] Email configuration not available. Cannot send invitation to [Email: ${email}] [inviteLink: ${inviteLink}]`);
+      logger.info(
+        `[sendAdminInvitationEmail] Email configuration not available. Cannot send invitation to [Email: ${email}] [inviteLink: ${inviteLink}]`,
+      );
       return;
     }
 
@@ -95,13 +121,15 @@ const sendAdminInvitationEmail = async (email, token) => {
       template: 'adminInvite.handlebars',
     });
 
-    logger.info(`[sendAdminInvitationEmail] Invitation sent. [Email: ${email}] [inviteLink: ${inviteLink}]`);
+    logger.info(
+      `[sendAdminInvitationEmail] Invitation sent. [Email: ${email}] [inviteLink: ${inviteLink}]`,
+    );
   } catch (error) {
     logger.error(`[sendAdminInvitationEmail] Error sending invitation: ${error.message}`);
   }
 };
 
 module.exports = {
-  processAdminInvitation,
+  processGrantAdminAccess,
   sendAdminInvitationEmail,
 };

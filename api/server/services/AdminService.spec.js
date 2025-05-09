@@ -1,12 +1,18 @@
-const { processAdminInvitation } = require('./AdminInvitationService');
+const { processGrantAdminAccess } = require('./AdminService');
 const { findUser } = require('~/models/userMethods');
+const { updateUser } = require('~/models');
 const { createAdminInvitation, findPendingAdminInvitationByEmail } = require('~/models/AdminInvitation');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
+const { SystemRoles } = require('librechat-data-provider');
 
 // Mock dependencies
 jest.mock('~/models/userMethods', () => ({
   findUser: jest.fn(),
+}));
+
+jest.mock('~/models', () => ({
+  updateUser: jest.fn(),
 }));
 
 jest.mock('~/models/AdminInvitation', () => ({
@@ -26,15 +32,15 @@ jest.mock('~/config', () => ({
   },
 }));
 
-describe('AdminInvitationService', () => {
+describe('AdminService', () => {
   beforeEach(() => {
     // Reset all mocks before each test
     jest.clearAllMocks();
   });
 
-  describe('processAdminInvitation', () => {
+  describe('processGrantAdminAccess', () => {
     it('should return error for invalid email format', async () => {
-      const result = await processAdminInvitation('invalid-email');
+      const result = await processGrantAdminAccess('invalid-email');
 
       expect(result).toEqual({
         success: false,
@@ -50,19 +56,70 @@ describe('AdminInvitationService', () => {
       expect(sendEmail).not.toHaveBeenCalled();
     });
 
-    it('should return error if user already exists', async () => {
+    it('should grant admin role if user exists but is not an admin', async () => {
       const email = 'test@example.com';
-      findUser.mockResolvedValue({ _id: 'user-id', email });
+      const userId = 'user-id';
+      const updatedUser = { _id: userId, email, role: SystemRoles.ADMIN };
 
-      const result = await processAdminInvitation(email);
+      findUser.mockResolvedValue({ _id: userId, email, role: SystemRoles.USER });
+      updateUser.mockResolvedValue(updatedUser);
+
+      const result = await processGrantAdminAccess(email);
+
+      expect(result).toEqual({
+        success: true,
+        status: 200,
+        message: 'Admin role granted successfully',
+        user: updatedUser,
+      });
+
+      expect(findUser).toHaveBeenCalledWith({ email }, 'email _id role');
+      expect(updateUser).toHaveBeenCalledWith(userId, { role: SystemRoles.ADMIN });
+      expect(findPendingAdminInvitationByEmail).not.toHaveBeenCalled();
+      expect(createAdminInvitation).not.toHaveBeenCalled();
+      expect(checkEmailConfig).not.toHaveBeenCalled();
+      expect(sendEmail).not.toHaveBeenCalled();
+      expect(logger.info).toHaveBeenCalledWith(`User ${email} has been granted admin role`);
+    });
+
+    it('should return error if user already has admin role', async () => {
+      const email = 'test@example.com';
+
+      findUser.mockResolvedValue({ _id: 'user-id', email, role: SystemRoles.ADMIN });
+
+      const result = await processGrantAdminAccess(email);
 
       expect(result).toEqual({
         success: false,
         status: 400,
-        message: 'A user with this email already exists',
+        message: 'User already has admin role',
       });
 
       expect(findUser).toHaveBeenCalledWith({ email }, 'email _id role');
+      expect(updateUser).not.toHaveBeenCalled();
+      expect(findPendingAdminInvitationByEmail).not.toHaveBeenCalled();
+      expect(createAdminInvitation).not.toHaveBeenCalled();
+      expect(checkEmailConfig).not.toHaveBeenCalled();
+      expect(sendEmail).not.toHaveBeenCalled();
+    });
+
+    it('should return error if updating user role fails', async () => {
+      const email = 'test@example.com';
+      const userId = 'user-id';
+
+      findUser.mockResolvedValue({ _id: userId, email, role: SystemRoles.USER });
+      updateUser.mockResolvedValue(null);
+
+      const result = await processGrantAdminAccess(email);
+
+      expect(result).toEqual({
+        success: false,
+        status: 500,
+        message: 'Failed to update user role',
+      });
+
+      expect(findUser).toHaveBeenCalledWith({ email }, 'email _id role');
+      expect(updateUser).toHaveBeenCalledWith(userId, { role: SystemRoles.ADMIN });
       expect(findPendingAdminInvitationByEmail).not.toHaveBeenCalled();
       expect(createAdminInvitation).not.toHaveBeenCalled();
       expect(checkEmailConfig).not.toHaveBeenCalled();
@@ -74,7 +131,7 @@ describe('AdminInvitationService', () => {
       findUser.mockResolvedValue(null);
       findPendingAdminInvitationByEmail.mockResolvedValue({ email });
 
-      const result = await processAdminInvitation(email);
+      const result = await processGrantAdminAccess(email);
 
       expect(result).toEqual({
         success: false,
@@ -102,7 +159,7 @@ describe('AdminInvitationService', () => {
 
       process.env.DOMAIN_CLIENT = 'http://localhost:3000';
 
-      const result = await processAdminInvitation(email);
+      const result = await processGrantAdminAccess(email);
 
       expect(result).toEqual({
         success: true,
@@ -139,7 +196,7 @@ describe('AdminInvitationService', () => {
 
       process.env.DOMAIN_CLIENT = 'http://localhost:3000';
 
-      const result = await processAdminInvitation(email);
+      const result = await processGrantAdminAccess(email);
 
       expect(result).toEqual({
         success: true,
@@ -162,7 +219,7 @@ describe('AdminInvitationService', () => {
 
       findUser.mockRejectedValue(error);
 
-      const result = await processAdminInvitation(email);
+      const result = await processGrantAdminAccess(email);
 
       expect(result).toEqual({
         success: false,
@@ -171,7 +228,7 @@ describe('AdminInvitationService', () => {
       });
 
       expect(logger.error).toHaveBeenCalledWith(
-        '[processAdminInvitation] Error processing admin invitation',
+        '[processGrantAdminAccess] Error processing admin invitation',
         error,
       );
     });
