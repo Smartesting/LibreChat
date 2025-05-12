@@ -80,5 +80,8 @@
   "com_orgadmin_error_name_required": "Nom requis",
   "com_orgadmin_error_name_not_empty": "Le nom ne peut pas être vide",
   "com_superadmin_confirm_admin_revocation": "Confirmer la révocation des droits d'administrateur",
-  "com_superadmin_admin_revocation_message": "Êtes-vous sûr de vouloir révoquer les droits d'administrateur de {{email}} ({{name}}) ?"
+  "com_superadmin_admin_revocation_message": "Êtes-vous sûr de vouloir révoquer les droits d'administrateur de {{email}} ({{name}}) ?",
+  "com_superadmin_past_trainings": "Formations passées :",
+  "com_superadmin_upcoming_trainings": "Formations à venir :",
+  "com_superadmin_in_progress_trainings": "Formations en cours :"
 }
