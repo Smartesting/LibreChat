@@ -134,6 +134,14 @@ export type Training = {
   trainingOrganizationId: string;
 };
 
+export type TrainingWithStatus = Training & { status: TrainingStatus };
+
+export enum TrainingStatus {
+  PAST = 'past',
+  IN_PROGRESS = 'in_progress',
+  UPCOMING = 'upcoming',
+}
+
 export type TrainingOrganizationCreateParams = TrainingOrganization;
 
 export type TrainingCreateParams = Omit<Training, '_id'>;

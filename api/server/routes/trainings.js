@@ -10,7 +10,7 @@ const {
   update,
   remove,
 } = require('~/server/controllers/TrainingController');
-const { checkAdmin, checkOrgAccess } = require('~/server/middleware/roles');
+const { checkOrgAccess } = require('~/server/middleware/roles');
 
 // Create a new training
 router.post('/', requireJwtAuth, checkOrgAccess, create);

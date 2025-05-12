@@ -768,7 +768,7 @@ export const removeTrainerFromOrganization = (
   return request.delete(endpoints.trainingOrganizations(id, 'trainers', email));
 };
 
-export const getTrainingsByOrganization = (organizationId: string): Promise<q.Training[]> => {
+export const getTrainingsByOrganization = (organizationId: string): Promise<q.TrainingWithStatus[]> => {
   return request.get(endpoints.trainingsByOrganization(organizationId));
 };
 

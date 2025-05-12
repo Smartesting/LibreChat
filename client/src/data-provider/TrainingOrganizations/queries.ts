@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 export const useListTrainingOrganizationsQuery = <
   TData = t.TrainingOrganization[],
 >(): QueryObserverResult<TData> => {
-  return useQuery<t.AgentListResponse, unknown, TData>(
+  return useQuery<t.TrainingOrganization[], unknown, TData>(
     [QueryKeys.trainingOrganizations],
     () => dataService.listTrainingOrganizations(),
     {
@@ -46,9 +46,9 @@ export const useTrainingOrganizationByIdQuery = <
  * Hook for fetching trainings by organization ID
  */
 export const useTrainingsByOrganizationQuery = <
-  TData = t.Training[],
+  TData = t.TrainingWithStatus[],
 >(organizationId: string): QueryObserverResult<TData> => {
-  return useQuery<t.Training[], unknown, TData>(
+  return useQuery<t.TrainingWithStatus[], unknown, TData>(
     [QueryKeys.trainingOrganizations, organizationId, 'trainings'],
     () => dataService.getTrainingsByOrganization(organizationId),
     {

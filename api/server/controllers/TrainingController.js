@@ -5,6 +5,7 @@ const {
   updateTraining,
   deleteTraining,
 } = require('../../models/Training');
+const { TrainingStatus } = require('librechat-data-provider');
 
 /**
  * Create a new training
@@ -43,10 +44,29 @@ const getByOrganization = async (req, res) => {
     }
 
     const trainings = await getTrainingsByOrganization(organizationId);
-    return res.status(200).json(trainings);
+    const trainingsWithStatus = trainings.map((training) => {
+      const status = calculateTrainingStatus(training.startDateTime, training.endDateTime);
+      return { ...training, status };
+    });
+
+    return res.status(200).json(trainingsWithStatus);
   } catch (error) {
     console.error('Error getting trainings:', error);
     return res.status(500).json({ error: error.message });
+  }
+};
+
+const calculateTrainingStatus = (startDateTime, endDateTime) => {
+  const now = new Date();
+  const start = new Date(startDateTime);
+  const end = new Date(endDateTime);
+
+  if (now < start) {
+    return TrainingStatus.UPCOMING;
+  } else if (now >= start && now <= end) {
+    return TrainingStatus.IN_PROGRESS;
+  } else {
+    return TrainingStatus.PAST;
   }
 };
 
