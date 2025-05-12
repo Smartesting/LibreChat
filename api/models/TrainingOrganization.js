@@ -62,6 +62,32 @@ const updateTrainingOrganizationAdmin = async (orgId, email, updateData) => {
 };
 
 /**
+ * Update a trainer in a training organization
+ * @param {string} orgId - The ID of the training organization
+ * @param {string} email - The email of the trainer to update
+ * @param {Object} updateData - The data to update
+ * @returns {Promise<Object|null>} The updated training organization document or null if not found
+ */
+const updateTrainingOrganizationTrainer = async (orgId, email, updateData) => {
+  return (await TrainingOrganization.findOneAndUpdate(
+    {
+      _id: orgId,
+      'trainers.email': email,
+    },
+    {
+      $set: {
+        'trainers.$.userId': updateData.userId,
+        'trainers.$.status': updateData.status,
+        'trainers.$.activatedAt': updateData.activatedAt,
+        'trainers.$.invitationToken': null,
+        'trainers.$.invitationExpires': null,
+      },
+    },
+    { new: true },
+  ).lean());
+};
+
+/**
  * Delete a training organization by ID
  * @param {string} orgId - The ID of the training organization to delete
  * @returns {Promise<Object|null>} The deleted training organization document or null if not found
@@ -84,6 +110,7 @@ module.exports = {
   createTrainingOrganization,
   getListTrainingOrganizations,
   updateTrainingOrganizationAdmin,
+  updateTrainingOrganizationTrainer,
   deleteTrainingOrganization,
   getTrainingOrganizationById,
 };
