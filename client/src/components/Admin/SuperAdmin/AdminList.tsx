@@ -67,7 +67,7 @@ const AdminList: FC = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       showToast({
-        message: smaLocalize('com_superadmin_error_email_invalid'),
+        message: smaLocalize('com_ui_error_email_invalid'),
         status: 'error',
       });
       return;
@@ -100,7 +100,7 @@ const AdminList: FC = () => {
         renderItem={(item) => `${item.email} (${item.name})`}
         handleAddItem={handleAddAdmin}
         handleRemoveItem={handleRevokeAdmin}
-        placeholder={smaLocalize('com_superadmin_admin_email_placeholder')}
+        placeholder={smaLocalize('com_ui_admin_email_placeholder')}
       />
     </>
   );

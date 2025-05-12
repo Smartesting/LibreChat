@@ -116,9 +116,16 @@ const TrainingOrganizationView: FC<{
   });
 
   const handleAddAdmin = (email: string) => {
-    if (email.trim() !== '') {
-      addAdminMutation.mutate({ id: trainingOrganization._id, email: email });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      showToast({
+        message: smaLocalize('com_ui_error_email_invalid'),
+        status: 'error',
+      });
+      return;
     }
+
+    addAdminMutation.mutate({ id: trainingOrganization._id, email: email });
   };
 
   const handleRemoveAdmin = (email: string) => {
@@ -236,6 +243,7 @@ const TrainingOrganizationView: FC<{
               renderItem={(user) => `${user.email}`}
               handleRemoveItem={(user) => handleRemoveAdmin(user.email)}
               handleAddItem={handleAddAdmin}
+              placeholder={smaLocalize('com_ui_admin_email_placeholder')}
             />
           </div>
 

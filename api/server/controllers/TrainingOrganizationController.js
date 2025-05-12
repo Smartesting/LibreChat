@@ -264,11 +264,13 @@ const addAdministratorHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const { email } = req.body;
+
     if (!id) {
       return res.status(400).json({ error: 'Missing organization ID' });
     }
-    if (!email) {
-      return res.status(400).json({ error: 'Missing administrator email' });
+
+    if (!email || !email.match(/\S+@\S+\.\S+/)) {
+      return res.status(400).json({ error: 'Invalid email address' });
     }
 
     const trainingOrganization = await getTrainingOrganizationById(id);
@@ -279,21 +281,23 @@ const addAdministratorHandler = async (req, res) => {
     const existingAdmin = trainingOrganization.administrators.find(
       (admin) => admin.email.toLowerCase() === email.toLowerCase(),
     );
+
     if (existingAdmin) {
       return res.status(400).json({ error: 'Administrator already exists in this organization' });
     }
 
     const processedAdmins = await processAdministrators([email], trainingOrganization.name);
+
     if (!processedAdmins || processedAdmins.length === 0) {
       return res.status(500).json({ error: 'Failed to process administrator' });
     }
-    trainingOrganization.administrators.push(processedAdmins[0]);
 
     const updatedOrg = await TrainingOrganization.findByIdAndUpdate(
       id,
-      { administrators: trainingOrganization.administrators },
+      { administrators: [...trainingOrganization.administrators, ...processedAdmins] },
       { new: true },
     ).lean();
+
     if (!updatedOrg) {
       return res.status(500).json({ error: 'Failed to update training organization' });
     }

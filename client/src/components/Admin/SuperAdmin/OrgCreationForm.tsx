@@ -147,7 +147,7 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
                       required: smaLocalize('com_superadmin_error_email_required'),
                       pattern: {
                         value: /\S+@\S+\.\S+/,
-                        message: smaLocalize('com_superadmin_error_email_invalid'),
+                        message: smaLocalize('com_ui_error_email_invalid'),
                       },
                     }}
                     render={({ field }) => (
@@ -156,7 +156,7 @@ const OrgCreationForm: FC<{ onSubmit: () => void; onCancel: () => void }> = ({
                           {...field}
                           className={inputClass}
                           type="email"
-                          placeholder={smaLocalize('com_superadmin_admin_email_placeholder')}
+                          placeholder={smaLocalize('com_ui_admin_email_placeholder')}
                           aria-label="Administrator email"
                         />
                         {errors.administrators?.[index] && (
