@@ -8,6 +8,7 @@
   "com_superadmin_error_name_not_empty": "Le nom ne peut pas être vide",
   "com_superadmin_administrators": "Administrateurs",
   "com_ui_admin_email_placeholder": "Saisir l'email de l'administrateur",
+  "com_ui_trainer_email_placeholder": "Saisir l'email du formateur",
   "com_superadmin_add_administrator": "Ajouter un administrateur",
   "com_superadmin_error_email_required": "L'email est requis",
   "com_ui_error_email_invalid": "Veuillez saisir une adresse email valide",

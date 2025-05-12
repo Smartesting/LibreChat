@@ -380,14 +380,17 @@ const addTrainerHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const { email } = req.body;
+
     if (!id) {
       return res.status(400).json({ error: 'Missing organization ID' });
     }
-    if (!email) {
-      return res.status(400).json({ error: 'Missing trainer email' });
+
+    if (!email || !email.match(/\S+@\S+\.\S+/)) {
+      return res.status(400).json({ error: 'Invalid email address' });
     }
 
     const trainingOrganization = await getTrainingOrganizationById(id);
+
     if (!trainingOrganization) {
       return res.status(404).json({ error: 'Training organization not found' });
     }
@@ -395,22 +398,23 @@ const addTrainerHandler = async (req, res) => {
     const existingTrainer = trainingOrganization.trainers.find(
       (trainer) => trainer.email.toLowerCase() === email.toLowerCase(),
     );
+
     if (existingTrainer) {
       return res.status(400).json({ error: 'Trainer already exists in this organization' });
     }
 
     const processedTrainers = await processTrainers([email], trainingOrganization.name);
+
     if (!processedTrainers || processedTrainers.length === 0) {
       return res.status(500).json({ error: 'Failed to process trainer' });
     }
 
-    trainingOrganization.trainers.push(processedTrainers[0]);
-
     const updatedOrg = await TrainingOrganization.findByIdAndUpdate(
       id,
-      { trainers: trainingOrganization.trainers },
+      { trainers: [...trainingOrganization.trainers, processedTrainers] },
       { new: true },
     ).lean();
+
     if (!updatedOrg) {
       return res.status(500).json({ error: 'Failed to update training organization' });
     }
