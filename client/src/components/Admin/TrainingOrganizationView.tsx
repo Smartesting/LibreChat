@@ -15,6 +15,7 @@ import {
 } from '~/data-provider/TrainingOrganizations';
 import GenericList from '~/components/ui/GenericList';
 import TrainingCreationModal from '~/components/Admin/TrainingCreationModal';
+import { isValidEmail } from '~/utils';
 
 const TrainingOrganizationView: FC<{
   trainingOrganization: TrainingOrganization;
@@ -116,8 +117,7 @@ const TrainingOrganizationView: FC<{
   });
 
   const handleAddAdmin = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
+    if (!isValidEmail(email)) {
       showToast({
         message: smaLocalize('com_ui_error_email_invalid'),
         status: 'error',
@@ -133,8 +133,7 @@ const TrainingOrganizationView: FC<{
   };
 
   const handleAddTrainer = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
+    if (!isValidEmail(email)) {
       showToast({
         message: smaLocalize('com_ui_error_email_invalid'),
         status: 'error',

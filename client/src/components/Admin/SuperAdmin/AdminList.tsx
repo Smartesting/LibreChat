@@ -10,6 +10,7 @@ import {
 } from '~/data-provider';
 import { AxiosError } from 'axios';
 import AdminRevokeConfirmationModal from './AdminRevokeConfirmationModal';
+import { isValidEmail } from '~/utils';
 
 const AdminList: FC = () => {
   const { data: adminUsers = [] } = useGetAdminUsersQuery();
@@ -64,8 +65,7 @@ const AdminList: FC = () => {
   });
 
   const handleAddAdmin = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
+    if (!isValidEmail(email)) {
       showToast({
         message: smaLocalize('com_ui_error_email_invalid'),
         status: 'error',
