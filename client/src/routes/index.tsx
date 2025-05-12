@@ -7,6 +7,7 @@ import {
   Registration,
   RequestPasswordReset,
   ResetPassword,
+  TrainerInvite,
   TwoFactorScreen,
   VerifyEmail,
 } from '~/components/Auth';
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
       {
         path: 'admin-invite',
         element: <AdminInvite />,
+      },
+      {
+        path: 'trainer-invite',
+        element: <TrainerInvite />,
       },
     ],
   },

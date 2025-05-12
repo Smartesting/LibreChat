@@ -7,7 +7,7 @@ import { useLocalize, useSmaLocalize } from '~/hooks';
 import { ErrorMessage } from '~/components/Auth/ErrorMessage';
 import { Spinner } from '~/components';
 
-type TOrgAdminInviteForm = {
+type TTrainerInviteForm = {
   token: string;
   email: string;
   name: string;
@@ -16,7 +16,7 @@ type TOrgAdminInviteForm = {
   confirm_password: string;
 };
 
-function OrgAdminInvite() {
+function TrainerInvite() {
   const localize = useLocalize();
   const smaLocalize = useSmaLocalize();
   const {
@@ -24,7 +24,7 @@ function OrgAdminInvite() {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<TOrgAdminInviteForm>();
+  } = useForm<TTrainerInviteForm>();
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
@@ -36,9 +36,9 @@ function OrgAdminInvite() {
   const organizationName = params.get('orgName');
 
   // Create a mutation for accepting the invitation
-  const acceptAdminInvitation = useMutation({
-    mutationFn: (data: TOrgAdminInviteForm) => {
-      return axios.post('/api/training-organizations/accept-admin-invitation', data);
+  const acceptTrainerInvitation = useMutation({
+    mutationFn: (data: TTrainerInviteForm) => {
+      return axios.post('/api/training-organizations/accept-trainer-invitation', data);
     },
     onMutate: () => {
       setIsSubmitting(true);
@@ -66,8 +66,8 @@ function OrgAdminInvite() {
     },
   });
 
-  const onSubmit = (data: TOrgAdminInviteForm) => {
-    acceptAdminInvitation.mutate(data);
+  const onSubmit = (data: TTrainerInviteForm) => {
+    acceptTrainerInvitation.mutate(data);
   };
 
   return (
@@ -77,13 +77,13 @@ function OrgAdminInvite() {
           {smaLocalize('com_ui_invite_error')} {errorMessage}
         </ErrorMessage>
       )}
-      {acceptAdminInvitation.isSuccess && countdown > 0 && (
+      {acceptTrainerInvitation.isSuccess && countdown > 0 && (
         <>
           <div
             className="relative mb-8 mt-4 rounded-2xl border border-green-400 bg-green-100 px-4 py-3 text-center text-green-700 dark:bg-gray-900 dark:text-white"
             role="alert"
           >
-            {smaLocalize('com_orgadmin_invite_success', { organizationName })}
+            {smaLocalize('com_trainer_invite_success', { organizationName })}
             {' ' + localize('com_auth_email_verification_redirecting', { 0: countdown.toString() })}
           </div>
         </>
@@ -234,7 +234,7 @@ function OrgAdminInvite() {
               !!errors.password ||
               !!errors.confirm_password ||
               isSubmitting ||
-              acceptAdminInvitation.isSuccess
+              acceptTrainerInvitation.isSuccess
             }
             type="submit"
             aria-label="Submit registration"
@@ -248,4 +248,4 @@ function OrgAdminInvite() {
   );
 }
 
-export default OrgAdminInvite;
+export default TrainerInvite;

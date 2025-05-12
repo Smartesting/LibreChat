@@ -7,3 +7,4 @@ export { default as RequestPasswordReset } from './RequestPasswordReset';
 export { default as TwoFactorScreen } from './TwoFactorScreen';
 export { default as OrgAdminInvite } from './OrgAdminInvite';
 export { default as AdminInvite } from './AdminInvite';
+export { default as TrainerInvite } from './TrainerInvite';

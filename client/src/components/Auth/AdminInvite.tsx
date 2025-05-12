@@ -45,7 +45,7 @@ function AdminInvite() {
     onError: (error) => {
       setIsSubmitting(false);
       if (axios.isAxiosError(error) && error.response?.data?.error) {
-        setErrorMessage(error.response?.data?.error ?? '');
+        setErrorMessage(error.response.data.error);
       }
     },
     onSuccess: () => {
@@ -73,7 +73,7 @@ function AdminInvite() {
     <>
       {errorMessage && (
         <ErrorMessage>
-          {smaLocalize('com_superadmin_invite_error')} {errorMessage}
+          {smaLocalize('com_ui_invite_error')} {errorMessage}
         </ErrorMessage>
       )}
       {acceptAdminInvitation.isSuccess && countdown > 0 && (
