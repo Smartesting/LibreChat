@@ -411,7 +411,7 @@ const addTrainerHandler = async (req, res) => {
 
     const updatedOrg = await TrainingOrganization.findByIdAndUpdate(
       id,
-      { trainers: [...trainingOrganization.trainers, processedTrainers] },
+      { trainers: [...trainingOrganization.trainers, ...processedTrainers] },
       { new: true },
     ).lean();
 
