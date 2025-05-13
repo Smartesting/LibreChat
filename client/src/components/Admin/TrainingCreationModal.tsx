@@ -4,13 +4,14 @@ import { cn } from '~/utils';
 import TrainingCreationForm from '~/components/Admin/TrainingCreationForm';
 import { useLocalize, useSmaLocalize } from '~/hooks';
 import { Training } from 'librechat-data-provider';
-import GenericList from '~/components/ui/GenericList';
+import UserMultiSelect from '~/components/Admin/UserMultiSelect';
 
 interface TrainingCreationModalProps {
   isOpen: boolean;
   onClose: () => void;
   organizationId: string;
   training?: Training;
+  organizationTrainers?: { email: string }[];
 }
 
 const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
@@ -18,6 +19,7 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
   onClose,
   organizationId,
   training,
+  organizationTrainers = [],
 }) => {
   const smaLocalize = useSmaLocalize();
   const localize = useLocalize();
@@ -109,19 +111,13 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
                 </div>
 
                 <div className="w-1/2 overflow-auto p-6">
-                  <GenericList
+                  <UserMultiSelect
                     title={smaLocalize('com_orgadmin_trainers')}
-                    items={trainers}
-                    getKey={(user) => user.email}
-                    renderItem={(user) => `${user.email}`}
-                    handleRemoveItem={(user) => {
-                      // Remove trainer
-                      setTrainers(trainers.filter((t) => t.email !== user.email));
-                    }}
-                    handleAddItem={(email) => {
-                      if (email && !trainers.some((t) => t.email === email)) {
-                        setTrainers([...trainers, { email }]);
-                      }
+                    users={organizationTrainers}
+                    selectedUsers={trainers.map((t) => t.email)}
+                    onSelectedUsersChange={(selectedEmails) => {
+                      const newTrainers = selectedEmails.map((email) => ({ email }));
+                      setTrainers(newTrainers);
                     }}
                     maxEntries={2}
                   />

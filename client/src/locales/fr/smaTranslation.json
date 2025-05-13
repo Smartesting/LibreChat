@@ -81,6 +81,8 @@
   "com_orgadmin_error_update_training": "Une erreur est survenue lors de la mise à jour. Réessayez.",
   "com_orgadmin_error_name_required": "Nom requis",
   "com_orgadmin_error_name_not_empty": "Le nom ne peut pas être vide",
+  "com_orgadmin_select_users": "Choisir les formateurs (2 max)",
+  "com_orgadmin_selected_users": "formateurs sélectionnés",
   "com_superadmin_confirm_admin_revocation": "Confirmer la révocation des droits d'administrateur",
   "com_superadmin_admin_revocation_message": "Êtes-vous sûr de vouloir révoquer les droits d'administrateur de {{email}} ({{name}}) ?",
   "com_superadmin_past_trainings": "Formations passées :",

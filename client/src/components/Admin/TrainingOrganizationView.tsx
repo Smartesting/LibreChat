@@ -1,6 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrainingOrganization } from 'librechat-data-provider';
+import { TrainingOrganization, TrainingStatus } from 'librechat-data-provider';
 import { ArrowLeft, ChevronDown, ChevronUp, Edit, Plus, Trash2, User } from 'lucide-react';
 import UtilityButtons from '~/components/Admin/UtilityButtons';
 import { useSmaLocalize } from '~/hooks';
@@ -34,6 +34,10 @@ const TrainingOrganizationView: FC<{
   const { data: trainings = [], isLoading: isLoadingTrainings } = useTrainingsByOrganizationQuery(
     trainingOrganization._id,
   );
+
+  const upcomingTrainings = useMemo(() => {
+    return trainings.filter((training) => training.status === TrainingStatus.UPCOMING);
+  }, [trainings]);
 
   const handleGoBack = () => {
     navigate(-1);
@@ -199,6 +203,7 @@ const TrainingOrganizationView: FC<{
         }}
         organizationId={trainingOrganization._id}
         training={trainingToEdit || undefined}
+        organizationTrainers={trainers}
       />
 
       {trainingToDelete && (
@@ -286,12 +291,12 @@ const TrainingOrganizationView: FC<{
                 <div className="p-4 text-center text-text-secondary">
                   {smaLocalize('com_ui_loading')}
                 </div>
-              ) : trainings.length === 0 ? (
+              ) : upcomingTrainings.length === 0 ? (
                 <div className="p-4 text-center text-text-secondary">
                   {smaLocalize('com_orgadmin_no_trainings')}
                 </div>
               ) : (
-                trainings.map((training) => (
+                upcomingTrainings.map((training) => (
                   <li key={training._id} className="overflow-hidden rounded bg-surface-tertiary">
                     <div
                       className="flex cursor-pointer items-center justify-between p-3"

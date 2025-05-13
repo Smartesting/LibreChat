@@ -81,6 +81,8 @@
   "com_orgadmin_error_update_training": "An error occurred while updating the training. Please try again.",
   "com_orgadmin_error_name_required": "Name is required",
   "com_orgadmin_error_name_not_empty": "Name cannot be empty",
+  "com_orgadmin_select_users": "Select trainers (max 2)",
+  "com_orgadmin_selected_users": "trainers selected",
   "com_superadmin_confirm_admin_revocation": "Confirm the revocation of administrator rights",
   "com_superadmin_admin_revocation_message": "Are you sure to revoke administrator rights from {{email}} ({{name}})?",
   "com_superadmin_past_trainings": "Past trainings:",
