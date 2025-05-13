@@ -6,9 +6,9 @@ import { Training, TrainingWithStatus } from 'librechat-data-provider';
 
 const TrainingItem: FC<{
   training: TrainingWithStatus;
-  setTrainingToEdit: (trainingToEdit: Training) => void;
-  setIsTrainingModalOpen: (isOpen: boolean) => void;
-  setTrainingToDelete: (trainingToDelete: string) => void;
+  setTrainingToEdit?: (trainingToEdit: Training) => void;
+  setIsTrainingModalOpen?: (isOpen: boolean) => void;
+  setTrainingToDelete?: (trainingToDelete: string) => void;
 }> = ({ training, setTrainingToEdit, setIsTrainingModalOpen, setTrainingToDelete }) => {
   const smaLocalize = useSmaLocalize();
   const [expandedTrainingId, setExpandedTrainingId] = useState<string | null>(null);
@@ -36,27 +36,31 @@ const TrainingItem: FC<{
         </div>
 
         <div className="flex items-center">
-          <button
-            className="mr-1 rounded-full p-1 hover:bg-surface-secondary"
-            aria-label={smaLocalize('com_ui_edit')}
-            onClick={(e) => {
-              e.stopPropagation();
-              setTrainingToEdit(training);
-              setIsTrainingModalOpen(true);
-            }}
-          >
-            <Edit size={16} className="text-text-primary" />
-          </button>
-          <button
-            className="mr-2 rounded-full p-1 hover:bg-surface-secondary"
-            aria-label={smaLocalize('com_ui_delete')}
-            onClick={(e) => {
-              e.stopPropagation();
-              setTrainingToDelete(training._id);
-            }}
-          >
-            <Trash2 size={16} className="text-text-primary" />
-          </button>
+          {setTrainingToEdit && (
+            <button
+              className="mr-1 rounded-full p-1 hover:bg-surface-secondary"
+              aria-label={smaLocalize('com_ui_edit')}
+              onClick={(e) => {
+                e.stopPropagation();
+                setTrainingToEdit(training);
+                setIsTrainingModalOpen && setIsTrainingModalOpen(true);
+              }}
+            >
+              <Edit size={16} className="text-text-primary" />
+            </button>
+          )}
+          {setTrainingToDelete && (
+            <button
+              className="mr-2 rounded-full p-1 hover:bg-surface-secondary"
+              aria-label={smaLocalize('com_ui_delete')}
+              onClick={(e) => {
+                e.stopPropagation();
+                setTrainingToDelete(training._id);
+              }}
+            >
+              <Trash2 size={16} className="text-text-primary" />
+            </button>
+          )}
           {expandedTrainingId === training._id ? (
             <ChevronUp size={20} className="text-text-primary" />
           ) : (

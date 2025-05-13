@@ -337,13 +337,7 @@ const TrainingOrganizationView: FC<{
                 </div>
               ) : (
                 pastTrainings.map((training) => (
-                  <TrainingItem
-                    key={training._id}
-                    training={training}
-                    setTrainingToEdit={setTrainingToEdit}
-                    setIsTrainingModalOpen={setIsTrainingModalOpen}
-                    setTrainingToDelete={setTrainingToDelete}
-                  />
+                  <TrainingItem key={training._id} training={training} />
                 ))
               )}
             </ul>
