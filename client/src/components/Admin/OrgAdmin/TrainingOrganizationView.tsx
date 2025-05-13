@@ -6,6 +6,7 @@ import UtilityButtons from '~/components/Admin/UtilityButtons';
 import { useSmaLocalize } from '~/hooks';
 import { useToastContext } from '~/Providers';
 import {
+  useActiveOrganizationMembersQuery,
   useAddAdministratorMutation,
   useAddTrainerMutation,
   useDeleteTrainingMutation,
@@ -43,6 +44,8 @@ const TrainingOrganizationView: FC<{
       pastTrainings: trainings.filter((training) => training.status === TrainingStatus.PAST),
     };
   }, [trainings]);
+
+  const { data: activeMembers } = useActiveOrganizationMembersQuery(trainingOrganization._id);
 
   const handleGoBack = () => {
     navigate(-1);
@@ -244,7 +247,14 @@ const TrainingOrganizationView: FC<{
               title={smaLocalize('com_orgadmin_administrators')}
               items={administrators}
               getKey={(user) => user.email}
-              renderItem={(user) => `${user.email}`}
+              renderItem={(user) => {
+                const activeAdmin = activeMembers?.activeAdministrators?.find(
+                  (admin) => admin.email.toLowerCase() === user.email.toLowerCase(),
+                );
+                return activeAdmin && activeAdmin.name
+                  ? `${user.email} (${activeAdmin.name})`
+                  : `${user.email} (${smaLocalize('com_ui_invited')})`;
+              }}
               handleRemoveItem={(user) => handleRemoveAdmin(user.email)}
               handleAddItem={handleAddAdmin}
               placeholder={smaLocalize('com_ui_admin_email_placeholder')}
@@ -255,7 +265,14 @@ const TrainingOrganizationView: FC<{
             title={smaLocalize('com_orgadmin_trainers')}
             items={trainers}
             getKey={(user) => user.email}
-            renderItem={(user) => `${user.email}`}
+            renderItem={(user) => {
+              const activeTrainer = activeMembers?.activeTrainers?.find(
+                (trainer) => trainer.email.toLowerCase() === user.email.toLowerCase(),
+              );
+              return activeTrainer && activeTrainer.name
+                ? `${user.email} (${activeTrainer.name})`
+                : `${user.email} (${smaLocalize('com_ui_invited')})`;
+            }}
             handleRemoveItem={(user) => handleRemoveTrainer(user.email)}
             handleAddItem={handleAddTrainer}
             placeholder={smaLocalize('com_ui_trainer_email_placeholder')}

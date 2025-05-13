@@ -24,7 +24,7 @@ const AdminList: FC = () => {
   const existingAndInvitedAdmins = useMemo(() => {
     const invitedUsers = pendingInvitations.map((invitation) => ({
       email: invitation.email,
-      name: smaLocalize('com_superadmin_invited'),
+      name: smaLocalize('com_ui_invited'),
     }));
 
     return [...adminUsers, ...invitedUsers];

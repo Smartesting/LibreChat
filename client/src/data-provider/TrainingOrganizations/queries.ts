@@ -61,3 +61,27 @@ export const useTrainingsByOrganizationQuery = <
     },
   );
 };
+
+/**
+ * Hook for fetching active organization members (administrators and trainers)
+ */
+export const useActiveOrganizationMembersQuery = <
+  TData = { activeAdministrators: t.TUser[]; activeTrainers: t.TUser[] },
+>(organizationId: string): QueryObserverResult<TData> => {
+  return useQuery<
+    { activeAdministrators: t.TUser[]; activeTrainers: t.TUser[] },
+    unknown,
+    TData
+  >(
+    [QueryKeys.trainingOrganizations, organizationId, 'active-members'],
+    () => dataService.getActiveOrganizationMembers(organizationId),
+    {
+      staleTime: 1000 * 5,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      enabled: !!organizationId,
+    },
+  );
+};

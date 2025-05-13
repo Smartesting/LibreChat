@@ -18,7 +18,7 @@
   "com_superadmin_add_admin_error": "Une erreur s'est produite lors de l'ajout du nouvel administrateur.",
   "com_superadmin_revoke_admin_success": "Administrateur révoqué avec succès",
   "com_superadmin_revoke_admin_error": "Une erreur s'est produite lors de la suppression de l'administrateur.",
-  "com_superadmin_invited": "invité",
+  "com_ui_invited": "invité",
   "com_superadmin_delete_organization": "Supprimer l'organisme de formation",
   "com_superadmin_delete_organization_error": "Une erreur s'est produite lors de la suppression de l'organisme de formation. Veuillez réessayer.",
   "com_superadmin_delete_organization_confirm": "Confirmer la suppression",

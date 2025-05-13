@@ -878,3 +878,9 @@ export function revokeAdminAccess(data: { email: string }): Promise<{ message: s
 export function getAdminUsers(): Promise<t.TUser[]> {
   return request.get(endpoints.admins());
 }
+
+export const getActiveOrganizationMembers = (
+  id: q.TrainingOrganization['_id'],
+): Promise<{ activeAdministrators: t.TUser[]; activeTrainers: t.TUser[] }> => {
+  return request.get(endpoints.trainingOrganizations(id, 'active-members'));
+};
