@@ -583,6 +583,54 @@ const removeTrainerHandler = async (req, res) => {
   }
 };
 
+/**
+ * Retrieves active administrators and trainers of a training organization.
+ * @route GET /training-organizations/:id/active-members
+ * @param {ServerRequest} req - The request object.
+ * @param {Object} req.params - The request parameters.
+ * @param {string} req.params.id - The ID of the training organization.
+ * @param {ServerResponse} res - The response object.
+ * @returns {Object} 200 - success response - application/json
+ */
+const getActiveOrganizationMembersHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Missing organization ID' });
+    }
+
+    const trainingOrganization = await getTrainingOrganizationById(id);
+
+    if (!trainingOrganization) {
+      return res.status(404).json({ error: 'Training organization not found' });
+    }
+
+    const activeAdministrators = await Promise.all(
+      trainingOrganization.administrators
+        .filter((admin) => admin.userId) // Only process active admins with userId
+        .map(async (admin) => await findUser({ _id: admin.userId })),
+    );
+
+    const activeTrainers = await Promise.all(
+      trainingOrganization.trainers
+        .filter((trainer) => trainer.userId) // Only process active trainers with userId
+        .map(async (trainer) => await findUser({ _id: trainer.userId })),
+    );
+
+    return res.json({
+      activeAdministrators: activeAdministrators,
+      activeTrainers: activeTrainers,
+    });
+  } catch (error) {
+    logger.error(
+      `[/training-organizations/${req.params.id}/active-members] Error retrieving active members`,
+      error,
+    );
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createTrainingOrganization: createTrainingOrganizationHandler,
   getListTrainingOrganizations: getListTrainingOrganizationsHandler,
@@ -594,4 +642,5 @@ module.exports = {
   removeAdministrator: removeAdministratorHandler,
   addTrainer: addTrainerHandler,
   removeTrainer: removeTrainerHandler,
+  getActiveOrganizationMembers: getActiveOrganizationMembersHandler,
 };
