@@ -1,0 +1,83 @@
+import React, { FC, useState } from 'react';
+import { Plus } from 'lucide-react';
+import { Training, TrainingWithStatus } from 'librechat-data-provider';
+import { useSmaLocalize } from '~/hooks';
+import TrainingItem from '~/components/Admin/OrgAdmin/Training/TrainingItem';
+import TrainingCreationModal from '~/components/Admin/OrgAdmin/Training/TrainingCreationModal';
+import DeleteTrainingModal from '~/components/Admin/OrgAdmin/DeleteTrainingModal';
+
+type TrainingsListProps = {
+  orgId: string;
+  trainings: TrainingWithStatus[];
+  isLoading: boolean;
+  trainers: { email: string }[];
+  type: 'upcoming' | 'past';
+};
+
+const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, trainers, type }) => {
+  const smaLocalize = useSmaLocalize();
+  const [isTrainingModalOpen, setIsTrainingModalOpen] = useState(false);
+  const [trainingToEdit, setTrainingToEdit] = useState<Training | null>(null);
+  const [trainingToDelete, setTrainingToDelete] = useState<string | null>(null);
+
+  const isPast = type === 'past';
+  const titleKey = isPast ? 'com_orgadmin_past_trainings' : 'com_orgadmin_upcoming_trainings';
+
+  return (
+    <>
+      <DeleteTrainingModal
+        trainingId={trainingToDelete}
+        onClose={() => setTrainingToDelete(null)}
+      />
+      <TrainingCreationModal
+        isOpen={isTrainingModalOpen}
+        onClose={() => {
+          setIsTrainingModalOpen(false);
+          setTrainingToEdit(null);
+        }}
+        organizationId={orgId}
+        training={trainingToEdit || undefined}
+        organizationTrainers={trainers}
+      />
+      <div className="mb-6">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-text-primary">{smaLocalize(titleKey)}</h2>
+          {!isPast && (
+            <button
+              className="rounded-full bg-surface-primary p-1 hover:bg-surface-secondary"
+              aria-label={
+                smaLocalize('com_ui_add') + ' ' + smaLocalize('com_orgadmin_upcoming_trainings')
+              }
+              onClick={() => setIsTrainingModalOpen(true)}
+            >
+              <Plus size={16} className="text-text-primary" />
+            </button>
+          )}
+        </div>
+        <ul className="space-y-2">
+          {isLoading ? (
+            <div className="p-4 text-center text-text-secondary">
+              {smaLocalize('com_ui_loading')}
+            </div>
+          ) : trainings.length === 0 ? (
+            <div className="p-4 text-center text-text-secondary">
+              {smaLocalize('com_orgadmin_no_trainings')}
+            </div>
+          ) : (
+            trainings.map((training) => (
+              <TrainingItem
+                key={training._id}
+                training={training}
+                setTrainingToEdit={!isPast ? setTrainingToEdit : undefined}
+                setIsTrainingModalOpen={!isPast ? setIsTrainingModalOpen : undefined}
+                setTrainingToDelete={!isPast ? setTrainingToDelete : undefined}
+              />
+            ))
+          )}
+        </ul>
+      </div>
+    </>
+  );
+};
+
+export default TrainingsList;

@@ -12,6 +12,7 @@ type ListProps<T> = {
   onAddButtonClick?: () => void;
   maxEntries?: number;
   placeholder?: string;
+  className?: string;
 };
 
 const GenericList = <T,>({
@@ -24,6 +25,7 @@ const GenericList = <T,>({
   onAddButtonClick,
   maxEntries,
   placeholder,
+  className,
 }: ListProps<T>) => {
   const localize = useLocalize();
   const [showNewItemInput, setShowNewItemInput] = useState(false);
@@ -31,7 +33,7 @@ const GenericList = <T,>({
   const [newItemValue, setNewItemValue] = useState('');
 
   return (
-    <div>
+    <div className={className}>
       <div className="mb-2 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
         {(handleAddItem || onAddButtonClick) && (
@@ -74,7 +76,9 @@ const GenericList = <T,>({
           </li>
         ))}
 
-        {handleAddItem && showNewItemInput && (maxEntries === undefined || items.length < maxEntries) && (
+        {handleAddItem &&
+          showNewItemInput &&
+          (maxEntries === undefined || items.length < maxEntries) && (
           <li className="flex items-center rounded bg-surface-tertiary p-2">
             <input
               type="text"
