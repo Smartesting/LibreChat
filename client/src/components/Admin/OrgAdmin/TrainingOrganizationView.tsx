@@ -15,9 +15,9 @@ import {
   useTrainingsByOrganizationQuery,
 } from '~/data-provider/TrainingOrganizations';
 import GenericList from '~/components/ui/GenericList';
-import TrainingCreationModal from '~/components/Admin/Training/TrainingCreationModal';
+import TrainingCreationModal from '~/components/Admin/OrgAdmin/Training/TrainingCreationModal';
 import { isValidEmail } from '~/utils';
-import TrainingItem from '../Training/TrainingItem';
+import TrainingItem from '~/components/Admin/OrgAdmin/Training/TrainingItem';
 
 const TrainingOrganizationView: FC<{
   trainingOrganization: TrainingOrganization;

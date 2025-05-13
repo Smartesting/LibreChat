@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { cn } from '~/utils';
-import TrainingCreationForm from '~/components/Admin/Training/TrainingCreationForm';
+import TrainingCreationForm from '~/components/Admin/OrgAdmin/Training/TrainingCreationForm';
 import { useLocalize, useSmaLocalize } from '~/hooks';
 import { Training } from 'librechat-data-provider';
 import UserMultiSelect from '~/components/ui/UserMultiSelect';
