@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { cn } from '~/utils';
-import TrainingCreationForm from '~/components/Admin/TrainingCreationForm';
+import TrainingCreationForm from '~/components/Admin/Training/TrainingCreationForm';
 import { useLocalize, useSmaLocalize } from '~/hooks';
 import { Training } from 'librechat-data-provider';
-import UserMultiSelect from '~/components/Admin/UserMultiSelect';
+import UserMultiSelect from '~/components/ui/UserMultiSelect';
 
 interface TrainingCreationModalProps {
   isOpen: boolean;

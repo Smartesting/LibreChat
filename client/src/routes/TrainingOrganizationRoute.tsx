@@ -4,7 +4,7 @@ import { useTrainingOrganizationByIdQuery } from '~/data-provider/TrainingOrgani
 import { useAuthContext, useSmaLocalize } from '~/hooks';
 import { NotificationSeverity } from '~/common';
 import { useToastContext } from '~/Providers';
-import TrainingOrganizationView from '~/components/Admin/TrainingOrganizationView';
+import TrainingOrganizationView from '~/components/Admin/Training/TrainingOrganizationView';
 import axios from 'axios';
 
 const TrainingOrganizationRoute: FC = () => {

@@ -1,7 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrainingOrganization, TrainingStatus } from 'librechat-data-provider';
-import { ArrowLeft, ChevronDown, ChevronUp, Edit, Plus, Trash2, User } from 'lucide-react';
+import { Training, TrainingOrganization, TrainingStatus } from 'librechat-data-provider';
+import { ArrowLeft, Plus } from 'lucide-react';
 import UtilityButtons from '~/components/Admin/UtilityButtons';
 import { useSmaLocalize } from '~/hooks';
 import { useToastContext } from '~/Providers';
@@ -14,8 +14,9 @@ import {
   useTrainingsByOrganizationQuery,
 } from '~/data-provider/TrainingOrganizations';
 import GenericList from '~/components/ui/GenericList';
-import TrainingCreationModal from '~/components/Admin/TrainingCreationModal';
+import TrainingCreationModal from '~/components/Admin/Training/TrainingCreationModal';
 import { isValidEmail } from '~/utils';
+import TrainingItem from './TrainingItem';
 
 const TrainingOrganizationView: FC<{
   trainingOrganization: TrainingOrganization;
@@ -26,17 +27,21 @@ const TrainingOrganizationView: FC<{
   const { showToast } = useToastContext();
   const [administrators, setAdministrators] = useState(trainingOrganization.administrators || []);
   const [trainers, setTrainers] = useState(trainingOrganization.trainers || []);
-  const [expandedTrainingId, setExpandedTrainingId] = useState<string | null>(null);
   const [isTrainingModalOpen, setIsTrainingModalOpen] = useState(false);
   const [trainingToDelete, setTrainingToDelete] = useState<string | null>(null);
-  const [trainingToEdit, setTrainingToEdit] = useState<t.Training | null>(null);
+  const [trainingToEdit, setTrainingToEdit] = useState<Training | null>(null);
 
   const { data: trainings = [], isLoading: isLoadingTrainings } = useTrainingsByOrganizationQuery(
     trainingOrganization._id,
   );
 
-  const upcomingTrainings = useMemo(() => {
-    return trainings.filter((training) => training.status === TrainingStatus.UPCOMING);
+  const { upcomingTrainings, pastTrainings } = useMemo(() => {
+    return {
+      upcomingTrainings: trainings.filter(
+        (training) => training.status === TrainingStatus.UPCOMING,
+      ),
+      pastTrainings: trainings.filter((training) => training.status === TrainingStatus.PAST),
+    };
   }, [trainings]);
 
   const handleGoBack = () => {
@@ -170,10 +175,6 @@ const TrainingOrganizationView: FC<{
     },
   });
 
-  const handleDeleteTraining = (trainingId: string) => {
-    setTrainingToDelete(trainingId);
-  };
-
   const confirmDeleteTraining = () => {
     if (trainingToDelete) {
       deleteTrainingMutation.mutate(trainingToDelete);
@@ -182,14 +183,6 @@ const TrainingOrganizationView: FC<{
 
   const cancelDeleteTraining = () => {
     setTrainingToDelete(null);
-  };
-
-  const toggleTrainingExpand = (trainingId: string) => {
-    setExpandedTrainingId(expandedTrainingId === trainingId ? null : trainingId);
-  };
-
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString();
   };
 
   return (
@@ -297,96 +290,43 @@ const TrainingOrganizationView: FC<{
                 </div>
               ) : (
                 upcomingTrainings.map((training) => (
-                  <li key={training._id} className="overflow-hidden rounded bg-surface-tertiary">
-                    <div
-                      className="flex cursor-pointer items-center justify-between p-3"
-                      onClick={() => toggleTrainingExpand(training._id)}
-                    >
-                      <div className="flex flex-1 items-center">
-                        <span className="mr-2 font-medium text-text-primary">{training.name}</span>
-                        <span className="mx-2">•</span>
-                        <span className="text-sm text-text-secondary">
-                          {training.participantCount}
-                        </span>
-                        <User size={14} className="mx-1 text-text-secondary" />
-                        <span className="mx-2">•</span>
-                        <span className="text-sm text-text-secondary">
-                          {formatDate(training.startDateTime)}
-                        </span>
-                      </div>
+                  <TrainingItem
+                    key={training._id}
+                    training={training}
+                    setTrainingToEdit={setTrainingToEdit}
+                    setIsTrainingModalOpen={setIsTrainingModalOpen}
+                    setTrainingToDelete={setTrainingToDelete}
+                  />
+                ))
+              )}
+            </ul>
+          </div>
+          <br />
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-text-primary">
+                {smaLocalize('com_orgadmin_past_trainings')}
+              </h2>
+            </div>
 
-                      <div className="flex items-center">
-                        <button
-                          className="mr-1 rounded-full p-1 hover:bg-surface-secondary"
-                          aria-label={smaLocalize('com_ui_edit')}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setTrainingToEdit(training);
-                            setIsTrainingModalOpen(true);
-                          }}
-                        >
-                          <Edit size={16} className="text-text-primary" />
-                        </button>
-                        <button
-                          className="mr-2 rounded-full p-1 hover:bg-surface-secondary"
-                          aria-label={smaLocalize('com_ui_delete')}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteTraining(training._id);
-                          }}
-                        >
-                          <Trash2 size={16} className="text-text-primary" />
-                        </button>
-                        {expandedTrainingId === training._id ? (
-                          <ChevronUp size={20} className="text-text-primary" />
-                        ) : (
-                          <ChevronDown size={20} className="text-text-primary" />
-                        )}
-                      </div>
-                    </div>
-                    <div
-                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                        expandedTrainingId === training._id
-                          ? 'max-h-96 opacity-100'
-                          : 'max-h-0 opacity-0'
-                      }`}
-                    >
-                      <div className="border-l-4 border-t border-border-light p-3 pb-4 pl-8 pt-4">
-                        <div className="flex flex-col gap-1 text-sm">
-                          <div className="text-text-primary">
-                            <span className="font-bold">
-                              {smaLocalize('com_orgadmin_description')} :
-                            </span>{' '}
-                            {training.description}
-                          </div>
-                          <div className="text-text-primary">
-                            <span className="font-bold">
-                              {smaLocalize('com_orgadmin_location')} :{' '}
-                            </span>{' '}
-                            {training.location}
-                          </div>
-                          <div className="text-text-primary">
-                            <span className="font-bold">
-                              {smaLocalize('com_orgadmin_timezone')} :{' '}
-                            </span>{' '}
-                            {training.timezone}
-                          </div>
-                          <div className="text-text-primary">
-                            <span className="font-bold">
-                              {smaLocalize('com_orgadmin_start_date')} :{' '}
-                            </span>{' '}
-                            {new Date(training.startDateTime).toLocaleString()}
-                          </div>
-                          <div className="text-text-primary">
-                            <span className="font-bold">
-                              {smaLocalize('com_orgadmin_end_date')} :{' '}
-                            </span>{' '}
-                            {new Date(training.endDateTime).toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
+            <ul className="space-y-2">
+              {isLoadingTrainings ? (
+                <div className="p-4 text-center text-text-secondary">
+                  {smaLocalize('com_ui_loading')}
+                </div>
+              ) : pastTrainings.length === 0 ? (
+                <div className="p-4 text-center text-text-secondary">
+                  {smaLocalize('com_orgadmin_no_trainings')}
+                </div>
+              ) : (
+                pastTrainings.map((training) => (
+                  <TrainingItem
+                    key={training._id}
+                    training={training}
+                    setTrainingToEdit={setTrainingToEdit}
+                    setIsTrainingModalOpen={setIsTrainingModalOpen}
+                    setTrainingToDelete={setTrainingToDelete}
+                  />
                 ))
               )}
             </ul>
