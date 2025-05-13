@@ -16,7 +16,7 @@ import {
 import GenericList from '~/components/ui/GenericList';
 import TrainingCreationModal from '~/components/Admin/Training/TrainingCreationModal';
 import { isValidEmail } from '~/utils';
-import TrainingItem from './TrainingItem';
+import TrainingItem from '../Training/TrainingItem';
 
 const TrainingOrganizationView: FC<{
   trainingOrganization: TrainingOrganization;
