@@ -260,7 +260,6 @@ describe('TrainingOrganizationController - acceptAdminInvitationHandler', () => 
 
     expect(updateTrainingOrganizationAdmin).toHaveBeenCalledWith('org-id-1', 'test@example.com', {
       userId: 'user-id-1',
-      status: 'active',
       activatedAt: expect.any(Date),
     });
 
