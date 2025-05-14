@@ -69,7 +69,7 @@ const OrgAdminList: FC<{
       return;
     }
 
-    addAdminMutation.mutate({ id: orgId, email: email });
+    addAdminMutation.mutate({ id: orgId, email: email.trim() });
   };
 
   const handleRemoveAdmin = (email: string) => {
