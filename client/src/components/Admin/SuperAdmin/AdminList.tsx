@@ -33,14 +33,14 @@ const AdminList: FC = () => {
   const grantAdminAccessMutation = useGrantAdminAccessMutation({
     onSuccess: () => {
       showToast({
-        message: smaLocalize('com_superadmin_add_admin_success'),
+        message: smaLocalize('com_ui_add_admin_success'),
         status: 'success',
       });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response?.data?.message) {
         showToast({
-          message: `${smaLocalize('com_superadmin_add_admin_error')} ${error.response.data.message}`,
+          message: `${smaLocalize('com_ui_add_admin_error')} ${error.response.data.message}`,
           status: 'error',
         });
       }
@@ -50,14 +50,14 @@ const AdminList: FC = () => {
   const revokeAdminAccessMutation = useRevokeAdminAccessMutation({
     onSuccess: () => {
       showToast({
-        message: smaLocalize('com_superadmin_revoke_admin_success'),
+        message: smaLocalize('com_ui_revoke_admin_success'),
         status: 'success',
       });
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response?.data?.message) {
         showToast({
-          message: `${smaLocalize('com_superadmin_revoke_admin_error')} ${error.response.data.message}`,
+          message: `${smaLocalize('com_ui_revoke_admin_error')} ${error.response.data.message}`,
           status: 'error',
         });
       }

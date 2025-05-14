@@ -52,38 +52,34 @@ const OrgAdminList: FC<{
   const addAdminMutation = useAddAdministratorMutation({
     onSuccess: () => {
       showToast({
-        message: `${smaLocalize('com_orgadmin_administrator')} ${smaLocalize('com_ui_added')}`,
+        message: smaLocalize('com_ui_add_admin_success'),
         status: 'success',
       });
     },
     onError: (error) => {
-      console.error('Error adding administrator:', error);
-      showToast({
-        message:
-          error instanceof AxiosError && error.response?.data?.message
-            ? error.response.data.error
-            : `${smaLocalize('com_ui_error_adding')} ${smaLocalize('com_orgadmin_administrator')}`,
-        status: 'error',
-      });
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        showToast({
+          message: `${smaLocalize('com_ui_add_admin_error')} ${error.response.data.message}`,
+          status: 'error',
+        });
+      }
     },
   });
 
   const removeAdminMutation = useRemoveAdministratorMutation({
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       showToast({
-        message: `${smaLocalize('com_orgadmin_administrator')} ${variables.email} ${smaLocalize('com_ui_removed')}`,
+        message: smaLocalize('com_ui_revoke_admin_success'),
         status: 'success',
       });
     },
-    onError: (error, variables) => {
-      console.error('Error removing administrator:', error);
-      showToast({
-        message:
-          error instanceof AxiosError && error.response?.data?.message
-            ? error.response.data.error
-            : `${smaLocalize('com_ui_error_removing')} ${variables.email} ${smaLocalize('com_orgadmin_administrator')}`,
-        status: 'error',
-      });
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        showToast({
+          message: `${smaLocalize('com_ui_revoke_admin_error')} ${error.response.data.message}`,
+          status: 'error',
+        });
+      }
     },
   });
 

@@ -4,7 +4,7 @@ import UtilityButtons from '~/components/Admin/UtilityButtons';
 import { useTrainingsByOrganizationQuery } from '~/data-provider/TrainingOrganizations';
 import TrainingOrganizationHeader from '~/components/Admin/OrgAdmin/TrainingOrganizationHeader';
 import OrgAdminList from '~/components/Admin/OrgAdmin/OrgAdminList';
-import TrainersList from '~/components/Admin/OrgAdmin/TrainersList';
+import TrainerList from '~/components/Admin/OrgAdmin/TrainerList';
 import TrainingsList from '~/components/Admin/OrgAdmin/TrainingsList';
 
 const TrainingOrganizationView: FC<{
@@ -34,7 +34,7 @@ const TrainingOrganizationView: FC<{
             orgId={trainingOrganization._id}
             orgAdmins={trainingOrganization.administrators}
           />
-          <TrainersList
+          <TrainerList
             orgId={trainingOrganization._id}
             trainers={trainingOrganization.trainers}
           />

@@ -17,7 +17,7 @@ interface TrainersListProps {
   trainers: User[];
 }
 
-const TrainersList: FC<TrainersListProps> = ({ orgId, trainers }) => {
+const TrainerList: FC<TrainersListProps> = ({ orgId, trainers }) => {
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
   const { data: activeMembers } = useActiveOrganizationMembersQuery(orgId);
@@ -56,38 +56,34 @@ const TrainersList: FC<TrainersListProps> = ({ orgId, trainers }) => {
   const addTrainerMutation = useAddTrainerMutation({
     onSuccess: () => {
       showToast({
-        message: `${smaLocalize('com_orgadmin_trainer')} ${smaLocalize('com_ui_added')}`,
+        message: smaLocalize('com_orgadmin_add_trainer_success'),
         status: 'success',
       });
     },
-    onError: (error, variables) => {
-      console.error('Error adding trainer:', error);
-      showToast({
-        message:
-          error instanceof AxiosError && error.response?.data?.message
-            ? error.response.data.error
-            : `${smaLocalize('com_ui_error_adding')}  ${variables.email} ${smaLocalize('com_orgadmin_trainer')}`,
-        status: 'error',
-      });
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        showToast({
+          message: `${smaLocalize('com_orgadmin_add_trainer_error')} ${error.response.data.message}`,
+          status: 'error',
+        });
+      }
     },
   });
 
   const removeTrainerMutation = useRemoveTrainerMutation({
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       showToast({
-        message: `${smaLocalize('com_orgadmin_trainer')} ${variables.email} ${smaLocalize('com_ui_removed')}`,
+        message: smaLocalize('com_orgadmin_revoke_trainer_success'),
         status: 'success',
       });
     },
-    onError: (error, variables) => {
-      console.error('Error removing trainer:', error);
-      showToast({
-        message:
-          error instanceof AxiosError && error.response?.data?.message
-            ? error.response.data.error
-            : `${smaLocalize('com_ui_error_removing')}  ${variables.email} ${smaLocalize('com_orgadmin_trainer')}`,
-        status: 'error',
-      });
+    onError: (error) => {
+      if (error instanceof AxiosError && error.response?.data?.message) {
+        showToast({
+          message: `${smaLocalize('com_orgadmin_revoke_trainer_error')} ${error.response.data.message}`,
+          status: 'error',
+        });
+      }
     },
   });
 
@@ -134,4 +130,4 @@ const TrainersList: FC<TrainersListProps> = ({ orgId, trainers }) => {
   );
 };
 
-export default TrainersList;
+export default TrainerList;
