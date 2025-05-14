@@ -93,21 +93,19 @@ function getOrgMutationOptions(
         email: string;
       },
     ) => {
+      // Update the organization in the cache
       queryClient.setQueryData<t.TrainingOrganization>(
-        [QueryKeys.trainingOrganization, variables.id],
+        [QueryKeys.trainingOrganizations, variables.id],
         updatedOrg,
       );
 
-      const listRes = queryClient.getQueryData<t.TrainingOrganization[]>([
+      // Invalidate the active members query to refresh the list of administrators
+      queryClient.invalidateQueries([
         QueryKeys.trainingOrganizations,
+        variables.id,
+        'active-members',
       ]);
-      if (listRes) {
-        const updatedList = listRes.map((org) => (org._id === variables.id ? updatedOrg : org));
-        queryClient.setQueryData<t.TrainingOrganization[]>(
-          [QueryKeys.trainingOrganizations],
-          updatedList,
-        );
-      }
+
       return options?.onSuccess?.(updatedOrg, variables);
     },
   };
@@ -123,25 +121,7 @@ export const useAddAdministratorMutation = (
   return useMutation(
     ({ id, email }: { id: string; email: string }) =>
       dataService.addAdministratorToOrganization(id, email),
-    {
-      ...getOrgMutationOptions(queryClient, options),
-      onSuccess: (updatedOrg, variables, context) => {
-        // Update the organization in the cache
-        queryClient.setQueryData<t.TrainingOrganization>(
-          [QueryKeys.trainingOrganizations, variables.id],
-          updatedOrg,
-        );
-
-        // Invalidate the active members query to refresh the list of administrators
-        queryClient.invalidateQueries([
-          QueryKeys.trainingOrganizations,
-          variables.id,
-          'active-members',
-        ]);
-
-        return options?.onSuccess?.(updatedOrg, variables, context);
-      },
-    },
+    getOrgMutationOptions(queryClient, options),
   );
 };
 
@@ -155,25 +135,7 @@ export const useRemoveAdministratorMutation = (
   return useMutation(
     ({ id, email }: { id: string; email: string }) =>
       dataService.removeAdministratorFromOrganization(id, email),
-    {
-      ...getOrgMutationOptions(queryClient, options),
-      onSuccess: (updatedOrg, variables, context) => {
-        // Update the organization in the cache
-        queryClient.setQueryData<t.TrainingOrganization>(
-          [QueryKeys.trainingOrganizations, variables.id],
-          updatedOrg,
-        );
-
-        // Invalidate the active members query to refresh the list of administrators
-        queryClient.invalidateQueries([
-          QueryKeys.trainingOrganizations,
-          variables.id,
-          'active-members',
-        ]);
-
-        return options?.onSuccess?.(updatedOrg, variables, context);
-      },
-    },
+    getOrgMutationOptions(queryClient, options),
   );
 };
 
@@ -187,25 +149,7 @@ export const useAddTrainerMutation = (
   return useMutation(
     ({ id, email }: { id: string; email: string }) =>
       dataService.addTrainerToOrganization(id, email),
-    {
-      ...getOrgMutationOptions(queryClient, options),
-      onSuccess: (updatedOrg, variables, context) => {
-        // Update the organization in the cache
-        queryClient.setQueryData<t.TrainingOrganization>(
-          [QueryKeys.trainingOrganizations, variables.id],
-          updatedOrg,
-        );
-
-        // Invalidate the active members query to refresh the list of trainers
-        queryClient.invalidateQueries([
-          QueryKeys.trainingOrganizations,
-          variables.id,
-          'active-members',
-        ]);
-
-        return options?.onSuccess?.(updatedOrg, variables, context);
-      },
-    },
+    getOrgMutationOptions(queryClient, options),
   );
 };
 
@@ -219,25 +163,7 @@ export const useRemoveTrainerMutation = (
   return useMutation(
     ({ id, email }: { id: string; email: string }) =>
       dataService.removeTrainerFromOrganization(id, email),
-    {
-      ...getOrgMutationOptions(queryClient, options),
-      onSuccess: (updatedOrg, variables, context) => {
-        // Update the organization in the cache
-        queryClient.setQueryData<t.TrainingOrganization>(
-          [QueryKeys.trainingOrganizations, variables.id],
-          updatedOrg,
-        );
-
-        // Invalidate the active members query to refresh the list of trainers
-        queryClient.invalidateQueries([
-          QueryKeys.trainingOrganizations,
-          variables.id,
-          'active-members',
-        ]);
-
-        return options?.onSuccess?.(updatedOrg, variables, context);
-      },
-    },
+    getOrgMutationOptions(queryClient, options),
   );
 };
 

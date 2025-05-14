@@ -48,7 +48,6 @@ export enum QueryKeys {
   banner = 'banner',
   session = 'session',
   trainingOrganizations = 'trainingOrganizations',
-  trainingOrganization = 'trainingOrganization',
   adminUsers = 'adminUsers',
   pendingAdminInvitations = 'pendingAdminInvitations'
 }
