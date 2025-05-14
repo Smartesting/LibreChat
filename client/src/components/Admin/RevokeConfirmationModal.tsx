@@ -4,28 +4,30 @@ import { cn } from '~/utils';
 import { useLocalize, useSmaLocalize } from '~/hooks';
 import { Button } from '~/components';
 
-interface AdminRevokeConfirmationModalProps {
+interface RevokeConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  admin: { email: string; name: string } | null;
-  onConfirm: (admin: { email: string; name: string }) => void;
+  user: { email: string; name: string } | null;
+  onConfirm: (userEmail: string) => void;
+  revocationType: 'admin' | 'trainer';
 }
 
-const AdminRevokeConfirmationModal: FC<AdminRevokeConfirmationModalProps> = ({
+const RevokeConfirmationModal: FC<RevokeConfirmationModalProps> = ({
   isOpen,
   onClose,
-  admin,
+  user,
   onConfirm,
+  revocationType,
 }) => {
   const smaLocalize = useSmaLocalize();
   const localize = useLocalize();
 
   const handleConfirm = () => {
-    if (!admin) {
+    if (!user) {
       return;
     }
 
-    onConfirm(admin);
+    onConfirm(user.email);
     onClose();
   };
 
@@ -62,7 +64,11 @@ const AdminRevokeConfirmationModal: FC<AdminRevokeConfirmationModalProps> = ({
                 as="div"
               >
                 <h2 className="text-lg font-medium leading-6 text-text-primary">
-                  {smaLocalize('com_superadmin_confirm_admin_revocation')}
+                  {smaLocalize(
+                    revocationType === 'admin'
+                      ? 'com_ui_confirm_admin_revocation'
+                      : 'com_ui_confirm_trainer_revocation',
+                  )}
                 </h2>
                 <button
                   type="button"
@@ -90,10 +96,15 @@ const AdminRevokeConfirmationModal: FC<AdminRevokeConfirmationModalProps> = ({
 
               <div className="px-6">
                 <p className="mb-4 text-text-primary">
-                  {smaLocalize('com_superadmin_admin_revocation_message', {
-                    email: admin?.email || '',
-                    name: admin?.name || '',
-                  })}
+                  {smaLocalize(
+                    revocationType === 'admin'
+                      ? 'com_ui_admin_revocation_message'
+                      : 'com_ui_trainer_revocation_message',
+                    {
+                      email: user?.email || '',
+                      name: user?.name || '',
+                    },
+                  )}
                 </p>
 
                 <div className="flex gap-4">
@@ -123,4 +134,4 @@ const AdminRevokeConfirmationModal: FC<AdminRevokeConfirmationModalProps> = ({
   );
 };
 
-export default AdminRevokeConfirmationModal;
+export default RevokeConfirmationModal;

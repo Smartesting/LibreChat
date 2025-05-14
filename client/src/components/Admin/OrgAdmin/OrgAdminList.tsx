@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useSmaLocalize } from '~/hooks';
 import { useToastContext } from '~/Providers';
 import {
@@ -9,7 +9,8 @@ import {
 import GenericList from '~/components/ui/GenericList';
 import { isValidEmail } from '~/utils';
 import { AxiosError } from 'axios';
-import { User } from 'librechat-data-provider';
+import { TUser, User } from 'librechat-data-provider';
+import RevokeConfirmationModal from '~/components/Admin/RevokeConfirmationModal';
 
 const OrgAdminList: FC<{
   orgId: string;
@@ -18,6 +19,35 @@ const OrgAdminList: FC<{
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
   const { data: activeMembers } = useActiveOrganizationMembersQuery(orgId);
+
+  const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
+  const [adminToRevoke, setAdminToRevoke] = useState<{ email: string; name: string } | null>(null);
+
+  const existingAndInvitedAdmins = useMemo(() => {
+    const existingUsers = orgAdmins
+      .filter((user) => user.activatedAt !== undefined)
+      .map((user) => ({
+        email: user.email,
+        name: getActiveAdminName(user.email, activeMembers?.activeAdministrators),
+      }));
+
+    const invitedUsers = orgAdmins
+      .filter((user) => user.activatedAt === undefined)
+      .map((invitation) => ({
+        email: invitation.email,
+        name: smaLocalize('com_ui_invited'),
+      }));
+
+    return [...existingUsers, ...invitedUsers];
+  }, [activeMembers?.activeAdministrators, orgAdmins, smaLocalize]);
+
+  function getActiveAdminName(email: string, activeAdmins: TUser[] | undefined): string {
+    const activeAdmin = activeAdmins?.find(
+      (admin) => admin.email.toLowerCase() === email.toLowerCase(),
+    );
+
+    return activeAdmin ? activeAdmin.name : '';
+  }
 
   const addAdminMutation = useAddAdministratorMutation({
     onSuccess: () => {
@@ -69,28 +99,35 @@ const OrgAdminList: FC<{
     addAdminMutation.mutate({ id: orgId, email: email.trim() });
   };
 
-  const handleRemoveAdmin = (email: string) => {
-    removeAdminMutation.mutate({ id: orgId, email });
+  const handleRemoveAdmin = (admin: { email: string; name: string }) => {
+    setAdminToRevoke(admin);
+    setIsRevokeModalOpen(true);
+  };
+
+  const confirmRevokeAdmin = (adminEmail: string) => {
+    removeAdminMutation.mutate({ id: orgId, email: adminEmail });
   };
 
   return (
-    <GenericList
-      className="mb-6"
-      title={smaLocalize('com_orgadmin_administrators')}
-      items={orgAdmins}
-      getKey={(user) => user.email}
-      renderItem={(user) => {
-        const activeAdmin = activeMembers?.activeAdministrators?.find(
-          (admin) => admin.email.toLowerCase() === user.email.toLowerCase(),
-        );
-        return activeAdmin && activeAdmin.name
-          ? `${user.email} (${activeAdmin.name})`
-          : `${user.email} (${smaLocalize('com_ui_invited')})`;
-      }}
-      handleRemoveItem={(user) => handleRemoveAdmin(user.email)}
-      handleAddItem={handleAddAdmin}
-      placeholder={smaLocalize('com_ui_admin_email_placeholder')}
-    />
+    <>
+      <RevokeConfirmationModal
+        isOpen={isRevokeModalOpen}
+        onClose={() => setIsRevokeModalOpen(false)}
+        user={adminToRevoke}
+        onConfirm={confirmRevokeAdmin}
+        revocationType="admin"
+      />
+      <GenericList
+        className="mb-6"
+        title={smaLocalize('com_orgadmin_administrators')}
+        items={existingAndInvitedAdmins}
+        getKey={(user) => user.email}
+        renderItem={(item) => item.email + (item.name.length > 0 ? ` (${item.name})` : '')}
+        handleRemoveItem={handleRemoveAdmin}
+        handleAddItem={handleAddAdmin}
+        placeholder={smaLocalize('com_ui_admin_email_placeholder')}
+      />
+    </>
   );
 };
 

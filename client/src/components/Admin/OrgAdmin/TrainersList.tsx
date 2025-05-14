@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { useSmaLocalize } from '~/hooks';
 import { useToastContext } from '~/Providers';
 import {
@@ -9,7 +9,8 @@ import {
 import GenericList from '~/components/ui/GenericList';
 import { isValidEmail } from '~/utils';
 import { AxiosError } from 'axios';
-import { User } from 'librechat-data-provider';
+import { TUser, User } from 'librechat-data-provider';
+import RevokeConfirmationModal from '~/components/Admin/RevokeConfirmationModal';
 
 interface TrainersListProps {
   orgId: string;
@@ -20,6 +21,37 @@ const TrainersList: FC<TrainersListProps> = ({ orgId, trainers }) => {
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
   const { data: activeMembers } = useActiveOrganizationMembersQuery(orgId);
+
+  const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
+  const [trainerToRevoke, setTrainerToRevoke] = useState<{ email: string; name: string } | null>(
+    null,
+  );
+
+  const existingAndInvitedTrainers = useMemo(() => {
+    const existingUsers = trainers
+      .filter((user) => user.activatedAt !== undefined)
+      .map((user) => ({
+        email: user.email,
+        name: getActiveTrainerName(user.email, activeMembers?.activeTrainers),
+      }));
+
+    const invitedUsers = trainers
+      .filter((user) => user.activatedAt === undefined)
+      .map((invitation) => ({
+        email: invitation.email,
+        name: smaLocalize('com_ui_invited'),
+      }));
+
+    return [...existingUsers, ...invitedUsers];
+  }, [activeMembers?.activeTrainers, smaLocalize, trainers]);
+
+  function getActiveTrainerName(email: string, activeTrainers: TUser[] | undefined): string {
+    const activeTrainer = activeTrainers?.find(
+      (admin) => admin.email.toLowerCase() === email.toLowerCase(),
+    );
+
+    return activeTrainer ? activeTrainer.name : '';
+  }
 
   const addTrainerMutation = useAddTrainerMutation({
     onSuccess: () => {
@@ -71,27 +103,34 @@ const TrainersList: FC<TrainersListProps> = ({ orgId, trainers }) => {
     addTrainerMutation.mutate({ id: orgId, email: email.trim() });
   };
 
-  const handleRemoveTrainer = (email: string) => {
-    removeTrainerMutation.mutate({ id: orgId, email });
+  const handleRemoveTrainer = (trainer: { email: string; name: string }) => {
+    setTrainerToRevoke(trainer);
+    setIsRevokeModalOpen(true);
+  };
+
+  const confirmRevokeTrainer = (trainerEmail: string) => {
+    removeTrainerMutation.mutate({ id: orgId, email: trainerEmail });
   };
 
   return (
-    <GenericList
-      title={smaLocalize('com_orgadmin_trainers')}
-      items={trainers}
-      getKey={(user) => user.email}
-      renderItem={(user) => {
-        const activeTrainer = activeMembers?.activeTrainers?.find(
-          (trainer) => trainer.email.toLowerCase() === user.email.toLowerCase(),
-        );
-        return activeTrainer && activeTrainer.name
-          ? `${user.email} (${activeTrainer.name})`
-          : `${user.email} (${smaLocalize('com_ui_invited')})`;
-      }}
-      handleRemoveItem={(user) => handleRemoveTrainer(user.email)}
-      handleAddItem={handleAddTrainer}
-      placeholder={smaLocalize('com_ui_trainer_email_placeholder')}
-    />
+    <>
+      <RevokeConfirmationModal
+        isOpen={isRevokeModalOpen}
+        onClose={() => setIsRevokeModalOpen(false)}
+        user={trainerToRevoke}
+        onConfirm={confirmRevokeTrainer}
+        revocationType="trainer"
+      />
+      <GenericList
+        title={smaLocalize('com_orgadmin_trainers')}
+        items={existingAndInvitedTrainers}
+        getKey={(user) => user.email}
+        renderItem={(item) => item.email + (item.name.length > 0 ? ` (${item.name})` : '')}
+        handleRemoveItem={handleRemoveTrainer}
+        handleAddItem={handleAddTrainer}
+        placeholder={smaLocalize('com_ui_trainer_email_placeholder')}
+      />
+    </>
   );
 };
 

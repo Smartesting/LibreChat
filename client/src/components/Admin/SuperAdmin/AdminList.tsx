@@ -9,7 +9,7 @@ import {
   useRevokeAdminAccessMutation,
 } from '~/data-provider';
 import { AxiosError } from 'axios';
-import AdminRevokeConfirmationModal from './AdminRevokeConfirmationModal';
+import RevokeConfirmationModal from '../RevokeConfirmationModal';
 import { isValidEmail } from '~/utils';
 
 const AdminList: FC = () => {
@@ -76,22 +76,23 @@ const AdminList: FC = () => {
     grantAdminAccessMutation.mutate({ email: email.trim() });
   };
 
-  const handleRevokeAdmin = (item: { email: string; name: string }) => {
-    setAdminToRevoke(item);
+  const handleRevokeAdmin = (admin: { email: string; name: string }) => {
+    setAdminToRevoke(admin);
     setIsRevokeModalOpen(true);
   };
 
-  const confirmRevokeAdmin = (admin: { email: string; name: string }) => {
-    revokeAdminAccessMutation.mutate({ email: admin.email });
+  const confirmRevokeAdmin = (adminEmail: string) => {
+    revokeAdminAccessMutation.mutate({ email: adminEmail });
   };
 
   return (
     <>
-      <AdminRevokeConfirmationModal
+      <RevokeConfirmationModal
         isOpen={isRevokeModalOpen}
         onClose={() => setIsRevokeModalOpen(false)}
-        admin={adminToRevoke}
+        user={adminToRevoke}
         onConfirm={confirmRevokeAdmin}
+        revocationType="admin"
       />
       <GenericList
         title={smaLocalize('com_superadmin_administrators')}
