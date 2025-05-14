@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useMemo } from 'react';
 import { TrainingOrganization, TrainingStatus } from 'librechat-data-provider';
 import UtilityButtons from '~/components/Admin/UtilityButtons';
 import { useTrainingsByOrganizationQuery } from '~/data-provider/TrainingOrganizations';
@@ -11,8 +11,6 @@ const TrainingOrganizationView: FC<{
   trainingOrganization: TrainingOrganization;
   showUtilityButtons?: boolean;
 }> = ({ trainingOrganization, showUtilityButtons }) => {
-  const [trainers, setTrainers] = useState(trainingOrganization.trainers || []);
-
   const { data: trainings = [], isLoading: isLoadingTrainings } = useTrainingsByOrganizationQuery(
     trainingOrganization._id,
   );
@@ -38,8 +36,7 @@ const TrainingOrganizationView: FC<{
           />
           <TrainersList
             orgId={trainingOrganization._id}
-            trainers={trainers}
-            setTrainers={setTrainers}
+            trainers={trainingOrganization.trainers}
           />
         </div>
         <div className="md:w-2/3">
@@ -47,14 +44,14 @@ const TrainingOrganizationView: FC<{
             orgId={trainingOrganization._id}
             trainings={upcomingTrainings}
             isLoading={isLoadingTrainings}
-            trainers={trainers}
+            trainers={trainingOrganization.trainers}
             type="upcoming"
           />
           <TrainingsList
             orgId={trainingOrganization._id}
             trainings={pastTrainings}
             isLoading={isLoadingTrainings}
-            trainers={trainers}
+            trainers={trainingOrganization.trainers}
             type="past"
           />
         </div>

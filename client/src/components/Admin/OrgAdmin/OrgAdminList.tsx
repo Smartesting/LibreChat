@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { useSmaLocalize } from '~/hooks';
 import { useToastContext } from '~/Providers';
 import {
@@ -15,14 +15,12 @@ const OrgAdminList: FC<{
   orgId: string;
   orgAdmins: User[];
 }> = ({ orgId, orgAdmins }) => {
-  const [administrators, setAdministrators] = useState(orgAdmins);
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
   const { data: activeMembers } = useActiveOrganizationMembersQuery(orgId);
 
   const addAdminMutation = useAddAdministratorMutation({
-    onSuccess: (updatedOrg) => {
-      setAdministrators(updatedOrg.administrators || []);
+    onSuccess: () => {
       showToast({
         message: `${smaLocalize('com_orgadmin_administrator')} ${smaLocalize('com_ui_added')}`,
         status: 'success',
@@ -41,8 +39,7 @@ const OrgAdminList: FC<{
   });
 
   const removeAdminMutation = useRemoveAdministratorMutation({
-    onSuccess: (updatedOrg, variables) => {
-      setAdministrators(updatedOrg.administrators || []);
+    onSuccess: (_, variables) => {
       showToast({
         message: `${smaLocalize('com_orgadmin_administrator')} ${variables.email} ${smaLocalize('com_ui_removed')}`,
         status: 'success',
@@ -80,7 +77,7 @@ const OrgAdminList: FC<{
     <GenericList
       className="mb-6"
       title={smaLocalize('com_orgadmin_administrators')}
-      items={administrators}
+      items={orgAdmins}
       getKey={(user) => user.email}
       renderItem={(user) => {
         const activeAdmin = activeMembers?.activeAdministrators?.find(

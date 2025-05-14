@@ -14,17 +14,15 @@ import { User } from 'librechat-data-provider';
 interface TrainersListProps {
   orgId: string;
   trainers: User[];
-  setTrainers: (trainers: User[]) => void;
 }
 
-const TrainersList: FC<TrainersListProps> = ({ orgId, trainers, setTrainers }) => {
+const TrainersList: FC<TrainersListProps> = ({ orgId, trainers }) => {
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
   const { data: activeMembers } = useActiveOrganizationMembersQuery(orgId);
 
   const addTrainerMutation = useAddTrainerMutation({
-    onSuccess: (updatedOrg) => {
-      setTrainers(updatedOrg.trainers || []);
+    onSuccess: () => {
       showToast({
         message: `${smaLocalize('com_orgadmin_trainer')} ${smaLocalize('com_ui_added')}`,
         status: 'success',
@@ -43,8 +41,7 @@ const TrainersList: FC<TrainersListProps> = ({ orgId, trainers, setTrainers }) =
   });
 
   const removeTrainerMutation = useRemoveTrainerMutation({
-    onSuccess: (updatedOrg, variables) => {
-      setTrainers(updatedOrg.trainers || []);
+    onSuccess: (_, variables) => {
       showToast({
         message: `${smaLocalize('com_orgadmin_trainer')} ${variables.email} ${smaLocalize('com_ui_removed')}`,
         status: 'success',
