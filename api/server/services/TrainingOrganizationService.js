@@ -36,11 +36,10 @@ const processAdministrators = async (administrators, orgName) => {
     const existingUser = await findUser({ email }, 'email _id name username role');
 
     if (existingUser && existingUser.role === SystemRoles.ORGADMIN) {
-      // User exists with ORGADMIN role, set status to active
+      // User exists with ORGADMIN role, set as active
       processedAdmins.push({
         email,
         userId: existingUser._id,
-        status: 'active',
         activatedAt: new Date(),
       });
 
@@ -57,7 +56,6 @@ const processAdministrators = async (administrators, orgName) => {
         email,
         invitationToken: tokenHash,
         invitationExpires,
-        status: 'invited',
         invitedAt: new Date(),
       });
 
@@ -158,7 +156,6 @@ const processTrainers = async (trainers, orgName) => {
       processedTrainers.push({
         email,
         userId: existingUser._id,
-        status: 'active',
         activatedAt: new Date(),
       });
 
@@ -173,7 +170,6 @@ const processTrainers = async (trainers, orgName) => {
         email,
         invitationToken: tokenHash,
         invitationExpires,
-        status: 'invited',
         invitedAt: new Date(),
       });
 

@@ -113,7 +113,7 @@ const acceptAdminInvitationHandler = async (req, res) => {
       const matchingAdmin = organization.administrators.find(
         (a) =>
           a.email.toLowerCase() === email.toLowerCase() &&
-          a.status === 'invited' &&
+          !a.activatedAt &&
           a.invitationToken !== undefined,
       );
 
@@ -164,7 +164,6 @@ const acceptAdminInvitationHandler = async (req, res) => {
     // Update the administrator in the training organization
     const updatedOrg = await updateTrainingOrganizationAdmin(org._id, email, {
       userId: user._id,
-      status: 'active',
       activatedAt: new Date(),
     });
 
@@ -288,7 +287,7 @@ const addAdministratorHandler = async (req, res) => {
     }
 
     const processedAdmins = await processAdministrators([email], trainingOrganization.name);
-
+console.log(processedAdmins);
     if (!processedAdmins || processedAdmins.length === 0) {
       return res.status(500).json({ error: 'Failed to process administrator' });
     }
@@ -460,7 +459,7 @@ const acceptTrainerInvitationHandler = async (req, res) => {
       const matchingTrainer = organization.trainers.find(
         (t) =>
           t.email.toLowerCase() === email.toLowerCase() &&
-          t.status === 'invited' &&
+          !t.activatedAt &&
           t.invitationToken !== undefined,
       );
 
@@ -511,7 +510,6 @@ const acceptTrainerInvitationHandler = async (req, res) => {
     // Update the trainer in the training organization
     const updatedOrg = await updateTrainingOrganizationTrainer(org._id, email, {
       userId: user._id,
-      status: 'active',
       activatedAt: new Date(),
     });
 

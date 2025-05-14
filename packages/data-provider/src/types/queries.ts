@@ -109,7 +109,6 @@ export type User = {
   email: string;
   invitationToken?: string;
   invitationExpires?: Date;
-  status: 'active' | 'invited';
   invitedAt?: Date;
   activatedAt?: Date;
 };

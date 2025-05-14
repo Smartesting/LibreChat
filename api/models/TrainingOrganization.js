@@ -29,7 +29,7 @@ const getListTrainingOrganizations = async (user) => {
     'administrators': {
       $elemMatch: {
         'userId': user.id,
-        'status': 'active',
+        'activatedAt': { $exists: true },
       },
     },
   }).lean());
@@ -51,10 +51,11 @@ const updateTrainingOrganizationAdmin = async (orgId, email, updateData) => {
     {
       $set: {
         'administrators.$.userId': updateData.userId,
-        'administrators.$.status': updateData.status,
         'administrators.$.activatedAt': updateData.activatedAt,
-        'administrators.$.invitationToken': null,
-        'administrators.$.invitationExpires': null,
+      },
+      $unset: {
+        'administrators.$.invitationToken': '',
+        'administrators.$.invitationExpires': '',
       },
     },
     { new: true },
@@ -77,10 +78,11 @@ const updateTrainingOrganizationTrainer = async (orgId, email, updateData) => {
     {
       $set: {
         'trainers.$.userId': updateData.userId,
-        'trainers.$.status': updateData.status,
         'trainers.$.activatedAt': updateData.activatedAt,
-        'trainers.$.invitationToken': null,
-        'trainers.$.invitationExpires': null,
+      },
+      $unset: {
+        'trainers.$.invitationToken': '',
+        'trainers.$.invitationExpires': '',
       },
     },
     { new: true },

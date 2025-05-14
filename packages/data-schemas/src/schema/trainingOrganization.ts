@@ -7,7 +7,6 @@ export interface ITrainingOrganization extends Omit<Document, 'model'> {
     email: string;
     invitationToken?: string;
     invitationExpires?: Date;
-    status: 'active' | 'invited';
     invitedAt?: Date;
     activatedAt?: Date;
   }>;
@@ -16,7 +15,6 @@ export interface ITrainingOrganization extends Omit<Document, 'model'> {
     email: string;
     invitationToken?: string;
     invitationExpires?: Date;
-    status: 'active' | 'invited';
     invitedAt?: Date;
     activatedAt?: Date;
   }>;
@@ -42,11 +40,6 @@ const OrgAdminSchema = new Schema(
     invitationExpires: {
       type: Date,
       required: false,
-    },
-    status: {
-      type: String,
-      enum: ['active', 'invited'],
-      default: 'invited',
     },
     invitedAt: {
       type: Date,
