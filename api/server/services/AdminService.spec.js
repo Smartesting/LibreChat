@@ -90,7 +90,7 @@ describe('AdminService', () => {
           name: email,
           loginLink: 'http://localhost:3000/login',
         },
-        template: 'adminRoleGranted.handlebars',
+        template: 'adminNotification.handlebars',
       });
       expect(logger.info).toHaveBeenCalledWith(`User ${email} has been granted admin role`);
     });
