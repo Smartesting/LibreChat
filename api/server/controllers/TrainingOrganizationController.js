@@ -287,7 +287,7 @@ const addAdministratorHandler = async (req, res) => {
     }
 
     const processedAdmins = await processAdministrators([email], trainingOrganization.name);
-console.log(processedAdmins);
+
     if (!processedAdmins || processedAdmins.length === 0) {
       return res.status(500).json({ error: 'Failed to process administrator' });
     }

@@ -50,7 +50,7 @@ const processGrantAdminAccess = async (email) => {
       logger.info(`User ${email} has been granted admin role`);
 
       // Send notification email to the user
-      await sendAdminRoleGrantedEmail(email);
+      await sendNotificationEmail(email);
 
       return {
         success: true,
@@ -137,14 +137,14 @@ const sendAdminInvitationEmail = async (email, token) => {
  * @param {string} email - The email address to send the notification to
  * @returns {Promise<void>}
  */
-const sendAdminRoleGrantedEmail = async (email) => {
+const sendNotificationEmail = async (email) => {
   try {
     const loginLink = `${process.env.DOMAIN_CLIENT}/login`;
 
     // Check if email configuration is available
     if (!checkEmailConfig()) {
       logger.info(
-        `[sendAdminRoleGrantedEmail] Email configuration not available. Cannot send notification to [Email: ${email}]`,
+        `[sendNotificationEmail] Email configuration not available. Cannot send notification to [Email: ${email}]`,
       );
       return;
     }
@@ -157,19 +157,19 @@ const sendAdminRoleGrantedEmail = async (email) => {
         name: email,
         loginLink,
       },
-      template: 'adminRoleGranted.handlebars',
+      template: 'adminNotification.handlebars',
     });
 
     logger.info(
-      `[sendAdminRoleGrantedEmail] Notification sent. [Email: ${email}]`,
+      `[sendNotificationEmail] Notification sent. [Email: ${email}]`,
     );
   } catch (error) {
-    logger.error(`[sendAdminRoleGrantedEmail] Error sending notification: ${error.message}`);
+    logger.error(`[sendNotificationEmail] Error sending notification: ${error.message}`);
   }
 };
 
 module.exports = {
   processGrantAdminAccess,
   sendAdminInvitationEmail,
-  sendAdminRoleGrantedEmail,
+  sendAdminRoleGrantedEmail: sendNotificationEmail,
 };

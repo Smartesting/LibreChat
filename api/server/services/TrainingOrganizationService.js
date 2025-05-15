@@ -44,7 +44,7 @@ const processAdministrators = async (administrators, orgName) => {
       });
 
       // Send notification email to existing user
-      await sendNotificationEmail(existingUser, orgName);
+      await sendOrgAdminNotificationEmail(existingUser, orgName);
     }
 
     if (!existingUser) {
@@ -60,7 +60,7 @@ const processAdministrators = async (administrators, orgName) => {
       });
 
       // Send invitation email
-      await sendInvitationEmail(email, invitationToken, orgName);
+      await sendOrgAdminInvitationEmail(email, invitationToken, orgName);
     }
   }
 
@@ -73,13 +73,13 @@ const processAdministrators = async (administrators, orgName) => {
  * @param {string} orgName - The name of the training organization
  * @returns {Promise<void>}
  */
-const sendNotificationEmail = async (user, orgName) => {
+const sendOrgAdminNotificationEmail = async (user, orgName) => {
   try {
     const loginLink = `${process.env.DOMAIN_CLIENT}/login`;
 
     // Check if email configuration is available
     if (!checkEmailConfig()) {
-      logger.info(`[sendNotificationEmail] Email configuration not available. Cannot send notification to [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
+      logger.info(`[sendOrgAdminNotificationEmail] Email configuration not available. Cannot send notification to [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
       return;
     }
 
@@ -92,12 +92,12 @@ const sendNotificationEmail = async (user, orgName) => {
         orgName,
         loginLink,
       },
-      template: 'adminNotification.handlebars',
+      template: 'orgAdminNotification.handlebars',
     });
 
-    logger.info(`[sendNotificationEmail] Admin notification sent. [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
+    logger.info(`[sendOrgAdminNotificationEmail] Admin notification sent. [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
   } catch (error) {
-    logger.error(`[sendNotificationEmail] Error sending notification: ${error.message}`);
+    logger.error(`[sendOrgAdminNotificationEmail] Error sending notification: ${error.message}`);
   }
 };
 
@@ -108,13 +108,13 @@ const sendNotificationEmail = async (user, orgName) => {
  * @param {string} orgName - The name of the training organization
  * @returns {Promise<void>}
  */
-const sendInvitationEmail = async (email, token, orgName) => {
+const sendOrgAdminInvitationEmail = async (email, token, orgName) => {
   try {
     const inviteLink = `${process.env.DOMAIN_CLIENT}/org-admin-invite?token=${token}&email=${encodeURIComponent(email)}&orgName=${encodeURIComponent(orgName)}`;
 
     // Check if email configuration is available
     if (!checkEmailConfig()) {
-      logger.info(`[sendInvitationEmail] Email configuration not available. Cannot send invitation to [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
+      logger.info(`[sendOrgAdminInvitationEmail] Email configuration not available. Cannot send invitation to [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
       return;
     }
 
@@ -130,9 +130,9 @@ const sendInvitationEmail = async (email, token, orgName) => {
       template: 'orgAdminInvite.handlebars',
     });
 
-    logger.info(`[sendInvitationEmail] Invitation sent. [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
+    logger.info(`[sendOrgAdminInvitationEmail] Invitation sent. [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
   } catch (error) {
-    logger.error(`[sendInvitationEmail] Error sending invitation: ${error.message}`);
+    logger.error(`[sendOrgAdminInvitationEmail] Error sending invitation: ${error.message}`);
   }
 };
 
@@ -250,8 +250,8 @@ const sendTrainerInvitationEmail = async (email, token, orgName) => {
 module.exports = {
   processAdministrators,
   processTrainers,
-  sendNotificationEmail,
-  sendInvitationEmail,
+  sendNotificationEmail: sendOrgAdminNotificationEmail,
+  sendInvitationEmail: sendOrgAdminInvitationEmail,
   sendTrainerNotificationEmail,
   sendTrainerInvitationEmail,
 };
