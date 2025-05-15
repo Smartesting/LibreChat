@@ -130,6 +130,11 @@ export type Training = {
   participantCount: number;
   location: string;
   trainers: string[];
+  trainees: Array<{
+    username: string;
+    password: string;
+    hasLoggedIn: boolean;
+  }>;
   trainingOrganizationId: string;
 };
 

@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import {
-  Permissions,
-  PermissionTypes,
-  permissionsSchema,
   agentPermissionsSchema,
-  promptPermissionsSchema,
-  runCodePermissionsSchema,
   bookmarkPermissionsSchema,
   multiConvoPermissionsSchema,
+  Permissions,
+  permissionsSchema,
+  PermissionTypes,
+  promptPermissionsSchema,
+  runCodePermissionsSchema,
   temporaryChatPermissionsSchema,
 } from './permissions';
 
@@ -27,6 +27,14 @@ export enum SystemRoles {
    * The organization admin role
    */
   ORGADMIN = 'ORGADMIN',
+  /**
+   * The trainer role
+   */
+  TRAINER = 'TRAINER',
+  /**
+   * The trainee role
+   */
+  TRAINEE = 'TRAINEE',
 }
 
 // The role schema now only needs to reference the permissions schema.
@@ -74,6 +82,14 @@ const defaultRolesSchema = z.object({
   }),
   [SystemRoles.ORGADMIN]: roleSchema.extend({
     name: z.literal(SystemRoles.ORGADMIN),
+    permissions: permissionsSchema,
+  }),
+  [SystemRoles.TRAINER]: roleSchema.extend({
+    name: z.literal(SystemRoles.TRAINER),
+    permissions: permissionsSchema,
+  }),
+  [SystemRoles.TRAINEE]: roleSchema.extend({
+    name: z.literal(SystemRoles.TRAINEE),
     permissions: permissionsSchema,
   }),
 });
@@ -142,6 +158,28 @@ export const roleDefaults = defaultRolesSchema.parse({
       [PermissionTypes.RUN_CODE]: {
         [Permissions.USE]: false,
       },
+    },
+  },
+  [SystemRoles.TRAINER]: {
+    name: SystemRoles.TRAINER,
+    permissions: {
+      [PermissionTypes.PROMPTS]: {},
+      [PermissionTypes.BOOKMARKS]: {},
+      [PermissionTypes.AGENTS]: {},
+      [PermissionTypes.MULTI_CONVO]: {},
+      [PermissionTypes.TEMPORARY_CHAT]: {},
+      [PermissionTypes.RUN_CODE]: {},
+    },
+  },
+  [SystemRoles.TRAINEE]: {
+    name: SystemRoles.TRAINEE,
+    permissions: {
+      [PermissionTypes.PROMPTS]: {},
+      [PermissionTypes.BOOKMARKS]: {},
+      [PermissionTypes.AGENTS]: {},
+      [PermissionTypes.MULTI_CONVO]: {},
+      [PermissionTypes.TEMPORARY_CHAT]: {},
+      [PermissionTypes.RUN_CODE]: {},
     },
   },
 });

@@ -102,7 +102,7 @@ const updateTraining = async (trainingId, updateData) => {
     }
   }
 
-  return await Training.findByIdAndUpdate(trainingId, updateData, { new: true }).lean();
+  return Training.findByIdAndUpdate(trainingId, updateData, { new: true }).lean();
 };
 
 /**
@@ -111,7 +111,7 @@ const updateTraining = async (trainingId, updateData) => {
  * @returns {Promise<Object|null>} The deleted training document or null if not found
  */
 const deleteTraining = async (trainingId) => {
-  return await Training.findByIdAndDelete(trainingId).lean();
+  return Training.findByIdAndDelete(trainingId).lean();
 };
 
 module.exports = {

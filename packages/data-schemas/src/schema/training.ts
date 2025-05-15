@@ -1,5 +1,24 @@
 import { Document, Schema, Types } from 'mongoose';
 
+// Define the Trainee schema
+const TraineeSchema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    hasLoggedIn: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { _id: false },
+);
+
 export interface ITraining extends Omit<Document, 'model'> {
   name: string;
   description?: string;
@@ -10,6 +29,11 @@ export interface ITraining extends Omit<Document, 'model'> {
   trainers: Array<Types.ObjectId>;
   trainingOrganizationId: Types.ObjectId;
   location?: string;
+  trainees: Array<{
+    username: string;
+    password: string;
+    hasLoggedIn: boolean;
+  }>;
 }
 
 const trainingSchema = new Schema<ITraining>(
@@ -58,6 +82,10 @@ const trainingSchema = new Schema<ITraining>(
     location: {
       type: String,
       required: false,
+    },
+    trainees: {
+      type: [TraineeSchema],
+      default: [],
     },
   },
   {

@@ -5,6 +5,7 @@ import TrainingCreationForm from '~/components/Admin/OrgAdmin/Training/TrainingC
 import { useLocalize, useSmaLocalize } from '~/hooks';
 import { Training } from 'librechat-data-provider';
 import UserMultiSelect from '~/components/ui/UserMultiSelect';
+import GenericList from '~/components/ui/GenericList';
 
 interface TrainingCreationModalProps {
   isOpen: boolean;
@@ -25,6 +26,13 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
   const localize = useLocalize();
   const isEditing = !!training;
   const [trainers, setTrainers] = useState<{ email: string }[]>([]);
+  const [trainees, setTrainees] = useState<
+    {
+      username: string;
+      password: string;
+      hasLoggedIn: boolean;
+    }[]
+  >([]);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -33,6 +41,9 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
       setTrainers(trainerEmails);
     } else {
       setTrainers([]);
+    }
+    if (training && training.trainees) {
+      setTrainees(training.trainees);
     }
   }, [training]);
 
@@ -120,6 +131,13 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
                       setTrainers(newTrainers);
                     }}
                     maxEntries={2}
+                  />
+                  <br />
+                  <GenericList
+                    title={smaLocalize('com_orgadmin_participants_title')}
+                    items={trainees}
+                    getKey={(trainee) => trainee.username}
+                    renderItem={(trainee) => trainee.username}
                   />
                 </div>
               </div>

@@ -177,6 +177,45 @@ const comparePassword = async (user, candidatePassword) => {
   });
 };
 
+/**
+ * Generates multiple trainee users with random UUIDs for email addresses and random passwords.
+ *
+ * @param {number} count - The number of trainee users to create.
+ * @returns {Promise<Array<{email: string, password: string, id: string}>>} An array of created user objects with their credentials.
+ */
+const generateTraineeUsers = async (count) => {
+  const crypto = require('crypto');
+  const { SystemRoles } = require('librechat-data-provider');
+
+  const users = [];
+
+  for (let i = 0; i < count; i++) {
+    const uuid = crypto.randomUUID();
+    const email = `${uuid}@smartesting.com`;
+
+    const password = crypto.randomBytes(16).toString('hex');
+    const salt = bcrypt.genSaltSync(10);
+
+    const userData = {
+      email,
+      password: bcrypt.hashSync(password, salt),
+      provider: 'local',
+      role: SystemRoles.TRAINEE,
+      emailVerified: true,
+    };
+
+    const userId = await createUser(userData);
+
+    users.push({
+      email,
+      password,
+      id: userId.toString(),
+    });
+  }
+
+  return users;
+};
+
 module.exports = {
   comparePassword,
   deleteUserById,
@@ -186,4 +225,5 @@ module.exports = {
   createUser,
   updateUser,
   findUser,
+  generateTraineeUsers,
 };

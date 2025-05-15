@@ -427,7 +427,7 @@ const addTrainerHandler = async (req, res) => {
 };
 
 /**
- * Accepts a trainer invitation and creates a new user account.
+ * Accepts a trainer invitation and creates a new trainer account.
  * @route POST /training-organizations/accept-trainer-invitation
  * @param {ServerRequest} req - The request object.
  * @param {Object} req.body - The request body.
@@ -494,7 +494,7 @@ const acceptTrainerInvitationHandler = async (req, res) => {
 
     const registerResult = await registerUser(userData, {
       emailVerified: true,
-      role: SystemRoles.USER,
+      role: SystemRoles.TRAINER,
     });
 
     if (registerResult.status !== 200) {

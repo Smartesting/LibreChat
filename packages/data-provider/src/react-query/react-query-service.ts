@@ -1,14 +1,14 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
-  UseQueryOptions,
-  UseMutationResult,
   QueryObserverResult,
+  UseMutationResult,
+  UseQueryOptions,
 } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Constants, initialModelsConfig } from '../config';
 import { defaultOrderQuery } from '../types/assistants';
 import * as dataService from '../data-service';
 import * as m from '../types/mutations';
-import { QueryKeys } from '../keys';
+import { MutationKeys, QueryKeys } from '../keys';
 import * as s from '../schemas';
 import * as t from '../types';
 
@@ -362,4 +362,19 @@ export const useGetCustomConfigSpeechQuery = (
       ...config,
     },
   );
+};
+
+/**
+ * Mutation hook for generating multiple trainee users with random credentials
+ * @returns Mutation result for generating trainee users
+ */
+export const useGenerateTraineesMutation = (): UseMutationResult<
+  t.TGenerateTraineesResponse,
+  unknown,
+  { count: number },
+  unknown
+> => {
+  return useMutation(({ count }: { count: number }) => dataService.generateTrainees(count), {
+    mutationKey: [QueryKeys.user, MutationKeys.generateTrainees],
+  });
 };

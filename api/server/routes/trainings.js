@@ -9,6 +9,9 @@ const {
   getById,
   update,
   remove,
+  addTrainee,
+  removeTrainee,
+  updateTrainee,
 } = require('~/server/controllers/TrainingController');
 const { checkOrgAccess } = require('~/server/middleware/roles');
 
@@ -26,5 +29,10 @@ router.put('/:id', requireJwtAuth, checkOrgAccess, update);
 
 // Delete a training
 router.delete('/:id', requireJwtAuth, checkOrgAccess, remove);
+
+// Trainee routes
+router.post('/:id/trainees', requireJwtAuth, checkOrgAccess, addTrainee);
+router.delete('/:id/trainees/:username', requireJwtAuth, checkOrgAccess, removeTrainee);
+router.patch('/:id/trainees/:username', requireJwtAuth, checkOrgAccess, updateTrainee);
 
 module.exports = router;

@@ -175,6 +175,15 @@ export const resendVerificationEmail = (
   return request.post(endpoints.resendVerificationEmail(), payload);
 };
 
+/**
+ * Generate multiple trainee users with random credentials
+ * @param count - The number of trainee users to create
+ * @returns Promise with the created users and their credentials
+ */
+export const generateTrainees = (count: number): Promise<t.TGenerateTraineesResponse> => {
+  return request.post(endpoints.generateTrainees(), { count });
+};
+
 export const getAvailablePlugins = (): Promise<s.TPlugin[]> => {
   return request.get(endpoints.plugins());
 };
@@ -768,7 +777,9 @@ export const removeTrainerFromOrganization = (
   return request.delete(endpoints.trainingOrganizations(id, 'trainers', email));
 };
 
-export const getTrainingsByOrganization = (organizationId: string): Promise<q.TrainingWithStatus[]> => {
+export const getTrainingsByOrganization = (
+  organizationId: string,
+): Promise<q.TrainingWithStatus[]> => {
   return request.get(endpoints.trainingsByOrganization(organizationId));
 };
 

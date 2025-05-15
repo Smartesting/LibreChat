@@ -534,6 +534,17 @@ export type TUserTermsResponse = {
   termsAccepted: boolean;
 };
 
+export type TTraineeUser = {
+  email: string;
+  password: string;
+  id: string;
+};
+
+export type TGenerateTraineesResponse = {
+  message: string;
+  users: TTraineeUser[];
+};
+
 export type TAcceptTermsResponse = {
   success: boolean;
 };

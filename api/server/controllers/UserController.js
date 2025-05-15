@@ -9,6 +9,7 @@ const {
   deleteMessages,
   deleteUserById,
   deleteAllUserSessions,
+  generateTraineeUsers,
 } = require('~/models');
 const User = require('~/models/User');
 const { updateUserPluginAuth, deleteUserPluginAuth } = require('~/server/services/PluginService');
@@ -182,6 +183,32 @@ const resendVerificationController = async (req, res) => {
   }
 };
 
+/**
+ * Generate multiple trainee users with random credentials
+ * @param {Object} req - Express request object with count in the body
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with created users
+ */
+const generateTraineesController = async (req, res) => {
+  try {
+    const { count } = req.body;
+
+    if (!count || !Number.isInteger(Number(count)) || Number(count) <= 0) {
+      return res.status(400).json({ error: 'A valid positive integer count is required' });
+    }
+
+    const users = await generateTraineeUsers(Number(count));
+
+    return res.status(201).json({
+      message: `Successfully created ${users.length} trainee users`,
+      users,
+    });
+  } catch (error) {
+    logger.error('[generateTraineesController]', error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getUserController,
   getTermsStatusController,
@@ -190,4 +217,5 @@ module.exports = {
   verifyEmailController,
   updateUserPluginsController,
   resendVerificationController,
+  generateTraineesController,
 };

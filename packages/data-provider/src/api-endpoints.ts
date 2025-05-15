@@ -140,6 +140,8 @@ export const verifyEmail = () => '/api/user/verify';
 
 export const resendVerificationEmail = () => '/api/user/verify/resend';
 
+export const generateTrainees = () => '/api/user/generate-trainees';
+
 export const plugins = () => '/api/plugins';
 
 export const config = () => '/api/config';
