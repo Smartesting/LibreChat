@@ -11,7 +11,7 @@ type TrainingsListProps = {
   trainings: TrainingWithStatus[];
   isLoading: boolean;
   trainers: { email: string }[];
-  type: 'upcoming' | 'past';
+  type: 'upcoming' | 'past' | 'ongoing';
 };
 
 const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, trainers, type }) => {
@@ -20,8 +20,22 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
   const [trainingToEdit, setTrainingToEdit] = useState<Training | null>(null);
   const [trainingToDelete, setTrainingToDelete] = useState<string | null>(null);
 
-  const isPast = type === 'past';
-  const titleKey = isPast ? 'com_orgadmin_past_trainings' : 'com_orgadmin_upcoming_trainings';
+  const isUpcoming = type === 'upcoming';
+  let titleKey:
+    | 'com_orgadmin_upcoming_trainings'
+    | 'com_orgadmin_past_trainings'
+    | 'com_orgadmin_ongoing_trainings';
+  switch (type) {
+    case 'upcoming':
+      titleKey = 'com_orgadmin_upcoming_trainings';
+      break;
+    case 'past':
+      titleKey = 'com_orgadmin_past_trainings';
+      break;
+    case 'ongoing':
+      titleKey = 'com_orgadmin_ongoing_trainings';
+      break;
+  }
 
   return (
     <>
@@ -42,7 +56,7 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-text-primary">{smaLocalize(titleKey)}</h2>
-          {!isPast && (
+          {isUpcoming && (
             <button
               className="rounded-full bg-surface-primary p-1 hover:bg-surface-secondary"
               aria-label={
@@ -68,9 +82,9 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
               <TrainingItem
                 key={training._id}
                 training={training}
-                setTrainingToEdit={!isPast ? setTrainingToEdit : undefined}
-                setIsTrainingModalOpen={!isPast ? setIsTrainingModalOpen : undefined}
-                setTrainingToDelete={!isPast ? setTrainingToDelete : undefined}
+                setTrainingToEdit={isUpcoming ? setTrainingToEdit : undefined}
+                setIsTrainingModalOpen={isUpcoming ? setIsTrainingModalOpen : undefined}
+                setTrainingToDelete={isUpcoming ? setTrainingToDelete : undefined}
               />
             ))
           )}

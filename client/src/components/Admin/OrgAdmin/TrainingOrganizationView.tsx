@@ -15,12 +15,15 @@ const TrainingOrganizationView: FC<{
     trainingOrganization._id,
   );
 
-  const { upcomingTrainings, pastTrainings } = useMemo(() => {
+  const { upcomingTrainings, pastTrainings, ongoingTrainings } = useMemo(() => {
     return {
       upcomingTrainings: trainings.filter(
         (training) => training.status === TrainingStatus.UPCOMING,
       ),
       pastTrainings: trainings.filter((training) => training.status === TrainingStatus.PAST),
+      ongoingTrainings: trainings.filter(
+        (training) => training.status === TrainingStatus.IN_PROGRESS,
+      ),
     };
   }, [trainings]);
 
@@ -34,12 +37,16 @@ const TrainingOrganizationView: FC<{
             orgId={trainingOrganization._id}
             orgAdmins={trainingOrganization.administrators}
           />
-          <TrainerList
-            orgId={trainingOrganization._id}
-            trainers={trainingOrganization.trainers}
-          />
+          <TrainerList orgId={trainingOrganization._id} trainers={trainingOrganization.trainers} />
         </div>
         <div className="md:w-2/3">
+          <TrainingsList
+            orgId={trainingOrganization._id}
+            trainings={ongoingTrainings}
+            isLoading={isLoadingTrainings}
+            trainers={trainingOrganization.trainers}
+            type="ongoing"
+          />
           <TrainingsList
             orgId={trainingOrganization._id}
             trainings={upcomingTrainings}

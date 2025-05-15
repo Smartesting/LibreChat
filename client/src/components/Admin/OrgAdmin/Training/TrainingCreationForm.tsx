@@ -27,6 +27,7 @@ const defaultTrainingFormValues: TrainingCreateParams = {
   endDateTime: new Date(Date.now() + 3600000), // Default to 1 hour from now
   participantCount: 0,
   trainers: [],
+  trainees: [],
   trainingOrganizationId: '',
   location: '',
 };
@@ -352,6 +353,10 @@ const TrainingCreationForm: FC<{
                 min: {
                   value: 0,
                   message: smaLocalize('com_orgadmin_error_participant_count_min'),
+                },
+                max: {
+                  value: 15,
+                  message: smaLocalize('com_orgadmin_error_participant_count_max'),
                 },
               }}
               render={({ field }) => (
