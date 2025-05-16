@@ -31,6 +31,7 @@ interface MultiSelectProps<T extends string> {
   selectItemsClassName?: string;
   selectedValues: T[];
   setSelectedValues: (values: T[]) => void;
+  disabled?: boolean;
 }
 
 function defaultRender<T extends string>(
@@ -64,6 +65,7 @@ export default function MultiSelect<T extends string>({
   selectItemsClassName,
   selectedValues = [],
   setSelectedValues,
+  disabled = false,
 }: MultiSelectProps<T>) {
   const selectRef = useRef<HTMLButtonElement>(null);
   // const [selectedValues, setSelectedValues] = React.useState<T[]>(defaultSelectedValues);
@@ -84,6 +86,7 @@ export default function MultiSelect<T extends string>({
           </SelectLabel>
         )}
         <Select
+          disabled={disabled}
           ref={selectRef}
           className={cn(
             'flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm',

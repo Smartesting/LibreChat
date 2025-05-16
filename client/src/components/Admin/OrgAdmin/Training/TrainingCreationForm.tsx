@@ -40,7 +40,17 @@ const TrainingCreationForm: FC<{
   hideButtons?: boolean;
   trainers?: string[];
   formRef?: React.RefObject<HTMLFormElement>;
-}> = ({ onSubmit, onCancel, organizationId, training, hideButtons = false, trainers, formRef }) => {
+  disabled?: boolean;
+}> = ({
+  onSubmit,
+  onCancel,
+  organizationId,
+  training,
+  hideButtons = false,
+  trainers,
+  formRef,
+  disabled = false,
+}) => {
   const smaLocalize = useSmaLocalize();
   const localize = useLocalize();
   const { showToast } = useToastContext();
@@ -176,6 +186,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="name"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_name_required'),
@@ -208,6 +219,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="description"
+              disabled={disabled}
               control={control}
               render={({ field }) => (
                 <>
@@ -229,6 +241,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="location"
+              disabled={disabled}
               control={control}
               render={({ field }) => (
                 <>
@@ -251,6 +264,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="timezone"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_timezone_required'),
@@ -278,6 +292,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="startDateTime"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_start_date_required'),
@@ -308,6 +323,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="endDateTime"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_end_date_required'),
@@ -347,6 +363,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="participantCount"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_participant_count_required'),
@@ -364,6 +381,7 @@ const TrainingCreationForm: FC<{
                   <input
                     {...field}
                     value={field.value ?? 0}
+                    disabled={disabled}
                     onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
                     className={inputClass}
                     type="number"
@@ -392,7 +410,7 @@ const TrainingCreationForm: FC<{
               <button
                 className="btn btn-primary focus:shadow-outline flex h-9 w-full items-center justify-center px-4 py-2 font-semibold text-white hover:bg-green-600 focus:border-green-500 disabled:opacity-50"
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || disabled}
               >
                 {isSubmitting
                   ? localize('com_ui_loading')

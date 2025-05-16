@@ -19,6 +19,7 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
   const [isTrainingModalOpen, setIsTrainingModalOpen] = useState(false);
   const [trainingToEdit, setTrainingToEdit] = useState<Training | null>(null);
   const [trainingToDelete, setTrainingToDelete] = useState<string | null>(null);
+  const [isEditDisabled, setIsEditDisabled] = useState<boolean>(false);
 
   const isUpcoming = type === 'upcoming';
   let titleKey:
@@ -48,10 +49,12 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
         onClose={() => {
           setIsTrainingModalOpen(false);
           setTrainingToEdit(null);
+          setIsEditDisabled(false);
         }}
         organizationId={orgId}
         training={trainingToEdit || undefined}
         organizationTrainers={trainers}
+        disabled={isEditDisabled}
       />
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between">
@@ -82,9 +85,12 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
               <TrainingItem
                 key={training._id}
                 training={training}
-                setTrainingToEdit={isUpcoming ? setTrainingToEdit : undefined}
-                setIsTrainingModalOpen={isUpcoming ? setIsTrainingModalOpen : undefined}
-                setTrainingToDelete={isUpcoming ? setTrainingToDelete : undefined}
+                editable={isUpcoming}
+                deletable={isUpcoming}
+                setTrainingToEdit={setTrainingToEdit}
+                setIsEditDisabled={setIsEditDisabled}
+                setIsTrainingModalOpen={setIsTrainingModalOpen}
+                setTrainingToDelete={setTrainingToDelete}
               />
             ))
           )}

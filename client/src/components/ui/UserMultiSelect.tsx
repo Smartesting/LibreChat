@@ -9,6 +9,7 @@ interface UserMultiSelectProps {
   onSelectedUsersChange: (users: string[]) => void;
   className?: string;
   maxEntries?: number;
+  disabled?: boolean;
 }
 
 const UserMultiSelect: FC<UserMultiSelectProps> = ({
@@ -18,6 +19,7 @@ const UserMultiSelect: FC<UserMultiSelectProps> = ({
   onSelectedUsersChange,
   className,
   maxEntries,
+  disabled = false,
 }) => {
   const smaLocalize = useSmaLocalize();
   const [selectedValues, setSelectedValues] = useState<string[]>(selectedUsers);
@@ -48,6 +50,7 @@ const UserMultiSelect: FC<UserMultiSelectProps> = ({
         setSelectedValues={handleSelectedValuesChange}
         placeholder={smaLocalize('com_orgadmin_select_users')}
         selectedItemsText={smaLocalize('com_orgadmin_selected_users')}
+        disabled={disabled}
       />
     </div>
   );

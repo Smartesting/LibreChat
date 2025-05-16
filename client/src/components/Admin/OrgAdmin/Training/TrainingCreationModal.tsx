@@ -13,6 +13,7 @@ interface TrainingCreationModalProps {
   organizationId: string;
   training?: Training;
   organizationTrainers?: { email: string }[];
+  disabled?: boolean;
 }
 
 const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
@@ -21,6 +22,7 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
   organizationId,
   training,
   organizationTrainers = [],
+  disabled = false,
 }) => {
   const smaLocalize = useSmaLocalize();
   const localize = useLocalize();
@@ -44,6 +46,8 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
     }
     if (training && training.trainees) {
       setTrainees(training.trainees);
+    } else {
+      setTrainees([]);
     }
   }, [training]);
 
@@ -72,7 +76,7 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
           <div className={cn('fixed inset-0 flex w-screen items-center justify-center p-4')}>
             <DialogPanel
               className={cn(
-                'flex min-h-[600px] flex-col overflow-hidden rounded-xl rounded-b-lg bg-background shadow-2xl backdrop-blur-2xl animate-in sm:rounded-2xl md:min-h-[373px] md:w-[900px]',
+                'flex min-h-[600px] max-h-full flex-col overflow-hidden rounded-xl rounded-b-lg bg-background shadow-2xl backdrop-blur-2xl animate-in sm:rounded-2xl md:min-h-[373px] md:w-[900px]',
               )}
             >
               <DialogTitle
@@ -118,12 +122,14 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
                     hideButtons={true}
                     trainers={trainers.map((t) => t.email)}
                     formRef={formRef}
+                    disabled={disabled}
                   />
                 </div>
 
                 <div className="w-1/2 overflow-auto p-6">
                   <UserMultiSelect
                     title={smaLocalize('com_orgadmin_trainers')}
+                    disabled={disabled}
                     users={organizationTrainers}
                     selectedUsers={trainers.map((t) => t.email)}
                     onSelectedUsersChange={(selectedEmails) => {
@@ -151,6 +157,7 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
                   {localize('com_ui_cancel')}
                 </button>
                 <button
+                  disabled={disabled}
                   className="btn btn-primary focus:shadow-outline h-9 px-4 py-2 font-semibold text-white hover:bg-green-600 focus:border-green-500"
                   type="button"
                   onClick={() => {
