@@ -10,6 +10,7 @@ const {
 const getLogStores = require('~/cache/getLogStores');
 const { roleSchema } = require('@librechat/data-schemas');
 const { logger } = require('~/config');
+const User = require('~/models/User');
 
 const Role = mongoose.model('Role', roleSchema);
 
@@ -208,6 +209,27 @@ const initializeRoles = async function () {
   }
 };
 
+const migrateUserRoles = async function () {
+  let updateCount = 0;
+
+  const users = await User.find({}).lean();
+  for (const user of users) {
+    const role = user.role;
+    if (typeof role === 'string') {
+      await User.updateOne({ _id: user._id }, [
+        {
+          $set: {
+            role: [role],
+          },
+        },
+      ]);
+      updateCount++;
+    }
+  }
+
+  console.log('[migrateUserRoles] Updated', updateCount, 'users with role as string');
+};
+
 /**
  * Migrates roles from old schema to new schema structure.
  * This can be called directly to fix existing roles.
@@ -294,4 +316,5 @@ module.exports = {
   updateRoleByName,
   updateAccessPermissions,
   migrateRoleSchema,
+  migrateUserRoles,
 };

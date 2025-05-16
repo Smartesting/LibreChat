@@ -29,7 +29,7 @@ const processGrantAdminAccess = async (email) => {
 
     if (existingUser) {
       // If user already exists and already has ADMIN role, return an error
-      if (existingUser.role === SystemRoles.ADMIN) {
+      if (existingUser.role.includes(SystemRoles.ADMIN)) {
         return {
           success: false,
           status: 400,
@@ -160,9 +160,7 @@ const sendNotificationEmail = async (email) => {
       template: 'adminNotification.handlebars',
     });
 
-    logger.info(
-      `[sendNotificationEmail] Notification sent. [Email: ${email}]`,
-    );
+    logger.info(`[sendNotificationEmail] Notification sent. [Email: ${email}]`);
   } catch (error) {
     logger.error(`[sendNotificationEmail] Error sending notification: ${error.message}`);
   }

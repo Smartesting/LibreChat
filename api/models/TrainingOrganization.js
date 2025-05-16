@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { trainingOrganizationSchema } = require('@librechat/data-schemas');
+const { SystemRoles } = require('librechat-data-provider');
 
 const TrainingOrganization = mongoose.model('trainingOrganization', trainingOrganizationSchema);
 
@@ -19,20 +20,22 @@ const createTrainingOrganization = async (trainingOrgData) => {
  * @returns {Promise<TrainingOrganization[]>} A promise that resolves to an array of training organizations.
  */
 const getListTrainingOrganizations = async (user) => {
-  // If no user is provided or user is an admin, return all organizations
-  if (!user || user.role === 'ADMIN') {
-    return (await TrainingOrganization.find({}).lean());
+  if (!user || user.role.includes(SystemRoles.ADMIN)) {
+    return TrainingOrganization.find({}).lean();
   }
 
-  // Otherwise, return only organizations where the user is an active administrator
-  return (await TrainingOrganization.find({
-    'administrators': {
-      $elemMatch: {
-        'userId': user.id,
-        'activatedAt': { $exists: true },
+  if (user.role.includes(SystemRoles.TRAINER)) {
+    return TrainingOrganization.find({
+      trainers: {
+        $elemMatch: {
+          userId: user.id,
+          activatedAt: { $exists: true },
+        },
       },
-    },
-  }).lean());
+    }).lean();
+  }
+
+  return [];
 };
 
 /**
@@ -43,7 +46,7 @@ const getListTrainingOrganizations = async (user) => {
  * @returns {Promise<Object|null>} The updated training organization document or null if not found
  */
 const updateTrainingOrganizationAdmin = async (orgId, email, updateData) => {
-  return (await TrainingOrganization.findOneAndUpdate(
+  return await TrainingOrganization.findOneAndUpdate(
     {
       _id: orgId,
       'administrators.email': email,
@@ -59,7 +62,7 @@ const updateTrainingOrganizationAdmin = async (orgId, email, updateData) => {
       },
     },
     { new: true },
-  ).lean());
+  ).lean();
 };
 
 /**
@@ -70,7 +73,7 @@ const updateTrainingOrganizationAdmin = async (orgId, email, updateData) => {
  * @returns {Promise<Object|null>} The updated training organization document or null if not found
  */
 const updateTrainingOrganizationTrainer = async (orgId, email, updateData) => {
-  return (await TrainingOrganization.findOneAndUpdate(
+  return await TrainingOrganization.findOneAndUpdate(
     {
       _id: orgId,
       'trainers.email': email,
@@ -86,7 +89,7 @@ const updateTrainingOrganizationTrainer = async (orgId, email, updateData) => {
       },
     },
     { new: true },
-  ).lean());
+  ).lean();
 };
 
 /**
@@ -95,7 +98,7 @@ const updateTrainingOrganizationTrainer = async (orgId, email, updateData) => {
  * @returns {Promise<Object|null>} The deleted training organization document or null if not found
  */
 const deleteTrainingOrganization = async (orgId) => {
-  return (await TrainingOrganization.findByIdAndDelete(orgId).lean());
+  return await TrainingOrganization.findByIdAndDelete(orgId).lean();
 };
 
 /**
@@ -104,7 +107,7 @@ const deleteTrainingOrganization = async (orgId) => {
  * @returns {Promise<Object|null>} The training organization document or null if not found
  */
 const getTrainingOrganizationById = async (orgId) => {
-  return (await TrainingOrganization.findById(orgId).lean());
+  return await TrainingOrganization.findById(orgId).lean();
 };
 
 module.exports = {

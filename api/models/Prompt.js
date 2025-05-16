@@ -227,7 +227,7 @@ const getPromptGroups = async (req, filter) => {
 const deletePromptGroup = async ({ _id, author, role }) => {
   const query = { _id, author };
   const groupQuery = { groupId: new ObjectId(_id), author };
-  if (role === SystemRoles.ADMIN) {
+  if (role.includes(SystemRoles.ADMIN)) {
     delete query.author;
     delete groupQuery.author;
   }
@@ -420,7 +420,7 @@ module.exports = {
    */
   deletePrompt: async ({ promptId, groupId, author, role }) => {
     const query = { _id: promptId, groupId, author };
-    if (role === SystemRoles.ADMIN) {
+    if (role.includes(SystemRoles.ADMIN)) {
       delete query.author;
     }
     const { deletedCount } = await Prompt.deleteOne(query);

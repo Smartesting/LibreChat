@@ -27,7 +27,9 @@ const processAdministrators = async (administrators, orgName) => {
   }
 
   // Remove duplicate administrators
-  const uniqueAdministrators = Array.from(new Set(administrators.map(email => email.toLowerCase())));
+  const uniqueAdministrators = Array.from(
+    new Set(administrators.map((email) => email.toLowerCase())),
+  );
 
   const processedAdmins = [];
 
@@ -35,7 +37,7 @@ const processAdministrators = async (administrators, orgName) => {
     // Check if user exists
     const existingUser = await findUser({ email }, 'email _id name username role');
 
-    if (existingUser && existingUser.role === SystemRoles.ORGADMIN) {
+    if (existingUser && existingUser.role.includes(SystemRoles.ORGADMIN)) {
       // User exists with ORGADMIN role, set as active
       processedAdmins.push({
         email,
@@ -79,7 +81,9 @@ const sendOrgAdminNotificationEmail = async (user, orgName) => {
 
     // Check if email configuration is available
     if (!checkEmailConfig()) {
-      logger.info(`[sendOrgAdminNotificationEmail] Email configuration not available. Cannot send notification to [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
+      logger.info(
+        `[sendOrgAdminNotificationEmail] Email configuration not available. Cannot send notification to [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`,
+      );
       return;
     }
 
@@ -95,7 +99,9 @@ const sendOrgAdminNotificationEmail = async (user, orgName) => {
       template: 'orgAdminNotification.handlebars',
     });
 
-    logger.info(`[sendOrgAdminNotificationEmail] Admin notification sent. [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
+    logger.info(
+      `[sendOrgAdminNotificationEmail] Admin notification sent. [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`,
+    );
   } catch (error) {
     logger.error(`[sendOrgAdminNotificationEmail] Error sending notification: ${error.message}`);
   }
@@ -114,7 +120,9 @@ const sendOrgAdminInvitationEmail = async (email, token, orgName) => {
 
     // Check if email configuration is available
     if (!checkEmailConfig()) {
-      logger.info(`[sendOrgAdminInvitationEmail] Email configuration not available. Cannot send invitation to [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
+      logger.info(
+        `[sendOrgAdminInvitationEmail] Email configuration not available. Cannot send invitation to [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`,
+      );
       return;
     }
 
@@ -130,7 +138,9 @@ const sendOrgAdminInvitationEmail = async (email, token, orgName) => {
       template: 'orgAdminInvite.handlebars',
     });
 
-    logger.info(`[sendOrgAdminInvitationEmail] Invitation sent. [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
+    logger.info(
+      `[sendOrgAdminInvitationEmail] Invitation sent. [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`,
+    );
   } catch (error) {
     logger.error(`[sendOrgAdminInvitationEmail] Error sending invitation: ${error.message}`);
   }
@@ -147,7 +157,7 @@ const processTrainers = async (trainers, orgName) => {
     return [];
   }
 
-  const uniqueTrainers = Array.from(new Set(trainers.map(email => email.toLowerCase())));
+  const uniqueTrainers = Array.from(new Set(trainers.map((email) => email.toLowerCase())));
 
   const processedTrainers = [];
   for (const email of uniqueTrainers) {
@@ -191,7 +201,9 @@ const sendTrainerNotificationEmail = async (user, orgName) => {
     const loginLink = `${process.env.DOMAIN_CLIENT}/login`;
 
     if (!checkEmailConfig()) {
-      logger.info(`[sendTrainerNotificationEmail] Email configuration not available. Cannot send notification to [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
+      logger.info(
+        `[sendTrainerNotificationEmail] Email configuration not available. Cannot send notification to [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`,
+      );
       return;
     }
 
@@ -207,7 +219,9 @@ const sendTrainerNotificationEmail = async (user, orgName) => {
       template: 'trainerNotification.handlebars',
     });
 
-    logger.info(`[sendTrainerNotificationEmail] Trainer notification sent. [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`);
+    logger.info(
+      `[sendTrainerNotificationEmail] Trainer notification sent. [Email: ${user.email}] [Org: ${orgName}] [loginLink: ${loginLink}]`,
+    );
   } catch (error) {
     logger.error(`[sendTrainerNotificationEmail] Error sending notification: ${error.message}`);
   }
@@ -225,7 +239,9 @@ const sendTrainerInvitationEmail = async (email, token, orgName) => {
     const inviteLink = `${process.env.DOMAIN_CLIENT}/trainer-invite?token=${token}&email=${encodeURIComponent(email)}&orgName=${encodeURIComponent(orgName)}`;
 
     if (!checkEmailConfig()) {
-      logger.info(`[sendTrainerInvitationEmail] Email configuration not available. Cannot send invitation to [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
+      logger.info(
+        `[sendTrainerInvitationEmail] Email configuration not available. Cannot send invitation to [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`,
+      );
       return;
     }
 
@@ -241,7 +257,9 @@ const sendTrainerInvitationEmail = async (email, token, orgName) => {
       template: 'trainerInvite.handlebars',
     });
 
-    logger.info(`[sendTrainerInvitationEmail] Invitation sent. [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`);
+    logger.info(
+      `[sendTrainerInvitationEmail] Invitation sent. [Email: ${email}] [Org: ${orgName}] [inviteLink: ${inviteLink}]`,
+    );
   } catch (error) {
     logger.error(`[sendTrainerInvitationEmail] Error sending invitation: ${error.message}`);
   }

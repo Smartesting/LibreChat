@@ -10,7 +10,7 @@ const OrgAdminProtectedRoute = () => {
   const { user } = useAuthContext();
 
   // If the user is an ORGADMIN, redirect them to /training-organizations
-  if (user?.role === SystemRoles.ORGADMIN) {
+  if (user?.role.includes(SystemRoles.ORGADMIN)) {
     return <Navigate to="/training-organizations" replace />;
   }
 

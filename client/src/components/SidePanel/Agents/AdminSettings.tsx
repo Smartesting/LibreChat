@@ -98,7 +98,7 @@ const AdminSettings = () => {
     }
   }, [roles, selectedRole, reset]);
 
-  if (user?.role !== SystemRoles.ADMIN) {
+  if (!user?.role.includes(SystemRoles.ADMIN)) {
     return null;
   }
 

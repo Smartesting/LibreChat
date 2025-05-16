@@ -10,6 +10,7 @@ import type {
   TConversationTag,
   TBanner,
 } from './schemas';
+import { SystemRoles } from './roles';
 export type TOpenAIMessage = OpenAI.Chat.ChatCompletionMessageParam;
 
 export * from './schemas';
@@ -120,7 +121,7 @@ export type TUser = {
   email: string;
   name: string;
   avatar: string;
-  role: string;
+  role: SystemRoles[];
   provider: string;
   plugins?: string[];
   twoFactorEnabled?: boolean;

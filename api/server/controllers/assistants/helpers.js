@@ -224,7 +224,7 @@ const fetchAssistants = async ({ req, res, overrideEndpoint }) => {
     body = await listAssistantsForAzure({ req, res, version, azureConfig, query });
   }
 
-  if (req.user.role === SystemRoles.ADMIN) {
+  if (req.user.role.includes(SystemRoles.ADMIN)) {
     return body;
   } else if (!req.app.locals[endpoint]) {
     return body;

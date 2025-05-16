@@ -113,7 +113,7 @@ function AccountSettings() {
           <GearIcon className="icon-md" aria-hidden="true" />
           {localize('com_nav_settings')}
         </Select.SelectItem>
-        {user?.role === SystemRoles.ADMIN && (
+        {user?.role.includes(SystemRoles.ADMIN) && (
           <Select.SelectItem
             value=""
             onClick={() => (window.location.href = '/admin')}

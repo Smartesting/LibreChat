@@ -11,8 +11,12 @@ const { getTrainingOrganizationById } = require('~/models/TrainingOrganization')
 async function checkOrgAccess(req, res, next) {
   try {
     // If user is a super admin, allow access
-    if (req.user.role === SystemRoles.ADMIN) {
+    if (req.user.role.includes(SystemRoles.ADMIN)) {
       return next();
+    }
+
+    if (!req.user.role.includes(SystemRoles.ORGADMIN)) {
+      return res.status(403).json({ message: 'Forbidden' });
     }
 
     // Get the organization ID from the request parameters
@@ -29,7 +33,8 @@ async function checkOrgAccess(req, res, next) {
 
     // Check if the user is an administrator of the organization
     const isOrgAdmin = organization.administrators.some(
-      (admin) => admin.userId && admin.userId.toString() === req.user.id && admin.status === 'active',
+      (admin) =>
+        admin.userId && admin.userId.toString() === req.user.id && admin.status === 'active',
     );
 
     if (!isOrgAdmin) {

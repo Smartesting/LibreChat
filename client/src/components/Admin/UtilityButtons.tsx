@@ -52,7 +52,7 @@ const UtilityButtons: FC = () => {
 
   return (
     <div className="absolute right-4 top-4 flex space-x-2">
-      {user?.role === SystemRoles.ADMIN && (
+      {user?.role.includes(SystemRoles.ADMIN) && (
         <TooltipAnchor
           aria-label={localize('com_ui_new_chat')}
           description={localize('com_ui_new_chat')}

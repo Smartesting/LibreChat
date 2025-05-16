@@ -5,9 +5,7 @@ const {
   findPendingAdminInvitationByEmail,
   deleteAdminInvitationById,
 } = require('~/models/AdminInvitation');
-const {
-  processGrantAdminAccess,
-} = require('~/server/services/AdminService');
+const { processGrantAdminAccess } = require('~/server/services/AdminService');
 const User = require('~/models/User');
 
 /**
@@ -54,12 +52,16 @@ const revokeAdminAccessController = async (req, res) => {
     const user = await findUser({ email }, 'email _id role');
 
     if (user) {
-      // If user exists and has ADMIN role, downgrade to USER
-      if (user.role === SystemRoles.ADMIN) {
-        const updatedUser = await updateUser(user._id, { role: SystemRoles.USER });
+      // If user exists and has ADMIN role, remove the role
+      if (user.role.includes(SystemRoles.ADMIN)) {
+        const updatedUser = await updateUser(user._id, {
+          role: user.role.filter((r) => r !== SystemRoles.ADMIN),
+        });
+
         if (!updatedUser) {
           return res.status(500).json({ message: 'Failed to update user role' });
         }
+
         logger.info(`Admin role removed from user ${email}`);
         return res.status(200).json({ message: 'Admin role removed successfully' });
       } else {
