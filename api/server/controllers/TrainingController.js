@@ -339,6 +339,12 @@ const update = async (req, res) => {
         }
         updateData.trainees = currentTraining.trainees.slice(0, newCount);
       }
+    } else if (Number(updateData.participantCount) === 0) {
+      for (const trainee of currentTraining.trainees) {
+        const user = await findUser({ email: trainee.username });
+        await deleteUserById(user._id);
+      }
+      updateData.trainees = [];
     }
 
     const training = await updateTraining(id, updateData);
