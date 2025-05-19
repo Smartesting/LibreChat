@@ -75,3 +75,6 @@ export type { ITraining } from './schema/training';
 
 export { default as adminInvitationSchema } from './schema/adminInvitation';
 export type { IAdminInvitation } from './schema/adminInvitation';
+
+export { default as invitationSchema } from './schema/invitation';
+export type { IInvitation } from './schema/invitation';

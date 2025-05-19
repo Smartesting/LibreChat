@@ -31,6 +31,7 @@ const trainingOrganizations = require('./trainingOrganizations');
 const trainings = require('./trainings');
 const adminInvitations = require('./adminInvitations');
 const admins = require('./admins');
+const invitations = require('./invitations');
 
 module.exports = {
   ask,
@@ -66,4 +67,5 @@ module.exports = {
   adminInvitations,
   trainings,
   admins,
+  invitations
 };

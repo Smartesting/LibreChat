@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { trainingOrganizationSchema } = require('@librechat/data-schemas');
 const { SystemRoles } = require('librechat-data-provider');
+const { logger } = require('~/config');
 
 const TrainingOrganization = mongoose.model('trainingOrganization', trainingOrganizationSchema);
 
@@ -110,6 +111,60 @@ const getTrainingOrganizationById = async (orgId) => {
   return await TrainingOrganization.findById(orgId).lean();
 };
 
+/**
+ * Add a new administrator to a training organization
+ * @param {string} orgId - The ID of the training organization
+ * @param {string} userId - The user ID of the administrator to add
+ * @param {string} userEmail - The email of the administrator to add
+ * @returns {Promise<Object|null>} The updated training organization document or null if error occurs
+ */
+const addAdminToOrganization = async (orgId, userId, userEmail) => {
+  try {
+    return await TrainingOrganization.findOneAndUpdate(
+      { _id: orgId },
+      {
+        $push: {
+          administrators: {
+            userId: userId,
+            email: userEmail,
+            activatedAt: new Date(),
+          },
+        },
+      },
+    );
+  } catch (error) {
+    logger.error(`[addAdminToOrganization] Error adding user ${userEmail} as admin to organization ${orgId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Add a new trainer to a training organization
+ * @param {string} orgId - The ID of the training organization
+ * @param {string} userId - The user ID of the trainer to add
+ * @param {string} userEmail - The email of the trainer to add
+ * @returns {Promise<Object|null>} The updated training organization document or null if error occurs
+ */
+const addTrainerToOrganization = async (orgId, userId, userEmail) => {
+  try {
+    return await TrainingOrganization.findOneAndUpdate(
+      { _id: orgId },
+      {
+        $push: {
+          trainers: {
+            userId: userId,
+            email: userEmail,
+            activatedAt: new Date(),
+          },
+        },
+      },
+    );
+  } catch (error) {
+    logger.error(`[addTrainerToOrganization] Error adding user ${userEmail} as trainer to organization ${orgId}:`, error);
+    throw error;
+  }
+};
+
 module.exports = {
   TrainingOrganization,
   createTrainingOrganization,
@@ -118,4 +173,6 @@ module.exports = {
   updateTrainingOrganizationTrainer,
   deleteTrainingOrganization,
   getTrainingOrganizationById,
+  addAdminToOrganization,
+  addTrainerToOrganization,
 };

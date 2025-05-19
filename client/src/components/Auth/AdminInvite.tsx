@@ -37,7 +37,7 @@ function AdminInvite() {
   // Create a mutation for accepting the invitation
   const acceptAdminInvitation = useMutation({
     mutationFn: (data: TAdminInviteForm) => {
-      return axios.post('/api/admin-invitations/accept', data);
+      return axios.post('/api/invitations/accept', data);
     },
     onMutate: () => {
       setIsSubmitting(true);
