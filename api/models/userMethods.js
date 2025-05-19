@@ -193,7 +193,7 @@ const generateTraineeUsers = async (count) => {
     const uuid = crypto.randomUUID();
     const email = `${uuid}@smartesting.com`;
 
-    const password = crypto.randomBytes(16).toString('hex');
+    const password = crypto.randomBytes(8).toString('hex');
     const salt = bcrypt.genSaltSync(10);
 
     const userData = {
@@ -203,7 +203,6 @@ const generateTraineeUsers = async (count) => {
       role: SystemRoles.TRAINEE,
       emailVerified: true,
     };
-
     const userId = await createUser(userData);
 
     users.push({
