@@ -44,7 +44,7 @@ const acceptAdminInvitationController = async (req, res) => {
 
     const registerResult = await registerUser(userData, {
       emailVerified: true,
-      role: SystemRoles.ADMIN,
+      role: [SystemRoles.ADMIN],
     });
 
     if (registerResult.status !== 200) {

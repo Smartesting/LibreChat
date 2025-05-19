@@ -148,7 +148,7 @@ const acceptAdminInvitationHandler = async (req, res) => {
 
     const registerResult = await registerUser(userData, {
       emailVerified: true,
-      role: SystemRoles.ORGADMIN,
+      role: [SystemRoles.ORGADMIN],
     });
 
     if (registerResult.status !== 200) {
@@ -494,7 +494,7 @@ const acceptTrainerInvitationHandler = async (req, res) => {
 
     const registerResult = await registerUser(userData, {
       emailVerified: true,
-      role: SystemRoles.TRAINER,
+      role: [SystemRoles.TRAINER],
     });
 
     if (registerResult.status !== 200) {

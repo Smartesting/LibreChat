@@ -1,7 +1,7 @@
 const { webcrypto } = require('node:crypto');
 const bcrypt = require('bcryptjs');
 const { SystemRoles } = require('librechat-data-provider');
-const { findUser } = require('~/models/userMethods');
+const { findUser, updateUser } = require('~/models/userMethods');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
 
@@ -37,19 +37,25 @@ const processAdministrators = async (administrators, orgName) => {
     // Check if user exists
     const existingUser = await findUser({ email }, 'email _id name username role');
 
-    if (existingUser && existingUser.role.includes(SystemRoles.ORGADMIN)) {
-      // User exists with ORGADMIN role, set as active
+    if (existingUser) {
+      // User exists, set as active
       processedAdmins.push({
         email,
         userId: existingUser._id,
         activatedAt: new Date(),
       });
 
+      await updateUser(existingUser._id, {
+        role: [...existingUser.role, SystemRoles.ORGADMIN],
+      });
+
+      logger.info(
+        `[processAdministrators] User ${email} has been granted admin role for organization ${orgName}`,
+      );
+
       // Send notification email to existing user
       await sendOrgAdminNotificationEmail(existingUser, orgName);
-    }
-
-    if (!existingUser) {
+    } else {
       // User doesn't exist, generate invitation token
       const [invitationToken, tokenHash] = createTokenHash();
       const invitationExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
@@ -162,6 +168,7 @@ const processTrainers = async (trainers, orgName) => {
   const processedTrainers = [];
   for (const email of uniqueTrainers) {
     const existingUser = await findUser({ email }, 'email _id name username role');
+
     if (existingUser) {
       processedTrainers.push({
         email,
@@ -169,10 +176,16 @@ const processTrainers = async (trainers, orgName) => {
         activatedAt: new Date(),
       });
 
-      await sendTrainerNotificationEmail(existingUser, orgName);
-    }
+      await updateUser(existingUser._id, {
+        role: [...existingUser.role, SystemRoles.TRAINER],
+      });
 
-    if (!existingUser) {
+      logger.info(
+        `[processTrainers] User ${email} has been granted trainer role for organization ${orgName}`,
+      );
+
+      await sendTrainerNotificationEmail(existingUser, orgName);
+    } else {
       const [invitationToken, tokenHash] = createTokenHash();
       const invitationExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
