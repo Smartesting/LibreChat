@@ -95,6 +95,8 @@
   "com_orgadmin_copy": "Copier vers le presse-papiers",
   "com_orgadmin_copy_success": "Copié dans le presse-papiers",
   "com_orgadmin_copy_error": "Erreur lors de la copie vers le presse-papiers",
+  "com_orgadmin_trainee_hasLoggedIn": "L'utilisateur s'est connecté au moins une fois",
+  "com_orgadmin_trainee_notLoggedIn": "L'utilisateur ne s'est pas connecté au moins une fois",
   "com_ui_confirm_admin_revocation": "Confirmer la révocation des droits d'administrateur",
   "com_ui_admin_revocation_message": "Êtes-vous sûr de vouloir révoquer les droits d'administrateur de {{email}} ({{name}}) ?",
   "com_ui_confirm_trainer_revocation": "Confirmer la révocation des droits de formateur",

@@ -95,6 +95,8 @@
   "com_orgadmin_copy": "Copy to clipboard",
   "com_orgadmin_copy_success": "Copied to clipboard",
   "com_orgadmin_copy_error": "Unable to copy to clipboard",
+  "com_orgadmin_trainee_hasLoggedIn": "The user has logged in at least once",
+  "com_orgadmin_trainee_notLoggedIn": "The user has not logged in at least once",
   "com_ui_confirm_admin_revocation": "Confirm the revocation of administrator rights",
   "com_ui_admin_revocation_message": "Are you sure to revoke administrator rights from {{email}} ({{name}})?",
   "com_ui_confirm_trainer_revocation": "Confirm the revocation of trainer rights",

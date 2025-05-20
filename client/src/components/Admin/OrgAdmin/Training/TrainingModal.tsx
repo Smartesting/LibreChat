@@ -1,12 +1,12 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { cn } from '~/utils';
-import TrainingCreationForm from '~/components/Admin/OrgAdmin/Training/TrainingCreationForm';
+import TrainingForm from '~/components/Admin/OrgAdmin/Training/TrainingForm';
 import { useLocalize, useSmaLocalize } from '~/hooks';
 import { Training } from 'librechat-data-provider';
 import UserMultiSelect from '~/components/ui/UserMultiSelect';
 import GenericList from '~/components/ui/GenericList';
-import { ClipboardCopy } from 'lucide-react';
+import { ClipboardCopy, MonitorCheck, MonitorX } from 'lucide-react';
 import { useToastContext } from '~/Providers';
 
 type Trainee = {
@@ -15,7 +15,7 @@ type Trainee = {
   hasLoggedIn: boolean;
 };
 
-interface TrainingCreationModalProps {
+interface TrainingModalProps {
   isOpen: boolean;
   onClose: () => void;
   organizationId: string;
@@ -24,7 +24,7 @@ interface TrainingCreationModalProps {
   disabled?: boolean;
 }
 
-const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
+const TrainingModal: FC<TrainingModalProps> = ({
   isOpen,
   onClose,
   organizationId,
@@ -70,6 +70,25 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
         status: 'error',
       });
     }
+  };
+
+  const renderTrainee = (trainee: Trainee) => {
+    const LoginIcon = () =>
+      trainee.hasLoggedIn ? (
+        <MonitorCheck size={24}>
+          <title>{smaLocalize('com_orgadmin_trainee_hasLoggedIn')}</title>
+        </MonitorCheck>
+      ) : (
+        <MonitorX size={24}>
+          <title>{smaLocalize('com_orgadmin_trainee_notLoggedIn')}</title>
+        </MonitorX>
+      );
+    return (
+      <div className="flex items-center gap-3 text-sm text-text-primary">
+        <LoginIcon />
+        {trainee.username}
+      </div>
+    );
   };
 
   return (
@@ -135,7 +154,7 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
 
               <div className="flex flex-1 overflow-hidden">
                 <div className="w-1/2 overflow-auto border-r border-border-light p-6">
-                  <TrainingCreationForm
+                  <TrainingForm
                     onSubmit={onClose}
                     onCancel={onClose}
                     organizationId={organizationId}
@@ -173,7 +192,7 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
                     )}
                     items={trainees}
                     getKey={(trainee) => trainee.username}
-                    renderItem={(trainee) => trainee.username}
+                    renderItem={renderTrainee}
                     extraButtons={(trainee) => [
                       <button
                         key={`copy-${trainee.username}`}
@@ -219,4 +238,4 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
   );
 };
 
-export default TrainingCreationModal;
+export default TrainingModal;

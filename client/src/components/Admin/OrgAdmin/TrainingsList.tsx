@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { Training, TrainingWithStatus } from 'librechat-data-provider';
 import { useSmaLocalize } from '~/hooks';
 import TrainingItem from '~/components/Admin/OrgAdmin/Training/TrainingItem';
-import TrainingCreationModal from '~/components/Admin/OrgAdmin/Training/TrainingCreationModal';
+import TrainingModal from '~/components/Admin/OrgAdmin/Training/TrainingModal';
 import DeleteTrainingModal from '~/components/Admin/OrgAdmin/DeleteTrainingModal';
 
 type TrainingsListProps = {
@@ -44,7 +44,7 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
         trainingId={trainingToDelete}
         onClose={() => setTrainingToDelete(null)}
       />
-      <TrainingCreationModal
+      <TrainingModal
         isOpen={isTrainingModalOpen}
         onClose={() => {
           setIsTrainingModalOpen(false);

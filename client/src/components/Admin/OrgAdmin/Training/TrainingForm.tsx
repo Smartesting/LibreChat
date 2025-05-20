@@ -32,7 +32,7 @@ const defaultTrainingFormValues: TrainingCreateParams = {
   location: '',
 };
 
-const TrainingCreationForm: FC<{
+const TrainingForm: FC<{
   onSubmit: () => void;
   onCancel: () => void;
   organizationId: string;
@@ -426,4 +426,4 @@ const TrainingCreationForm: FC<{
   );
 };
 
-export default TrainingCreationForm;
+export default TrainingForm;
