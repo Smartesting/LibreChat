@@ -1,17 +1,17 @@
 import {
-  useMemo,
-  useState,
-  useEffect,
-  ReactNode,
-  useContext,
-  useCallback,
   createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
   useRef,
+  useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { setTokenHeader, SystemRoles } from 'librechat-data-provider';
 import type * as t from 'librechat-data-provider';
+import { setTokenHeader, SystemRoles } from 'librechat-data-provider';
 import {
   useGetRole,
   useGetUserQuery,
@@ -19,7 +19,7 @@ import {
   useLogoutUserMutation,
   useRefreshTokenMutation,
 } from '~/data-provider';
-import { TAuthConfig, TUserContext, TAuthContext, TResError } from '~/common';
+import { TAuthConfig, TAuthContext, TResError, TUserContext } from '~/common';
 import useTimeout from './useTimeout';
 import store from '~/store';
 
@@ -84,12 +84,13 @@ const AuthContextProvider = ({
         return;
       }
       setError(undefined);
-      const redirectPath = user?.role === SystemRoles.ORGADMIN ? '/training-organizations' : '/c/new';
+      const redirectPath =
+        user?.role === SystemRoles.ORGADMIN ? '/training-organizations' : '/c/new';
       setUserContext({ token, isAuthenticated: true, user, redirect: redirectPath });
     },
     onError: (error: TResError | unknown) => {
       const resError = error as TResError;
-      doSetError(resError.message);
+      doSetError(`${resError.response.data.message} (${resError.message})`);
       navigate('/login', { replace: true });
     },
   });

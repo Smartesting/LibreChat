@@ -6,8 +6,8 @@ const {
   deleteTraining,
 } = require('../../models/Training');
 const { generateTraineeUsers, deleteUserById } = require('../../models/userMethods');
-const { TrainingStatus } = require('librechat-data-provider');
 const { findUser } = require('~/models/userMethods');
+const { calculateTrainingStatus } = require('~/models/Training');
 
 /**
  * Create a new training
@@ -73,20 +73,6 @@ const getByOrganization = async (req, res) => {
   } catch (error) {
     console.error('Error getting trainings:', error);
     return res.status(500).json({ error: error.message });
-  }
-};
-
-const calculateTrainingStatus = (startDateTime, endDateTime) => {
-  const now = new Date();
-  const start = new Date(startDateTime);
-  const end = new Date(endDateTime);
-
-  if (now < start) {
-    return TrainingStatus.UPCOMING;
-  } else if (now >= start && now <= end) {
-    return TrainingStatus.IN_PROGRESS;
-  } else {
-    return TrainingStatus.PAST;
   }
 };
 

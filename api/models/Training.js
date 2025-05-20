@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { trainingSchema, userSchema } = require('@librechat/data-schemas');
+const { TrainingStatus } = require('librechat-data-provider');
 const User = mongoose.model('user', userSchema);
 const Training = mongoose.model('training', trainingSchema);
 
@@ -114,6 +115,40 @@ const deleteTraining = async (trainingId) => {
   return Training.findByIdAndDelete(trainingId).lean();
 };
 
+/**
+ * Get ongoing trainings
+ * @returns {Promise<Training[]|null>}
+ */
+const getOngoingTrainings = async () => {
+  const trainings = await Training.find().lean();
+  const trainingsWithStatus = trainings.map((training) => {
+    const status = calculateTrainingStatus(training.startDateTime, training.endDateTime);
+    return { ...training, status };
+  });
+
+  return trainingsWithStatus.filter((training) => training.status === TrainingStatus.IN_PROGRESS);
+};
+
+/**
+ * Calculate the training status given its start and end times.
+ * @param startDateTime
+ * @param endDateTime
+ * @returns {TrainingStatus}
+ */
+const calculateTrainingStatus = (startDateTime, endDateTime) => {
+  const now = new Date();
+  const start = new Date(startDateTime);
+  const end = new Date(endDateTime);
+
+  if (now < start) {
+    return TrainingStatus.UPCOMING;
+  } else if (now >= start && now <= end) {
+    return TrainingStatus.IN_PROGRESS;
+  } else {
+    return TrainingStatus.PAST;
+  }
+};
+
 module.exports = {
   Training,
   createTraining,
@@ -121,4 +156,6 @@ module.exports = {
   getTrainingById,
   updateTraining,
   deleteTraining,
+  calculateTrainingStatus,
+  getOngoingTrainings,
 };
