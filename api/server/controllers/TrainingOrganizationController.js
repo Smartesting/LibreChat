@@ -41,14 +41,13 @@ const createTrainingOrganizationHandler = async (req, res) => {
         .json({ error: 'A training organization with this name already exists' });
     }
 
-    // Process administrators (check if they exist, remove duplicates, generate tokens, send emails)
-    const processedAdministrators = await processAdministrators(administrators, name);
-
     // Create the training organization with processed administrators
     const trainingOrganization = await createTrainingOrganization({
       name,
-      administrators: processedAdministrators,
     });
+
+    // Process administrators (check if they exist, remove duplicates, generate tokens, send emails)
+    await processAdministrators(administrators, trainingOrganization._id, name);
 
     res.status(201).json(trainingOrganization);
   } catch (error) {
@@ -286,20 +285,12 @@ const addAdministratorHandler = async (req, res) => {
       return res.status(400).json({ error: 'Administrator already exists in this organization' });
     }
 
-    const processedAdmins = await processAdministrators([email], trainingOrganization.name);
+    await processAdministrators([email], id, trainingOrganization.name);
 
-    if (!processedAdmins || processedAdmins.length === 0) {
-      return res.status(500).json({ error: 'Failed to process administrator' });
-    }
-
-    const updatedOrg = await TrainingOrganization.findByIdAndUpdate(
-      id,
-      { administrators: [...trainingOrganization.administrators, ...processedAdmins] },
-      { new: true },
-    ).lean();
+    const updatedOrg = await getTrainingOrganizationById(id);
 
     if (!updatedOrg) {
-      return res.status(500).json({ error: 'Failed to update training organization' });
+      return res.status(500).json({ error: 'Failed to find updated training organization' });
     }
 
     res.status(200).json(updatedOrg);

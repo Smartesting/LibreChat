@@ -38,7 +38,7 @@ function OrgAdminInvite() {
   // Create a mutation for accepting the invitation
   const acceptAdminInvitation = useMutation({
     mutationFn: (data: TOrgAdminInviteForm) => {
-      return axios.post('/api/training-organizations/accept-admin-invitation', data);
+      return axios.post('api/invitations/accept', data);
     },
     onMutate: () => {
       setIsSubmitting(true);

@@ -49,7 +49,54 @@ const createSuperAdminInvitation = async (email) => {
 
     return { invitation, token };
   } catch (error) {
-    logger.error('[createSuperAdminInvitation] Error creating admin invitation', error);
+    logger.error('[createSuperAdminInvitation] Error creating super admin invitation', error);
+    throw error;
+  }
+};
+
+/**
+ * Creates a new org admin invitation
+ * @param {string} email - The email to invite
+ * @param {string} orgId - The organization ID
+ * @returns {Promise<Object>} - The created invitation and the plain token
+ */
+const createOrgAdminInvitation = async (email, orgId) => {
+  try {
+    // Generate a random token
+    const token = Buffer.from(webcrypto.getRandomValues(new Uint8Array(32))).toString('hex');
+    const tokenHash = bcrypt.hashSync(token, 10);
+
+    const existingInvitation = await Invitation.findOne({ email });
+    let invitation;
+
+    if (existingInvitation) {
+      // Update the existing invitation
+      invitation = await Invitation.findOneAndUpdate(
+        { email },
+        {
+          $push: {
+            'roles.orgAdmin': orgId,
+            invitationTokens: tokenHash,
+          },
+        },
+        { new: true },
+      );
+    } else {
+      // Create the invitation
+      invitation = await Invitation.create({
+        email,
+        invitationTokens: [tokenHash],
+        roles: {
+          superAdmin: false,
+          orgAdmin: [orgId],
+          orgTrainer: [],
+        },
+      });
+    }
+
+    return { invitation, token };
+  } catch (error) {
+    logger.error('[createOrgAdminInvitation] Error creating org admin invitation', error);
     throw error;
   }
 };
@@ -114,6 +161,7 @@ const deleteInvitationById = async (invitationId) => {
 
 module.exports = {
   createSuperAdminInvitation,
+  createOrgAdminInvitation,
   findSuperAdminInvitationByEmail,
   findInvitationByEmailAndToken,
   deleteInvitationById,

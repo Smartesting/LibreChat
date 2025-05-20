@@ -4,6 +4,8 @@ const { SystemRoles } = require('librechat-data-provider');
 const { findUser, updateUser } = require('~/models/userMethods');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
+const { createOrgAdminInvitation } = require('~/models/Invitation');
+const { addAdminToOrganization } = require('~/models/TrainingOrganization');
 
 /**
  * Creates Token and corresponding Hash for verification
@@ -18,10 +20,11 @@ const createTokenHash = () => {
 /**
  * Process administrators for a training organization
  * @param {Array} administrators - Array of administrator emails
+ * @param {string} orgId - The ID of the training organization
  * @param {string} orgName - The name of the training organization
- * @returns {Promise<Array>} - Array of processed administrator objects
+ * @returns {Promise<void>}
  */
-const processAdministrators = async (administrators, orgName) => {
+const processAdministrators = async (administrators, orgId, orgName) => {
   if (!administrators || !Array.isArray(administrators)) {
     return [];
   }
@@ -31,23 +34,19 @@ const processAdministrators = async (administrators, orgName) => {
     new Set(administrators.map((email) => email.toLowerCase())),
   );
 
-  const processedAdmins = [];
-
   for (const email of uniqueAdministrators) {
     // Check if user exists
     const existingUser = await findUser({ email }, 'email _id name username role');
 
     if (existingUser) {
-      // User exists, set as active
-      processedAdmins.push({
-        email,
-        userId: existingUser._id,
-        activatedAt: new Date(),
-      });
+      await addAdminToOrganization(orgId, existingUser._id, existingUser.email);
 
-      await updateUser(existingUser._id, {
-        role: [...existingUser.role, SystemRoles.ORGADMIN],
-      });
+      // Only add ORGADMIN role if the user doesn't already have it
+      if (!existingUser.role.includes(SystemRoles.ORGADMIN)) {
+        await updateUser(existingUser._id, {
+          role: [...existingUser.role, SystemRoles.ORGADMIN],
+        });
+      }
 
       logger.info(
         `[processAdministrators] User ${email} has been granted admin role for organization ${orgName}`,
@@ -57,22 +56,12 @@ const processAdministrators = async (administrators, orgName) => {
       await sendOrgAdminNotificationEmail(existingUser, orgName);
     } else {
       // User doesn't exist, generate invitation token
-      const [invitationToken, tokenHash] = createTokenHash();
-      const invitationExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-      processedAdmins.push({
-        email,
-        invitationToken: tokenHash,
-        invitationExpires,
-        invitedAt: new Date(),
-      });
+      const { token } = await createOrgAdminInvitation(email, orgId);
 
       // Send invitation email
-      await sendOrgAdminInvitationEmail(email, invitationToken, orgName);
+      await sendOrgAdminInvitationEmail(email, token, orgName);
     }
   }
-
-  return processedAdmins;
 };
 
 /**
@@ -110,6 +99,7 @@ const sendOrgAdminNotificationEmail = async (user, orgName) => {
     );
   } catch (error) {
     logger.error(`[sendOrgAdminNotificationEmail] Error sending notification: ${error.message}`);
+    throw error;
   }
 };
 
@@ -149,6 +139,7 @@ const sendOrgAdminInvitationEmail = async (email, token, orgName) => {
     );
   } catch (error) {
     logger.error(`[sendOrgAdminInvitationEmail] Error sending invitation: ${error.message}`);
+    throw error;
   }
 };
 
@@ -281,8 +272,8 @@ const sendTrainerInvitationEmail = async (email, token, orgName) => {
 module.exports = {
   processAdministrators,
   processTrainers,
-  sendNotificationEmail: sendOrgAdminNotificationEmail,
-  sendInvitationEmail: sendOrgAdminInvitationEmail,
+  sendOrgAdminNotificationEmail,
+  sendOrgAdminInvitationEmail,
   sendTrainerNotificationEmail,
   sendTrainerInvitationEmail,
 };
