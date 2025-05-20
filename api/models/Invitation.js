@@ -250,7 +250,7 @@ const findTrainerInvitationsByOrgId = async (orgId) => {
 const findAllAdminInvitations = async () => {
   try {
     return await Invitation.find({
-      'role.superAdmin': true,
+      'roles.superAdmin': true,
     });
   } catch (error) {
     logger.error('[findAllAdminInvitations] Error finding admin invitations', error);

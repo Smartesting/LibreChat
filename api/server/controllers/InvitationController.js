@@ -6,6 +6,8 @@ const {
   findInvitationByEmailAndToken,
   deleteInvitationById,
   findAllAdminInvitations,
+  findOrgAdminInvitationsByOrgId,
+  findTrainerInvitationsByOrgId,
 } = require('~/models/Invitation');
 const {
   addTrainerToOrganization,
@@ -104,6 +106,54 @@ const getAdminInvitationsController = async (req, res) => {
   }
 };
 
+/**
+ * Controller function to get the admin invitations of an organization
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getOrgAdminInvitationsController = async (req, res) => {
+  const { orgId } = req.params;
+
+  if (!orgId) {
+    return res.status(400).json({ message: 'Missing required orgId' });
+  }
+
+  try {
+    const orgAdminInvitations = await findOrgAdminInvitationsByOrgId(orgId);
+    res.status(200).json(orgAdminInvitations);
+  } catch (error) {
+    logger.error(
+      '[/invitations/organizations/:orgId/admins] Error getting organization admin invitations',
+      error,
+    );
+    res.status(500).json({ message: 'Error retrieving organization admin invitations' });
+  }
+};
+
+/**
+ * Controller function to get the trainer invitations of an organization
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getOrgTrainerInvitationsController = async (req, res) => {
+  const { orgId } = req.params;
+
+  if (!orgId) {
+    return res.status(400).json({ message: 'Missing required orgId' });
+  }
+
+  try {
+    const orgTrainerInvitations = await findTrainerInvitationsByOrgId(orgId);
+    res.status(200).json(orgTrainerInvitations);
+  } catch (error) {
+    logger.error(
+      '[/invitations/organizations/:orgId/trainers] Error getting organization trainer invitations',
+      error,
+    );
+    res.status(500).json({ message: 'Error retrieving organization trainer invitations' });
+  }
+};
+
 const computeUserRolesFromInvitation = (invitation) => {
   const { superAdmin, orgAdmin, orgTrainer } = invitation.roles;
   const roles = [];
@@ -126,4 +176,6 @@ const computeUserRolesFromInvitation = (invitation) => {
 module.exports = {
   acceptInvitationController,
   getAdminInvitationsController,
+  getOrgAdminInvitationsController,
+  getOrgTrainerInvitationsController,
 };
