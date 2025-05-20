@@ -2,7 +2,11 @@ const { logger } = require('~/config');
 const { SystemRoles } = require('librechat-data-provider');
 const { registerUser } = require('~/server/services/AuthService');
 const { findUser } = require('~/models/userMethods');
-const { findInvitationByEmailAndToken, deleteInvitationById } = require('~/models/Invitation');
+const {
+  findInvitationByEmailAndToken,
+  deleteInvitationById,
+  findAllAdminInvitations,
+} = require('~/models/Invitation');
 const {
   addTrainerToOrganization,
   addAdminToOrganization,
@@ -85,6 +89,21 @@ const acceptInvitationController = async (req, res) => {
   }
 };
 
+/**
+ * Controller function to get all admin invitations
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getAdminInvitationsController = async (req, res) => {
+  try {
+    const adminsInvitations = await findAllAdminInvitations();
+    res.status(200).json(adminsInvitations);
+  } catch (error) {
+    logger.error('[/invitations/admins] Error getting admins invitations', error);
+    res.status(500).json({ message: 'Error retrieving admin invitations' });
+  }
+};
+
 const computeUserRolesFromInvitation = (invitation) => {
   const { superAdmin, orgAdmin, orgTrainer } = invitation.roles;
   const roles = [];
@@ -106,4 +125,5 @@ const computeUserRolesFromInvitation = (invitation) => {
 
 module.exports = {
   acceptInvitationController,
+  getAdminInvitationsController,
 };

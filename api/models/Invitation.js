@@ -243,6 +243,21 @@ const findTrainerInvitationsByOrgId = async (orgId) => {
   }
 };
 
+/**
+ * Finds all admin invitations
+ * @returns {Promise<Array>} - Array of admin invitations
+ */
+const findAllAdminInvitations = async () => {
+  try {
+    return await Invitation.find({
+      'role.superAdmin': true,
+    });
+  } catch (error) {
+    logger.error('[findAllAdminInvitations] Error finding admin invitations', error);
+    throw error;
+  }
+};
+
 module.exports = {
   createSuperAdminInvitation,
   createOrgAdminInvitation,
@@ -252,4 +267,5 @@ module.exports = {
   deleteInvitationById,
   findOrgAdminInvitationsByOrgId,
   findTrainerInvitationsByOrgId,
+  findAllAdminInvitations,
 };

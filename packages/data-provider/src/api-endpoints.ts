@@ -312,7 +312,7 @@ export const regenerateBackupCodes = () => '/api/auth/2fa/backup/regenerate';
 export const verifyTwoFactorTemp = () => '/api/auth/2fa/verify-temp';
 
 /* Admin Invitations */
-export const pendingAdminInvitations = () => '/api/admin-invitations/pending';
+export const adminInvitations = () => '/api/invitations/admins';
 
 /* Admins */
 export const admins = () => '/api/admins';

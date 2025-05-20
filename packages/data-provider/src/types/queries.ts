@@ -150,9 +150,12 @@ export type TrainingOrganizationCreateParams = TrainingOrganization;
 
 export type TrainingCreateParams = Omit<Training, '_id'>;
 
-export type AdminInvitation = {
-  _id: string;
+export type Invitation = {
   email: string;
-  invitationExpires: string;
-  createdAt: string;
+  invitationTokens: string[];
+  roles: {
+    superAdmin: boolean;
+    orgAdmin: string[];
+    orgTrainer: string[];
+  };
 };

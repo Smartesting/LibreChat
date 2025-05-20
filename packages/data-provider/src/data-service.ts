@@ -874,8 +874,8 @@ export function verifyTwoFactorTemp(
   return request.post(endpoints.verifyTwoFactorTemp(), payload);
 }
 
-export function getPendingAdminInvitations(): Promise<q.AdminInvitation[]> {
-  return request.get(endpoints.pendingAdminInvitations());
+export function getAdminInvitations(): Promise<q.Invitation[]> {
+  return request.get(endpoints.adminInvitations());
 }
 
 export function grantAdminAccess(data: { email: string }): Promise<{ message: string }> {

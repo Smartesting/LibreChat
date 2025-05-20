@@ -13,4 +13,4 @@ export * from './queries';
 export * from './roles';
 export * from './tags';
 export * from './TrainingOrganizations';
-export * from './AdminInvitations';
+export * from './Invitations';
