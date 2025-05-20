@@ -1,12 +1,12 @@
 const { findUser, updateUser } = require('~/models');
 const { SystemRoles } = require('librechat-data-provider');
 const { logger } = require('~/config');
-const {
-  findPendingAdminInvitationByEmail,
-  deleteAdminInvitationById,
-} = require('~/models/AdminInvitation');
 const { processGrantAdminAccess } = require('~/server/services/AdminService');
 const User = require('~/models/User');
+const {
+  findAdminInvitationByEmail,
+  removeAdminRoleFromInvitation,
+} = require('~/models/Invitation');
 
 /**
  * Controller function to grant admin access
@@ -68,12 +68,12 @@ const revokeAdminAccessController = async (req, res) => {
         return res.status(400).json({ message: 'User does not have admin role' });
       }
     } else {
-      // If user doesn't exist, check if there's a pending admin invitation
-      const pendingInvitation = await findPendingAdminInvitationByEmail(email);
+      // If user doesn't exist, check if there's an admin invitation
+      const invitation = await findAdminInvitationByEmail(email);
 
-      if (pendingInvitation) {
-        // Delete the pending invitation
-        await deleteAdminInvitationById(pendingInvitation._id);
+      if (invitation) {
+        // Delete the invitation
+        await removeAdminRoleFromInvitation(invitation._id);
         logger.info(`Admin invitation deleted for ${email}`);
         return res.status(200).json({ message: 'Admin invitation deleted successfully' });
       } else {

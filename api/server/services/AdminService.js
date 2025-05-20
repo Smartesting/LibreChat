@@ -3,10 +3,7 @@ const { updateUser } = require('~/models');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
 const { SystemRoles } = require('librechat-data-provider');
-const {
-  findSuperAdminInvitationByEmail,
-  createSuperAdminInvitation,
-} = require('~/models/Invitation');
+const { findAdminInvitationByEmail, createAdminInvitation } = require('~/models/Invitation');
 
 /**
  * Grant admin access
@@ -63,7 +60,7 @@ const processGrantAdminAccess = async (email) => {
     }
 
     // Check if there's already a pending invitation for this email
-    const existingInvitation = await findSuperAdminInvitationByEmail(email);
+    const existingInvitation = await findAdminInvitationByEmail(email);
 
     if (existingInvitation) {
       return {
@@ -74,7 +71,7 @@ const processGrantAdminAccess = async (email) => {
     }
 
     // Create a new invitation
-    const { invitation, token } = await createSuperAdminInvitation(email);
+    const { invitation, token } = await createAdminInvitation(email);
 
     // Send invitation email
     await sendAdminInvitationEmail(email, token);

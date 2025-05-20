@@ -7,11 +7,11 @@ const { webcrypto } = require('node:crypto');
 const Invitation = mongoose.model('Invitation', invitationSchema);
 
 /**
- * Creates a new super admin invitation
+ * Creates a new admin invitation
  * @param {string} email - The email to invite
  * @returns {Promise<Object>} - The created invitation and the plain token
  */
-const createSuperAdminInvitation = async (email) => {
+const createAdminInvitation = async (email) => {
   try {
     // Generate a random token
     const token = Buffer.from(webcrypto.getRandomValues(new Uint8Array(32))).toString('hex');
@@ -49,7 +49,7 @@ const createSuperAdminInvitation = async (email) => {
 
     return { invitation, token };
   } catch (error) {
-    logger.error('[createSuperAdminInvitation] Error creating super admin invitation', error);
+    logger.error('[createAdminInvitation] Error creating admin invitation', error);
     throw error;
   }
 };
@@ -149,18 +149,18 @@ const createTrainerInvitation = async (email, orgId) => {
 };
 
 /**
- * Finds a super admin invitation by email
+ * Finds an admin invitation by email
  * @param {string} email - The email to search for
  * @returns {Promise<Object|null>} - The found invitation or null if not found
  */
-const findSuperAdminInvitationByEmail = async (email) => {
+const findAdminInvitationByEmail = async (email) => {
   try {
     return await Invitation.findOne({
       email,
       'roles.superAdmin': true,
     });
   } catch (error) {
-    logger.error('[findSuperAdminInvitationByEmail] Error finding pending admin invitation', error);
+    logger.error('[findAdminInvitationByEmail] Error finding pending admin invitation', error);
     throw error;
   }
 };
@@ -258,14 +258,47 @@ const findAllAdminInvitations = async () => {
   }
 };
 
+/**
+ * Removes the admin role from an invitation and deletes it if orgAdmin and orgTrainer are empty
+ * @param {string} invitationId - The ID of the invitation to update
+ * @returns {Promise<Object>} - Result object with success status and message
+ */
+const removeAdminRoleFromInvitation = async (invitationId) => {
+  try {
+    // Update the invitation to remove admin role
+    const updatedInvitation = await Invitation.findByIdAndUpdate(
+      invitationId,
+      {
+        $set: {
+          'roles.superAdmin': false,
+        },
+      },
+      { new: true },
+    );
+
+    // Check if orgAdmin and orgTrainer are empty
+    if (
+      updatedInvitation.roles.orgAdmin.length === 0 &&
+      updatedInvitation.roles.orgTrainer.length === 0
+    ) {
+      // Delete the invitation if both are empty
+      await deleteInvitationById(invitationId);
+    }
+  } catch (error) {
+    logger.error('[removeAdminRoleFromInvitation] Error updating invitation', error);
+    throw error;
+  }
+};
+
 module.exports = {
-  createSuperAdminInvitation,
+  createAdminInvitation,
   createOrgAdminInvitation,
   createTrainerInvitation,
-  findSuperAdminInvitationByEmail,
+  findAdminInvitationByEmail,
   findInvitationByEmailAndToken,
   deleteInvitationById,
   findOrgAdminInvitationsByOrgId,
   findTrainerInvitationsByOrgId,
   findAllAdminInvitations,
+  removeAdminRoleFromInvitation
 };
