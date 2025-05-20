@@ -57,9 +57,9 @@ const OrgAdminList: FC<{
       });
     },
     onError: (error) => {
-      if (error instanceof AxiosError && error.response?.data?.message) {
+      if (error instanceof AxiosError && error.response?.data?.error) {
         showToast({
-          message: `${smaLocalize('com_ui_add_admin_error')} ${error.response.data.message}`,
+          message: `${smaLocalize('com_ui_add_admin_error')} ${error.response.data.error}`,
           status: 'error',
         });
       }
@@ -74,9 +74,9 @@ const OrgAdminList: FC<{
       });
     },
     onError: (error) => {
-      if (error instanceof AxiosError && error.response?.data?.message) {
+      if (error instanceof AxiosError && error.response?.data?.error) {
         showToast({
-          message: `${smaLocalize('com_ui_revoke_admin_error')} ${error.response.data.message}`,
+          message: `${smaLocalize('com_ui_revoke_admin_error')} ${error.response.data.error}`,
           status: 'error',
         });
       }

@@ -61,9 +61,9 @@ const TrainerList: FC<TrainersListProps> = ({ orgId, trainers }) => {
       });
     },
     onError: (error) => {
-      if (error instanceof AxiosError && error.response?.data?.message) {
+      if (error instanceof AxiosError && error.response?.data?.error) {
         showToast({
-          message: `${smaLocalize('com_orgadmin_add_trainer_error')} ${error.response.data.message}`,
+          message: `${smaLocalize('com_orgadmin_add_trainer_error')} ${error.response.data.error}`,
           status: 'error',
         });
       }
@@ -78,9 +78,9 @@ const TrainerList: FC<TrainersListProps> = ({ orgId, trainers }) => {
       });
     },
     onError: (error) => {
-      if (error instanceof AxiosError && error.response?.data?.message) {
+      if (error instanceof AxiosError && error.response?.data?.error) {
         showToast({
-          message: `${smaLocalize('com_orgadmin_revoke_trainer_error')} ${error.response.data.message}`,
+          message: `${smaLocalize('com_orgadmin_revoke_trainer_error')} ${error.response.data.error}`,
           status: 'error',
         });
       }
