@@ -51,6 +51,7 @@ const UserMultiSelect: FC<UserMultiSelectProps> = ({
         placeholder={smaLocalize('com_orgadmin_select_users')}
         selectedItemsText={smaLocalize('com_orgadmin_selected_users')}
         disabled={disabled}
+        displayValues={true}
       />
     </div>
   );
