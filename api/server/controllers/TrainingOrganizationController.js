@@ -16,6 +16,7 @@ const {
 } = require('~/server/services/TrainingOrganizationService');
 const { registerUser } = require('~/server/services/AuthService');
 const { findUser } = require('~/models/userMethods');
+const { findTrainerInvitationsByOrgId, findOrgAdminInvitationsByOrgId } = require('~/models/Invitation');
 
 /**
  * Creates a training organization.
@@ -285,6 +286,15 @@ const addAdministratorHandler = async (req, res) => {
       return res.status(400).json({ error: 'Administrator already exists in this organization' });
     }
 
+    const adminInvitations = await findOrgAdminInvitationsByOrgId(id);
+    const existingInvitation = adminInvitations.find(
+      (invitation) => invitation.email.toLowerCase() === email.toLowerCase(),
+    );
+
+    if (existingInvitation) {
+      return res.status(400).json({ error: 'Administrator already invited in this organization' });
+    }
+
     await processAdministrators([email], id, trainingOrganization.name);
 
     const updatedOrg = await getTrainingOrganizationById(id);
@@ -394,20 +404,21 @@ const addTrainerHandler = async (req, res) => {
       return res.status(400).json({ error: 'Trainer already exists in this organization' });
     }
 
-    const processedTrainers = await processTrainers([email], trainingOrganization.name);
+    const trainerInvitations = await findTrainerInvitationsByOrgId(id);
+    const existingInvitation = trainerInvitations.find(
+      (invitation) => invitation.email.toLowerCase() === email.toLowerCase(),
+    );
 
-    if (!processedTrainers || processedTrainers.length === 0) {
-      return res.status(500).json({ error: 'Failed to process trainer' });
+    if (existingInvitation) {
+      return res.status(400).json({ error: 'Trainer already invited in this organization' });
     }
 
-    const updatedOrg = await TrainingOrganization.findByIdAndUpdate(
-      id,
-      { trainers: [...trainingOrganization.trainers, ...processedTrainers] },
-      { new: true },
-    ).lean();
+    await processTrainers([email], id, trainingOrganization.name);
+
+    const updatedOrg = await getTrainingOrganizationById(id);
 
     if (!updatedOrg) {
-      return res.status(500).json({ error: 'Failed to update training organization' });
+      return res.status(500).json({ error: 'Failed to find updated training organization' });
     }
 
     res.status(200).json(updatedOrg);

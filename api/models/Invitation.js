@@ -102,6 +102,53 @@ const createOrgAdminInvitation = async (email, orgId) => {
 };
 
 /**
+ * Creates a new trainer invitation
+ * @param {string} email - The email to invite
+ * @param {string} orgId - The organization ID
+ * @returns {Promise<Object>} - The created invitation and the plain token
+ */
+const createTrainerInvitation = async (email, orgId) => {
+  try {
+    // Generate a random token
+    const token = Buffer.from(webcrypto.getRandomValues(new Uint8Array(32))).toString('hex');
+    const tokenHash = bcrypt.hashSync(token, 10);
+
+    const existingInvitation = await Invitation.findOne({ email });
+    let invitation;
+
+    if (existingInvitation) {
+      // Update the existing invitation
+      invitation = await Invitation.findOneAndUpdate(
+        { email },
+        {
+          $push: {
+            'roles.orgTrainer': orgId,
+            invitationTokens: tokenHash,
+          },
+        },
+        { new: true },
+      );
+    } else {
+      // Create the invitation
+      invitation = await Invitation.create({
+        email,
+        invitationTokens: [tokenHash],
+        roles: {
+          superAdmin: false,
+          orgAdmin: [],
+          orgTrainer: [orgId],
+        },
+      });
+    }
+
+    return { invitation, token };
+  } catch (error) {
+    logger.error('[createOrgAdminInvitation] Error creating org admin invitation', error);
+    throw error;
+  }
+};
+
+/**
  * Finds a super admin invitation by email
  * @param {string} email - The email to search for
  * @returns {Promise<Object|null>} - The found invitation or null if not found
@@ -150,6 +197,11 @@ const findInvitationByEmailAndToken = async (email, token) => {
   }
 };
 
+/**
+ * Delete an invitation by its ID
+ * @param {string} invitationId - The ID of the invitation to delete
+ * @throws {Error} If deletion fails
+ */
 const deleteInvitationById = async (invitationId) => {
   try {
     await Invitation.deleteOne({ _id: invitationId });
@@ -159,10 +211,45 @@ const deleteInvitationById = async (invitationId) => {
   }
 };
 
+/**
+ * Find all organization admin invitations for a specific organization
+ * @param {string} orgId - The organization ID to search for
+ * @returns {Promise<Array>} Array of matching invitation documents
+ * @throws {Error} If query fails
+ */
+const findOrgAdminInvitationsByOrgId = async (orgId) => {
+  try {
+    return await Invitation.find({
+      'roles.orgAdmin': orgId,
+    });
+  } catch (error) {
+    logger.error('[findOrgAdminInvitationsByOrgId] Error finding org admin invitation', error);
+  }
+};
+
+/**
+ * Find all trainer invitations for a specific organization
+ * @param {string} orgId - The organization ID to search for
+ * @returns {Promise<Array>} Array of matching invitation documents
+ * @throws {Error} If query fails
+ */
+const findTrainerInvitationsByOrgId = async (orgId) => {
+  try {
+    return await Invitation.find({
+      'roles.orgTrainer': orgId,
+    });
+  } catch (error) {
+    logger.error('[findTrainerInvitationsByOrgId] Error finding org trainer invitation', error);
+  }
+};
+
 module.exports = {
   createSuperAdminInvitation,
   createOrgAdminInvitation,
+  createTrainerInvitation,
   findSuperAdminInvitationByEmail,
   findInvitationByEmailAndToken,
   deleteInvitationById,
+  findOrgAdminInvitationsByOrgId,
+  findTrainerInvitationsByOrgId,
 };

@@ -123,7 +123,7 @@ const addAdminToOrganization = async (orgId, userId, userEmail) => {
     return await TrainingOrganization.findOneAndUpdate(
       { _id: orgId },
       {
-        $push: {
+        $addToSet: {
           administrators: {
             userId: userId,
             email: userEmail,
@@ -150,7 +150,7 @@ const addTrainerToOrganization = async (orgId, userId, userEmail) => {
     return await TrainingOrganization.findOneAndUpdate(
       { _id: orgId },
       {
-        $push: {
+        $addToSet: {
           trainers: {
             userId: userId,
             email: userEmail,
