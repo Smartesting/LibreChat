@@ -6,8 +6,6 @@ const router = express.Router();
 const {
   createTrainingOrganization,
   getListTrainingOrganizations,
-  acceptAdminInvitation,
-  acceptTrainerInvitation,
   deleteTrainingOrganization,
   getTrainingOrganizationById,
   addAdministrator,
@@ -22,8 +20,6 @@ router.post('/', requireJwtAuth, checkAdmin, createTrainingOrganization);
 router.get('/', requireJwtAuth, getListTrainingOrganizations);
 router.get('/:id', requireJwtAuth, checkOrgAccess, getTrainingOrganizationById);
 router.delete('/:id', requireJwtAuth, checkAdmin, deleteTrainingOrganization);
-router.post('/accept-admin-invitation', acceptAdminInvitation);
-router.post('/accept-trainer-invitation', acceptTrainerInvitation);
 router.post('/:id/administrators', requireJwtAuth, checkOrgAccess, addAdministrator);
 router.delete('/:id/administrators/:email', requireJwtAuth, checkOrgAccess, removeAdministrator);
 router.post('/:id/trainers', requireJwtAuth, checkOrgAccess, addTrainer);
