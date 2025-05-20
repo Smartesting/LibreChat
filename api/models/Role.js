@@ -230,6 +230,17 @@ const migrateUserRoles = async function () {
   console.log('[migrateUserRoles] Updated', updateCount, 'users with role as string');
 };
 
+const removeAdminInvitationsMigration = async function () {
+  try {
+    await mongoose.connection.db.dropCollection('admininvitations');
+    console.log(
+      '[removeAdminInvitationsMigration] Successfully dropped admininvitations collection',
+    );
+  } catch (error) {
+    console.error('[removeAdminInvitationsMigration] Error dropping collection:', error);
+  }
+};
+
 /**
  * Migrates roles from old schema to new schema structure.
  * This can be called directly to fix existing roles.
@@ -317,4 +328,5 @@ module.exports = {
   updateAccessPermissions,
   migrateRoleSchema,
   migrateUserRoles,
+  removeAdminInvitationsMigration
 };

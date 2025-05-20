@@ -1,11 +1,7 @@
 const { logger } = require('~/config');
-const bcrypt = require('bcryptjs');
-const { SystemRoles } = require('librechat-data-provider');
 const {
   createTrainingOrganization,
   getListTrainingOrganizations,
-  updateTrainingOrganizationAdmin,
-  updateTrainingOrganizationTrainer,
   deleteTrainingOrganization,
   getTrainingOrganizationById,
   TrainingOrganization,
@@ -14,9 +10,11 @@ const {
   processAdministrators,
   processTrainers,
 } = require('~/server/services/TrainingOrganizationService');
-const { registerUser } = require('~/server/services/AuthService');
 const { findUser } = require('~/models/userMethods');
-const { findTrainerInvitationsByOrgId, findOrgAdminInvitationsByOrgId } = require('~/models/Invitation');
+const {
+  findTrainerInvitationsByOrgId,
+  findOrgAdminInvitationsByOrgId,
+} = require('~/models/Invitation');
 
 /**
  * Creates a training organization.
