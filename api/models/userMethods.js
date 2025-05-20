@@ -197,6 +197,7 @@ const generateTraineeUsers = async (count) => {
     const salt = bcrypt.genSaltSync(10);
 
     const userData = {
+      username: 'Training account',
       email,
       password: bcrypt.hashSync(password, salt),
       provider: 'local',
