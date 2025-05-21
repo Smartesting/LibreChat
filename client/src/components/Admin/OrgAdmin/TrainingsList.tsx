@@ -41,6 +41,7 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
   return (
     <>
       <DeleteTrainingModal
+        organizationId={orgId}
         trainingId={trainingToDelete}
         onClose={() => setTrainingToDelete(null)}
       />

@@ -215,10 +215,17 @@ export const trainingOrganizations = (id?: string, path?: string, email?: string
   return url;
 };
 
-export const trainings = () => '/api/trainings';
-
-export const trainingsByOrganization = (organizationId: string) =>
-  `${trainings()}/organization/${organizationId}`;
+export const trainings = (
+  organizationId: string,
+  action: 'create' | 'update' | 'delete' | 'getByOrg' | 'get',
+  trainingId?: string,
+) => {
+  let endpoint = `/api/organization/${organizationId}/trainings/${action}`;
+  if (trainingId) {
+    endpoint += `/${trainingId}`;
+  }
+  return endpoint;
+};
 
 export const files = () => '/api/files';
 

@@ -77,187 +77,6 @@ const getByOrganization = async (req, res) => {
 };
 
 /**
- * Adds a trainee to a training.
- * @route POST /trainings/:id/trainees
- * @param {ServerRequest} req - The request object.
- * @param {Object} req.params - The request parameters.
- * @param {string} req.params.id - The ID of the training.
- * @param {Object} req.body - The request body.
- * @param {string} req.body.username - The username of the trainee to add.
- * @param {ServerResponse} res - The response object.
- * @returns {Object} 200 - success response - application/json
- */
-const addTrainee = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { username } = req.body;
-
-    if (!id) {
-      return res.status(400).json({ error: 'Missing training ID' });
-    }
-
-    if (!username || username.trim() === '') {
-      return res.status(400).json({ error: 'Invalid username' });
-    }
-
-    const training = await getTrainingById(id);
-
-    if (!training) {
-      return res.status(404).json({ error: 'Training not found' });
-    }
-
-    const existingTrainee =
-      training.trainees &&
-      training.trainees.find(
-        (trainee) => trainee.username.toLowerCase() === username.toLowerCase(),
-      );
-
-    if (existingTrainee) {
-      return res.status(400).json({ error: 'Trainee already exists in this training' });
-    }
-
-    const newTrainee = {
-      username,
-      hasLoggedIn: false,
-    };
-
-    const trainees = training.trainees || [];
-    const updatedTraining = await updateTraining(id, {
-      trainees: [...trainees, newTrainee],
-    });
-
-    if (!updatedTraining) {
-      return res.status(500).json({ error: 'Failed to update training' });
-    }
-
-    res.status(200).json(updatedTraining);
-  } catch (error) {
-    console.error(`[/trainings/${req.params.id}/trainees] Error adding trainee`, error);
-    res.status(500).json({ error: error.message });
-  }
-};
-
-/**
- * Removes a trainee from a training.
- * @route DELETE /trainings/:id/trainees/:username
- * @param {ServerRequest} req - The request object.
- * @param {Object} req.params - The request parameters.
- * @param {string} req.params.id - The ID of the training.
- * @param {string} req.params.username - The username of the trainee to remove.
- * @param {ServerResponse} res - The response object.
- * @returns {Object} 200 - success response - application/json
- */
-const removeTrainee = async (req, res) => {
-  try {
-    const { id, username } = req.params;
-
-    if (!id || !username) {
-      return res.status(400).json({ error: 'Missing required parameters' });
-    }
-
-    const training = await getTrainingById(id);
-
-    if (!training) {
-      return res.status(404).json({ error: 'Training not found' });
-    }
-
-    const existingTrainee =
-      training.trainees &&
-      training.trainees.find(
-        (trainee) => trainee.username.toLowerCase() === username.toLowerCase(),
-      );
-
-    if (!existingTrainee) {
-      return res.status(404).json({ error: 'Trainee not found in this training' });
-    }
-
-    const updatedTrainees = training.trainees.filter(
-      (trainee) => trainee.username.toLowerCase() !== username.toLowerCase(),
-    );
-
-    const updatedTraining = await updateTraining(id, { trainees: updatedTrainees });
-
-    if (!updatedTraining) {
-      return res.status(500).json({ error: 'Failed to update training' });
-    }
-
-    res.status(200).json(updatedTraining);
-  } catch (error) {
-    console.error(
-      `[/trainings/${req.params.id}/trainees/${req.params.username}] Error removing trainee`,
-      error,
-    );
-    res.status(500).json({ error: error.message });
-  }
-};
-
-/**
- * Updates a trainee's login status in a training.
- * @route PATCH /trainings/:id/trainees/:username
- * @param {ServerRequest} req - The request object.
- * @param {Object} req.params - The request parameters.
- * @param {string} req.params.id - The ID of the training.
- * @param {string} req.params.username - The username of the trainee to update.
- * @param {Object} req.body - The request body.
- * @param {boolean} req.body.hasLoggedIn - The new login status.
- * @param {ServerResponse} res - The response object.
- * @returns {Object} 200 - success response - application/json
- */
-const updateTrainee = async (req, res) => {
-  try {
-    const { id, username } = req.params;
-    const { hasLoggedIn } = req.body;
-
-    if (!id || !username) {
-      return res.status(400).json({ error: 'Missing required parameters' });
-    }
-
-    if (hasLoggedIn === undefined) {
-      return res.status(400).json({ error: 'Missing hasLoggedIn field' });
-    }
-
-    const training = await getTrainingById(id);
-
-    if (!training) {
-      return res.status(404).json({ error: 'Training not found' });
-    }
-
-    const traineeIndex =
-      training.trainees &&
-      training.trainees.findIndex(
-        (trainee) => trainee.username.toLowerCase() === username.toLowerCase(),
-      );
-
-    if (traineeIndex === -1) {
-      return res.status(404).json({ error: 'Trainee not found in this training' });
-    }
-
-    // Create a copy of the trainees array
-    const updatedTrainees = [...training.trainees];
-
-    // Update the specific trainee
-    updatedTrainees[traineeIndex] = {
-      ...updatedTrainees[traineeIndex],
-      hasLoggedIn,
-    };
-
-    const updatedTraining = await updateTraining(id, { trainees: updatedTrainees });
-
-    if (!updatedTraining) {
-      return res.status(500).json({ error: 'Failed to update training' });
-    }
-
-    res.status(200).json(updatedTraining);
-  } catch (error) {
-    console.error(
-      `[/trainings/${req.params.id}/trainees/${req.params.username}] Error updating trainee`,
-      error,
-    );
-    res.status(500).json({ error: error.message });
-  }
-};
-
-/**
  * Get a training by ID
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
@@ -265,13 +84,13 @@ const updateTrainee = async (req, res) => {
  */
 const getById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { trainingId } = req.params;
 
-    if (!id) {
+    if (!trainingId) {
       return res.status(400).json({ error: 'Training ID is required' });
     }
 
-    const training = await getTrainingById(id);
+    const training = await getTrainingById(trainingId);
 
     if (!training) {
       return res.status(404).json({ error: 'Training not found' });
@@ -292,14 +111,14 @@ const getById = async (req, res) => {
  */
 const update = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { trainingId } = req.params;
     const updateData = req.body;
 
-    if (!id) {
+    if (!trainingId) {
       return res.status(400).json({ error: 'Training ID is required' });
     }
 
-    const currentTraining = await getTrainingById(id);
+    const currentTraining = await getTrainingById(trainingId);
     if (!currentTraining) {
       return res.status(404).json({ error: 'Training not found' });
     }
@@ -333,7 +152,7 @@ const update = async (req, res) => {
       updateData.trainees = [];
     }
 
-    const training = await updateTraining(id, updateData);
+    const training = await updateTraining(trainingId, updateData);
 
     if (!training) {
       return res.status(404).json({ error: 'Training not found' });
@@ -354,13 +173,13 @@ const update = async (req, res) => {
  */
 const remove = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { trainingId } = req.params;
 
-    if (!id) {
+    if (!trainingId) {
       return res.status(400).json({ error: 'Training ID is required' });
     }
 
-    const trainingToDelete = await getTrainingById(id);
+    const trainingToDelete = await getTrainingById(trainingId);
     if (!trainingToDelete) {
       return res.status(404).json({ error: 'Training not found' });
     }
@@ -370,7 +189,7 @@ const remove = async (req, res) => {
       await deleteUserById(user._id);
     }
 
-    const training = await deleteTraining(id);
+    const training = await deleteTraining(trainingId);
     if (!training) {
       return res.status(404).json({ error: 'Training not found' });
     }
@@ -388,7 +207,4 @@ module.exports = {
   getById,
   update,
   remove,
-  addTrainee,
-  removeTrainee,
-  updateTrainee,
 };

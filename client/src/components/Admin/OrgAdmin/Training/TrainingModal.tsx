@@ -75,11 +75,11 @@ const TrainingModal: FC<TrainingModalProps> = ({
   const renderTrainee = (trainee: Trainee) => {
     const LoginIcon = () =>
       trainee.hasLoggedIn ? (
-        <MonitorCheck size={24}>
+        <MonitorCheck size={24} color="green">
           <title>{smaLocalize('com_orgadmin_trainee_hasLoggedIn')}</title>
         </MonitorCheck>
       ) : (
-        <MonitorX size={24}>
+        <MonitorX size={24} color="grey">
           <title>{smaLocalize('com_orgadmin_trainee_notLoggedIn')}</title>
         </MonitorX>
       );

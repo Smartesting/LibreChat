@@ -115,6 +115,7 @@ const TrainingForm: FC<{
       if (isEditing && training) {
         updateTraining.mutate(
           {
+            organizationId: training.trainingOrganizationId,
             id: training._id,
             data: formattedData,
           },
