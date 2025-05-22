@@ -50,8 +50,8 @@ const deleteTrainingOrganization = async (orgId) => {
  */
 const getTrainingOrganizationById = async (orgId) => {
   return TrainingOrganization.findById(orgId)
-    .populate('administrators', '_id email name')
-    .populate('trainers', '_id email name')
+    .populate('administrators', '_id email name role')
+    .populate('trainers', '_id email name role')
     .lean();
 };
 
@@ -123,7 +123,9 @@ const removeAdminFromOrganization = async (orgId, userId) => {
         },
       },
       { new: true },
-    );
+    )
+      .populate('administrators', '_id email name role')
+      .populate('trainers', '_id email name role');
   } catch (error) {
     logger.error(
       `[removeAdminFromOrganization] Error removing user ${userId} as admin from organization ${orgId}:`,
