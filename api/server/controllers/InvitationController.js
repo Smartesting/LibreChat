@@ -1,7 +1,7 @@
 const { logger } = require('~/config');
 const { SystemRoles } = require('librechat-data-provider');
 const { registerUser } = require('~/server/services/AuthService');
-const { findUser } = require('~/models/userMethods');
+const { findUser, updateUser } = require('~/models/userMethods');
 const {
   findInvitationByEmailAndToken,
   deleteInvitationById,
@@ -45,7 +45,7 @@ const acceptInvitationController = async (req, res) => {
 
     const registerResult = await registerUser(userData, {
       emailVerified: true,
-      role: computeUserRolesFromInvitation(invitation),
+      role: [],
     });
 
     if (registerResult.status !== 200) {
@@ -58,10 +58,19 @@ const acceptInvitationController = async (req, res) => {
       return res.status(500).json({ error: 'Failed to create user account' });
     }
 
+    const roles = new Set();
+
+    if (invitation.roles.superAdmin) {
+      roles.add(SystemRoles.ADMIN);
+    }
+
     // Add user as admin to organizations in invitation.roles.orgAdmin
     for (const orgId of invitation.roles.orgAdmin) {
       try {
-        await addAdminToOrganization(orgId, user._id, user.email);
+        const updatedOrganization = await addAdminToOrganization(orgId, user._id, user.email);
+        if (updatedOrganization !== null) {
+          roles.add(SystemRoles.ORGADMIN);
+        }
       } catch {
         /* empty */
       }
@@ -70,11 +79,16 @@ const acceptInvitationController = async (req, res) => {
     // Add user as trainer to organizations in invitation.roles.orgTrainer
     for (const orgId of invitation.roles.orgTrainer) {
       try {
-        await addTrainerToOrganization(orgId, user._id, user.email);
+        const updatedOrganization = await addTrainerToOrganization(orgId, user._id, user.email);
+        if (updatedOrganization !== null) {
+          roles.add(SystemRoles.TRAINER);
+        }
       } catch {
         /* empty */
       }
     }
+
+    await updateUser(user._id, { role: Array.from(roles) });
 
     try {
       await deleteInvitationById(invitation._id);
@@ -152,25 +166,6 @@ const getOrgTrainerInvitationsController = async (req, res) => {
     );
     res.status(500).json({ message: 'Error retrieving organization trainer invitations' });
   }
-};
-
-const computeUserRolesFromInvitation = (invitation) => {
-  const { superAdmin, orgAdmin, orgTrainer } = invitation.roles;
-  const roles = [];
-
-  if (superAdmin) {
-    roles.push(SystemRoles.ADMIN);
-  }
-
-  if (orgAdmin.length > 0) {
-    roles.push(SystemRoles.ORGADMIN);
-  }
-
-  if (orgTrainer.length > 0) {
-    roles.push(SystemRoles.TRAINER);
-  }
-
-  return roles;
 };
 
 module.exports = {
