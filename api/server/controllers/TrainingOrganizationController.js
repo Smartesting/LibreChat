@@ -1,19 +1,26 @@
 const { logger } = require('~/config');
+const { SystemRoles } = require('librechat-data-provider');
+const { updateUser } = require('~/models');
 const {
   createTrainingOrganization,
   getListTrainingOrganizations,
   deleteTrainingOrganization,
   getTrainingOrganizationById,
+  removeAdminFromOrganization,
+  removeTrainerFromOrganization,
   TrainingOrganization,
+  findTrainingOrganizationsByAdmin,
+  findTrainingOrganizationsByTrainer,
 } = require('~/models/TrainingOrganization');
 const {
   processAdministrators,
   processTrainers,
 } = require('~/server/services/TrainingOrganizationService');
-const { findUser } = require('~/models/userMethods');
 const {
   findTrainerInvitationsByOrgId,
   findOrgAdminInvitationsByOrgId,
+  removeOrgAdminRoleFromInvitation,
+  removeTrainerRoleFromInvitation,
 } = require('~/models/Invitation');
 
 /**
@@ -233,25 +240,46 @@ const removeAdministratorHandler = async (req, res) => {
       return res.status(404).json({ error: 'Training organization not found' });
     }
 
-    const adminIndex = trainingOrganization.administrators.findIndex(
+    const existingAdmin = trainingOrganization.administrators.find(
       (admin) => admin.email.toLowerCase() === email.toLowerCase(),
     );
-    if (adminIndex === -1) {
-      return res.status(404).json({ error: 'Administrator not found in this organization' });
+
+    if (existingAdmin) {
+      const updatedOrg = await removeAdminFromOrganization(id, existingAdmin._id);
+
+      if (updatedOrg) {
+        const orgsWithUserAsAdmin = await findTrainingOrganizationsByAdmin(existingAdmin._id);
+
+        // If the user is not an administrator of any organization, remove the orgadmin role
+        if (orgsWithUserAsAdmin.length === 0 && existingAdmin.role.includes(SystemRoles.ORGADMIN)) {
+          await updateUser(existingAdmin._id, {
+            role: existingAdmin.role.filter((role) => role !== SystemRoles.ORGADMIN),
+          });
+          logger.info(
+            `Removed ${SystemRoles.ORGADMIN} role from user ${existingAdmin.email} as he is no longer an administrator of any organization`,
+          );
+        }
+      }
+
+      return res.status(200).json(updatedOrg);
+    } else {
+      // If user doesn't exist, check if there's an admin invitation
+      const invitations = await findOrgAdminInvitationsByOrgId(trainingOrganization._id);
+      const orgAdminInvitation = invitations.find(
+        (invitation) => invitation.email.toLowerCase() === email.toLowerCase(),
+      );
+
+      if (orgAdminInvitation) {
+        // Remove the org admin role from the invitation
+        await removeOrgAdminRoleFromInvitation(orgAdminInvitation._id, trainingOrganization._id);
+        logger.info(
+          `Org admin role removed from invitation for ${email} on ${trainingOrganization.name} organization`,
+        );
+        return res.status(200).json(trainingOrganization);
+      } else {
+        return res.status(404).json({ error: 'User not found and no pending invitation exists' });
+      }
     }
-
-    trainingOrganization.administrators.splice(adminIndex, 1);
-
-    const updatedOrg = await TrainingOrganization.findByIdAndUpdate(
-      id,
-      { administrators: trainingOrganization.administrators },
-      { new: true },
-    ).lean();
-    if (!updatedOrg) {
-      return res.status(500).json({ error: 'Failed to update training organization' });
-    }
-
-    res.status(200).json(updatedOrg);
   } catch (error) {
     logger.error(
       `[/training-organizations/${req.params.id}/administrators/${req.params.email}] Error removing administrator`,
@@ -348,75 +376,52 @@ const removeTrainerHandler = async (req, res) => {
       return res.status(404).json({ error: 'Training organization not found' });
     }
 
-    const trainerExists = trainingOrganization.trainers.some(
+    const existingTrainer = trainingOrganization.trainers.find(
       (trainer) => trainer.email.toLowerCase() === email.toLowerCase(),
     );
-    if (!trainerExists) {
-      return res.status(404).json({ error: 'Trainer not found in this organization' });
-    }
 
-    const result = await TrainingOrganization.updateOne(
-      { _id: id },
-      { $pull: { trainers: { email: { $regex: new RegExp('^' + email + '$', 'i') } } } },
-    );
-    if (result.modifiedCount === 0) {
-      logger.error(`Failed to update training organization ${id}`);
-      return res.status(500).json({ error: 'Failed to update training organization' });
-    }
+    if (existingTrainer) {
+      const updatedOrg = await removeTrainerFromOrganization(id, existingTrainer._id);
 
-    const updatedOrg = await getTrainingOrganizationById(id);
-    res.status(200).json(updatedOrg);
+      if (updatedOrg) {
+        const orgsWithUserAsTrainer = await findTrainingOrganizationsByTrainer(existingTrainer._id);
+
+        // If the user is not a trainer in any organization, remove the trainer role
+        if (
+          orgsWithUserAsTrainer.length === 0 &&
+          existingTrainer.role.includes(SystemRoles.TRAINER)
+        ) {
+          await updateUser(existingTrainer._id, {
+            role: existingTrainer.role.filter((role) => role !== SystemRoles.TRAINER),
+          });
+          logger.info(
+            `Removed ${SystemRoles.TRAINER} role from user ${existingTrainer.email} as he is no longer a trainer in any organization`,
+          );
+        }
+      }
+
+      return res.status(200).json(updatedOrg);
+    } else {
+      // If user doesn't exist, check if there's a trainer invitation
+      const invitations = await findTrainerInvitationsByOrgId(trainingOrganization._id);
+      const trainerInvitation = invitations.find(
+        (invitation) => invitation.email.toLowerCase() === email.toLowerCase(),
+      );
+
+      if (trainerInvitation) {
+        // Remove the trainer role from the invitation
+        await removeTrainerRoleFromInvitation(trainerInvitation._id, trainingOrganization._id);
+        logger.info(
+          `Trainer role removed from invitation for ${email} on ${trainingOrganization.name} organization`,
+        );
+        return res.status(200).json(trainingOrganization);
+      } else {
+        return res.status(404).json({ error: 'Trainer not found and no pending invitation exists' });
+      }
+    }
   } catch (error) {
     logger.error(
       `[/training-organizations/${req.params.id}/trainers/${req.params.email}] Error removing trainer`,
-      error,
-    );
-    res.status(500).json({ error: error.message });
-  }
-};
-
-/**
- * Retrieves active administrators and trainers of a training organization.
- * @route GET /training-organizations/:id/active-members
- * @param {ServerRequest} req - The request object.
- * @param {Object} req.params - The request parameters.
- * @param {string} req.params.id - The ID of the training organization.
- * @param {ServerResponse} res - The response object.
- * @returns {Object} 200 - success response - application/json
- */
-const getActiveOrganizationMembersHandler = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    if (!id) {
-      return res.status(400).json({ error: 'Missing organization ID' });
-    }
-
-    const trainingOrganization = await getTrainingOrganizationById(id);
-
-    if (!trainingOrganization) {
-      return res.status(404).json({ error: 'Training organization not found' });
-    }
-
-    const activeAdministrators = await Promise.all(
-      trainingOrganization.administrators
-        .filter((admin) => admin.userId) // Only process active admins with userId
-        .map(async (admin) => await findUser({ _id: admin.userId })),
-    );
-
-    const activeTrainers = await Promise.all(
-      trainingOrganization.trainers
-        .filter((trainer) => trainer.userId) // Only process active trainers with userId
-        .map(async (trainer) => await findUser({ _id: trainer.userId })),
-    );
-
-    return res.json({
-      activeAdministrators: activeAdministrators,
-      activeTrainers: activeTrainers,
-    });
-  } catch (error) {
-    logger.error(
-      `[/training-organizations/${req.params.id}/active-members] Error retrieving active members`,
       error,
     );
     res.status(500).json({ error: error.message });
@@ -432,5 +437,4 @@ module.exports = {
   removeAdministrator: removeAdministratorHandler,
   addTrainer: addTrainerHandler,
   removeTrainer: removeTrainerHandler,
-  getActiveOrganizationMembers: getActiveOrganizationMembersHandler,
 };

@@ -99,11 +99,18 @@ function getOrgMutationOptions(
         updatedOrg,
       );
 
-      // Invalidate the active members query to refresh the list of administrators
+      // Invalidate the admin invitations query to refresh the list of administrators
       queryClient.invalidateQueries([
         QueryKeys.trainingOrganizations,
         variables.id,
-        'active-members',
+        'adminInvitations',
+      ]);
+
+      // Invalidate the trainer invitations query to refresh the list of trainers
+      queryClient.invalidateQueries([
+        QueryKeys.trainingOrganizations,
+        variables.id,
+        'trainerInvitations',
       ]);
 
       return options?.onSuccess?.(updatedOrg, variables);

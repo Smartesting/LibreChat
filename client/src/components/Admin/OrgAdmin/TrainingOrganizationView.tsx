@@ -1,7 +1,11 @@
 import React, { FC, useMemo } from 'react';
 import { TrainingOrganization, TrainingStatus } from 'librechat-data-provider';
 import UtilityButtons from '~/components/Admin/UtilityButtons';
-import { useTrainingsByOrganizationQuery } from '~/data-provider/TrainingOrganizations';
+import {
+  useTrainingsByOrganizationQuery,
+  useOrgAdminInvitationsQuery,
+  useOrgTrainerInvitationsQuery,
+} from '~/data-provider/TrainingOrganizations';
 import TrainingOrganizationHeader from '~/components/Admin/OrgAdmin/TrainingOrganizationHeader';
 import OrgAdminList from '~/components/Admin/OrgAdmin/OrgAdminList';
 import TrainerList from '~/components/Admin/OrgAdmin/TrainerList';
@@ -14,6 +18,9 @@ const TrainingOrganizationView: FC<{
   const { data: trainings = [], isLoading: isLoadingTrainings } = useTrainingsByOrganizationQuery(
     trainingOrganization._id,
   );
+
+  const { data: adminInvitations = [] } = useOrgAdminInvitationsQuery(trainingOrganization._id);
+  const { data: trainerInvitations = [] } = useOrgTrainerInvitationsQuery(trainingOrganization._id);
 
   const { upcomingTrainings, pastTrainings, ongoingTrainings } = useMemo(() => {
     return {
@@ -36,8 +43,13 @@ const TrainingOrganizationView: FC<{
           <OrgAdminList
             orgId={trainingOrganization._id}
             orgAdmins={trainingOrganization.administrators}
+            adminInvitations={adminInvitations}
           />
-          <TrainerList orgId={trainingOrganization._id} trainers={trainingOrganization.trainers} />
+          <TrainerList
+            orgId={trainingOrganization._id}
+            trainers={trainingOrganization.trainers}
+            trainerInvitations={trainerInvitations}
+          />
         </div>
         <div className="md:w-2/3">
           <TrainingsList

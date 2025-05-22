@@ -20,7 +20,7 @@ const { agentsConfigSetup } = require('./start/agents');
 const {
   initializeRoles,
   migrateUserRoles,
-  removeAdminInvitationsMigration,
+  removeAdminInvitationsMigration, migrateTrainingOrgUsers,
 } = require('~/models/Role');
 const { isEnabled } = require('~/server/utils');
 const { getMCPManager } = require('~/config');
@@ -36,6 +36,7 @@ const AppService = async (app) => {
   await initializeRoles();
   await migrateUserRoles();
   await removeAdminInvitationsMigration();
+  await migrateTrainingOrgUsers();
   /** @type {TCustomConfig} */
   const config = (await loadCustomConfig()) ?? {};
   const configDefaults = getConfigDefaults();

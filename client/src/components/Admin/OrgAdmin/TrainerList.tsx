@@ -2,56 +2,39 @@ import React, { FC, useMemo, useState } from 'react';
 import { useSmaLocalize } from '~/hooks';
 import { useToastContext } from '~/Providers';
 import {
-  useActiveOrganizationMembersQuery,
   useAddTrainerMutation,
   useRemoveTrainerMutation,
 } from '~/data-provider/TrainingOrganizations';
 import GenericList from '~/components/ui/GenericList';
 import { isValidEmail } from '~/utils';
 import { AxiosError } from 'axios';
-import { TUser, User } from 'librechat-data-provider';
+import { Invitation, User } from 'librechat-data-provider';
 import RevokeConfirmationModal from '~/components/Admin/RevokeConfirmationModal';
 
 interface TrainersListProps {
   orgId: string;
   trainers: User[];
+  trainerInvitations: Invitation[];
 }
 
-const TrainerList: FC<TrainersListProps> = ({ orgId, trainers }) => {
+const TrainerList: FC<TrainersListProps> = ({ orgId, trainers, trainerInvitations = [] }) => {
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
-  const { data: activeMembers } = useActiveOrganizationMembersQuery(orgId);
 
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [trainerToRevoke, setTrainerToRevoke] = useState<{ email: string; name: string } | null>(
     null,
   );
 
-  const existingAndInvitedTrainers = useMemo(() => {
-    const existingUsers = trainers
-      .filter((user) => user.activatedAt !== undefined)
-      .map((user) => ({
-        email: user.email,
-        name: getActiveTrainerName(user.email, activeMembers?.activeTrainers),
-      }));
+  // Combine existing trainers with invited trainers
+  const allTrainers = useMemo(() => {
+    const invitedTrainers = trainerInvitations.map((invitation) => ({
+      email: invitation.email,
+      name: smaLocalize('com_ui_invited'),
+    }));
 
-    const invitedUsers = trainers
-      .filter((user) => user.activatedAt === undefined)
-      .map((invitation) => ({
-        email: invitation.email,
-        name: smaLocalize('com_ui_invited'),
-      }));
-
-    return [...existingUsers, ...invitedUsers];
-  }, [activeMembers?.activeTrainers, smaLocalize, trainers]);
-
-  function getActiveTrainerName(email: string, activeTrainers: TUser[] | undefined): string {
-    const activeTrainer = activeTrainers?.find(
-      (admin) => admin.email.toLowerCase() === email.toLowerCase(),
-    );
-
-    return activeTrainer ? activeTrainer.name : '';
-  }
+    return [...trainers, ...invitedTrainers];
+  }, [trainerInvitations, trainers, smaLocalize]);
 
   const addTrainerMutation = useAddTrainerMutation({
     onSuccess: () => {
@@ -119,9 +102,9 @@ const TrainerList: FC<TrainersListProps> = ({ orgId, trainers }) => {
       />
       <GenericList
         title={smaLocalize('com_orgadmin_trainers')}
-        items={existingAndInvitedTrainers}
+        items={allTrainers}
         getKey={(user) => user.email}
-        renderItem={(item) => item.email + (item.name.length > 0 ? ` (${item.name})` : '')}
+        renderItem={(item) => item.email + ` (${item.name})`}
         handleRemoveItem={handleRemoveTrainer}
         handleAddItem={handleAddTrainer}
         placeholder={smaLocalize('com_ui_trainer_email_placeholder')}

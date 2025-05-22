@@ -313,6 +313,8 @@ export const verifyTwoFactorTemp = () => '/api/auth/2fa/verify-temp';
 
 /* Admin Invitations */
 export const adminInvitations = () => '/api/invitations/admins';
+export const orgAdminInvitations = (orgId: string) => `/api/invitations/organizations/${orgId}/admins`;
+export const orgTrainerInvitations = (orgId: string) => `/api/invitations/organizations/${orgId}/trainers`;
 
 /* Admins */
 export const admins = () => '/api/admins';

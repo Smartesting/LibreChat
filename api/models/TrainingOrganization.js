@@ -25,14 +25,9 @@ const getListTrainingOrganizations = async (user) => {
     return TrainingOrganization.find({}).lean();
   }
 
-  if (user.role.includes(SystemRoles.TRAINER)) {
+  if (user.role.includes(SystemRoles.ORGADMIN)) {
     return TrainingOrganization.find({
-      trainers: {
-        $elemMatch: {
-          userId: user.id,
-          activatedAt: { $exists: true },
-        },
-      },
+      administrators: user._id,
     }).lean();
   }
 
@@ -45,7 +40,7 @@ const getListTrainingOrganizations = async (user) => {
  * @returns {Promise<Object|null>} The deleted training organization document or null if not found
  */
 const deleteTrainingOrganization = async (orgId) => {
-  return await TrainingOrganization.findByIdAndDelete(orgId).lean();
+  return TrainingOrganization.findByIdAndDelete(orgId).lean();
 };
 
 /**
@@ -54,7 +49,10 @@ const deleteTrainingOrganization = async (orgId) => {
  * @returns {Promise<Object|null>} The training organization document or null if not found
  */
 const getTrainingOrganizationById = async (orgId) => {
-  return await TrainingOrganization.findById(orgId).lean();
+  return TrainingOrganization.findById(orgId)
+    .populate('administrators', '_id email name')
+    .populate('trainers', '_id email name')
+    .lean();
 };
 
 /**
@@ -70,16 +68,15 @@ const addAdminToOrganization = async (orgId, userId, userEmail) => {
       { _id: orgId },
       {
         $addToSet: {
-          administrators: {
-            userId: userId,
-            email: userEmail,
-            activatedAt: new Date(),
-          },
+          administrators: userId,
         },
       },
     );
   } catch (error) {
-    logger.error(`[addAdminToOrganization] Error adding user ${userEmail} as admin to organization ${orgId}:`, error);
+    logger.error(
+      `[addAdminToOrganization] Error adding user ${userEmail} as admin to organization ${orgId}:`,
+      error,
+    );
     throw error;
   }
 };
@@ -97,16 +94,91 @@ const addTrainerToOrganization = async (orgId, userId, userEmail) => {
       { _id: orgId },
       {
         $addToSet: {
-          trainers: {
-            userId: userId,
-            email: userEmail,
-            activatedAt: new Date(),
-          },
+          trainers: userId,
         },
       },
     );
   } catch (error) {
-    logger.error(`[addTrainerToOrganization] Error adding user ${userEmail} as trainer to organization ${orgId}:`, error);
+    logger.error(
+      `[addTrainerToOrganization] Error adding user ${userEmail} as trainer to organization ${orgId}:`,
+      error,
+    );
+    throw error;
+  }
+};
+
+/**
+ * Remove an administrator from a training organization
+ * @param {string} orgId - The ID of the training organization
+ * @param {string} userId - The ID of the administrator to remove
+ * @returns {Promise<Object|null>} The updated training organization document or null if error occurs
+ */
+const removeAdminFromOrganization = async (orgId, userId) => {
+  try {
+    return await TrainingOrganization.findOneAndUpdate(
+      { _id: orgId },
+      {
+        $pull: {
+          administrators: userId,
+        },
+      },
+      { new: true },
+    );
+  } catch (error) {
+    logger.error(
+      `[removeAdminFromOrganization] Error removing user ${userId} as admin from organization ${orgId}:`,
+      error,
+    );
+    throw error;
+  }
+};
+
+/**
+ * Remove a trainer from a training organization
+ * @param {string} orgId - The ID of the training organization
+ * @param {string} userId - The ID of the trainer to remove
+ * @returns {Promise<Object|null>} The updated training organization document or null if error occurs
+ */
+const removeTrainerFromOrganization = async (orgId, userId) => {
+  try {
+    return await TrainingOrganization.findOneAndUpdate(
+      { _id: orgId },
+      {
+        $pull: {
+          trainers: userId,
+        },
+      },
+      { new: true },
+    );
+  } catch (error) {
+    logger.error(
+      `[removeTrainerFromOrganization] Error removing user ${userId} as trainer from organization ${orgId}:`,
+      error,
+    );
+    throw error;
+  }
+};
+
+const findTrainingOrganizationsByAdmin = async (adminId) => {
+  try {
+    return await TrainingOrganization.find({ administrators: adminId }).lean();
+  } catch (error) {
+    logger.error(
+      `[findTrainingOrganizationsByAdmin] Error finding training organization where user ${adminId} is admin`,
+      error,
+    );
+    throw error;
+  }
+};
+
+const findTrainingOrganizationsByTrainer = async (trainerId) => {
+  try {
+    return await TrainingOrganization.find({ trainers: trainerId }).lean();
+  } catch (error) {
+    logger.error(
+      `[findTrainingOrganizationsByTrainer] Error finding training organization where user ${trainerId} is trainer`,
+      error,
+    );
     throw error;
   }
 };
@@ -119,4 +191,8 @@ module.exports = {
   getTrainingOrganizationById,
   addAdminToOrganization,
   addTrainerToOrganization,
+  removeAdminFromOrganization,
+  removeTrainerFromOrganization,
+  findTrainingOrganizationsByAdmin,
+  findTrainingOrganizationsByTrainer,
 };

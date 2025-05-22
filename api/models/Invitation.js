@@ -290,6 +290,74 @@ const removeAdminRoleFromInvitation = async (invitationId) => {
   }
 };
 
+/**
+ * Removes the orgAdmin role for a specific organization from an invitation and deletes it if orgAdmin and orgTrainer are empty and superAdmin is false
+ * @param {string} invitationId - The ID of the invitation to update
+ * @param {string} orgId - The organization ID to remove from orgAdmin array
+ * @returns {Promise<Object>} - Result object with success status and message
+ */
+const removeOrgAdminRoleFromInvitation = async (invitationId, orgId) => {
+  try {
+    // Update the invitation to remove the orgId from orgAdmin array
+    const updatedInvitation = await Invitation.findByIdAndUpdate(
+      invitationId,
+      {
+        $pull: {
+          'roles.orgAdmin': orgId,
+        },
+      },
+      { new: true },
+    );
+
+    // Check if orgAdmin and orgTrainer are empty and superAdmin is false
+    if (
+      !updatedInvitation.roles.superAdmin &&
+      updatedInvitation.roles.orgAdmin.length === 0 &&
+      updatedInvitation.roles.orgTrainer.length === 0
+    ) {
+      // Delete the invitation if all role fields are empty
+      await deleteInvitationById(invitationId);
+    }
+  } catch (error) {
+    logger.error('[removeOrgAdminRoleFromInvitation] Error updating invitation', error);
+    throw error;
+  }
+};
+
+/**
+ * Removes the orgTrainer role for a specific organization from an invitation and deletes it if orgAdmin and orgTrainer are empty and superAdmin is false
+ * @param {string} invitationId - The ID of the invitation to update
+ * @param {string} orgId - The organization ID to remove from orgTrainer array
+ * @returns {Promise<Object>} - Result object with success status and message
+ */
+const removeTrainerRoleFromInvitation = async (invitationId, orgId) => {
+  try {
+    // Update the invitation to remove the orgId from orgTrainer array
+    const updatedInvitation = await Invitation.findByIdAndUpdate(
+      invitationId,
+      {
+        $pull: {
+          'roles.orgTrainer': orgId,
+        },
+      },
+      { new: true },
+    );
+
+    // Check if orgAdmin and orgTrainer are empty and superAdmin is false
+    if (
+      !updatedInvitation.roles.superAdmin &&
+      updatedInvitation.roles.orgAdmin.length === 0 &&
+      updatedInvitation.roles.orgTrainer.length === 0
+    ) {
+      // Delete the invitation if all role fields are empty
+      await deleteInvitationById(invitationId);
+    }
+  } catch (error) {
+    logger.error('[removeTrainerRoleFromInvitation] Error updating invitation', error);
+    throw error;
+  }
+};
+
 module.exports = {
   createAdminInvitation,
   createOrgAdminInvitation,
@@ -300,5 +368,7 @@ module.exports = {
   findOrgAdminInvitationsByOrgId,
   findTrainerInvitationsByOrgId,
   findAllAdminInvitations,
-  removeAdminRoleFromInvitation
+  removeAdminRoleFromInvitation,
+  removeOrgAdminRoleFromInvitation,
+  removeTrainerRoleFromInvitation,
 };

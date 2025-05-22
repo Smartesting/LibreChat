@@ -12,7 +12,6 @@ const {
   removeAdministrator,
   addTrainer,
   removeTrainer,
-  getActiveOrganizationMembers,
 } = require('~/server/controllers/TrainingOrganizationController');
 const { checkAdmin, checkOrgAccess } = require('~/server/middleware/roles');
 
@@ -24,6 +23,5 @@ router.post('/:id/administrators', requireJwtAuth, checkOrgAccess, addAdministra
 router.delete('/:id/administrators/:email', requireJwtAuth, checkOrgAccess, removeAdministrator);
 router.post('/:id/trainers', requireJwtAuth, checkOrgAccess, addTrainer);
 router.delete('/:id/trainers/:email', requireJwtAuth, checkOrgAccess, removeTrainer);
-router.get('/:id/active-members', requireJwtAuth, checkOrgAccess, getActiveOrganizationMembers);
 
 module.exports = router;

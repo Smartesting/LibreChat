@@ -878,6 +878,14 @@ export function getAdminInvitations(): Promise<q.Invitation[]> {
   return request.get(endpoints.adminInvitations());
 }
 
+export function getOrgAdminInvitations(orgId: string): Promise<q.Invitation[]> {
+  return request.get(endpoints.orgAdminInvitations(orgId));
+}
+
+export function getOrgTrainerInvitations(orgId: string): Promise<q.Invitation[]> {
+  return request.get(endpoints.orgTrainerInvitations(orgId));
+}
+
 export function grantAdminAccess(data: { email: string }): Promise<{ message: string }> {
   return request.post(endpoints.grantAdminAccess(), data);
 }
@@ -889,9 +897,3 @@ export function revokeAdminAccess(data: { email: string }): Promise<{ message: s
 export function getAdminUsers(): Promise<t.TUser[]> {
   return request.get(endpoints.admins());
 }
-
-export const getActiveOrganizationMembers = (
-  id: q.TrainingOrganization['_id'],
-): Promise<{ activeAdministrators: t.TUser[]; activeTrainers: t.TUser[] }> => {
-  return request.get(endpoints.trainingOrganizations(id, 'active-members'));
-};
