@@ -11,6 +11,8 @@ import {
 import { useToastContext } from '~/Providers/ToastContext';
 import { AxiosError } from 'axios';
 import { Training, TrainingCreateParams } from 'librechat-data-provider';
+import { formatDateToTimezoneLocalString, parseDatetimeLocalToDate } from './dateMethods';
+import HoverCardSettings from '~/components/Nav/SettingsTabs/HoverCardSettings';
 
 const labelClass = 'mb-2 text-token-text-primary block font-medium';
 const inputClass = cn(
@@ -56,6 +58,9 @@ const TrainingForm: FC<{
   const { showToast } = useToastContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditing = !!training;
+  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [startDateValue, setStartDateValue] = useState('');
+  const [endDateValue, setEndDateValue] = useState('');
 
   const methods = useForm<TrainingCreateParams>({
     defaultValues: {
@@ -74,6 +79,20 @@ const TrainingForm: FC<{
 
   useEffect(() => {
     if (training) {
+      if (training.startDateTime) {
+        setStartDateValue(
+          formatDateToTimezoneLocalString(new Date(training.startDateTime), training.timezone),
+        );
+      }
+      if (training.endDateTime) {
+        setEndDateValue(
+          formatDateToTimezoneLocalString(new Date(training.endDateTime), training.timezone),
+        );
+      }
+      if (training.timezone) {
+        setTimezone(training.timezone);
+      }
+
       reset({
         name: training.name,
         description: training.description || '',
@@ -272,7 +291,15 @@ const TrainingForm: FC<{
               }}
               render={({ field }) => (
                 <>
-                  <select {...field} className={inputClass} aria-label="Training timezone">
+                  <select
+                    {...field}
+                    className={inputClass}
+                    aria-label={smaLocalize('com_orgadmin_timezone')}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setTimezone(e.target.value);
+                    }}
+                  >
                     {Intl.supportedValuesOf('timeZone').map((timezone) => (
                       <option key={timezone} value={timezone}>
                         {timezone}
@@ -289,7 +316,13 @@ const TrainingForm: FC<{
 
           <div className="mb-4">
             <label className={labelClass} htmlFor="startDateTime">
-              {smaLocalize('com_orgadmin_start_date')}
+              <div className="flex items-center space-x-2">
+                <div>{smaLocalize('com_orgadmin_start_date')}</div>
+                <HoverCardSettings
+                  side="bottom"
+                  text={smaLocalize('com_orgadmin_datetime_tooltip')}
+                />
+              </div>
             </label>
             <Controller
               name="startDateTime"
@@ -302,13 +335,15 @@ const TrainingForm: FC<{
                 <>
                   <input
                     {...field}
-                    value={
-                      field.value instanceof Date ? field.value.toISOString().slice(0, 16) : ''
-                    }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
-                    className={inputClass}
                     type="datetime-local"
-                    aria-label="Training start date and time"
+                    className={inputClass}
+                    aria-label={smaLocalize('com_orgadmin_start_date')}
+                    value={startDateValue}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setStartDateValue(val);
+                      field.onChange(parseDatetimeLocalToDate(val, timezone));
+                    }}
                   />
                   {errors.startDateTime && (
                     <p className="mt-1 text-sm text-red-500">{errors.startDateTime.message}</p>
@@ -320,7 +355,13 @@ const TrainingForm: FC<{
 
           <div className="mb-4">
             <label className={labelClass} htmlFor="endDateTime">
-              {smaLocalize('com_orgadmin_end_date')}
+              <div className="flex items-center space-x-2">
+                <div>{smaLocalize('com_orgadmin_end_date')}</div>
+                <HoverCardSettings
+                  side="bottom"
+                  text={smaLocalize('com_orgadmin_datetime_tooltip')}
+                />
+              </div>
             </label>
             <Controller
               name="endDateTime"
@@ -342,13 +383,15 @@ const TrainingForm: FC<{
                 <>
                   <input
                     {...field}
-                    value={
-                      field.value instanceof Date ? field.value.toISOString().slice(0, 16) : ''
-                    }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
-                    className={inputClass}
                     type="datetime-local"
-                    aria-label="Training end date and time"
+                    className={inputClass}
+                    aria-label={smaLocalize('com_orgadmin_end_date')}
+                    value={endDateValue}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEndDateValue(val);
+                      field.onChange(parseDatetimeLocalToDate(val, timezone));
+                    }}
                   />
                   {errors.endDateTime && (
                     <p className="mt-1 text-sm text-red-500">{errors.endDateTime.message}</p>
