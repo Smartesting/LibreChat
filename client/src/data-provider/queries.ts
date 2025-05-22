@@ -533,10 +533,3 @@ export const useUserTermsQuery = (
   });
 };
 
-export const useRemoveExpiredTrainees = (): QueryObserverResult<any> => {
-  return useQuery([QueryKeys.userTerms], () => dataService.removeExpiredTrainees(), {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
-  });
-};

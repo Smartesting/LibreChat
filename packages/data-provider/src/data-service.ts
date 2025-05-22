@@ -184,10 +184,6 @@ export const generateTrainees = (count: number): Promise<t.TGenerateTraineesResp
   return request.post(endpoints.generateTrainees(), { count });
 };
 
-export const removeExpiredTrainees = (): Promise<any> => {
-  return request.get(endpoints.removeExpiredTrainees());
-};
-
 export const getAvailablePlugins = (): Promise<s.TPlugin[]> => {
   return request.get(endpoints.plugins());
 };
