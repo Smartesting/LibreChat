@@ -76,6 +76,10 @@ function getOrgMutationOptions(
       email: string;
     }
   >,
+  invalidateQueries?: Partial<{
+    adminInvitations: boolean;
+    trainerInvitations: boolean;
+  }>,
 ) {
   return {
     onMutate: (variables: { id: string; email: string }) => options?.onMutate?.(variables),
@@ -99,19 +103,23 @@ function getOrgMutationOptions(
         updatedOrg,
       );
 
-      // Invalidate the admin invitations query to refresh the list of administrators
-      queryClient.invalidateQueries([
-        QueryKeys.trainingOrganizations,
-        variables.id,
-        'adminInvitations',
-      ]);
+      if (invalidateQueries?.adminInvitations) {
+        // Invalidate the admin invitations query to refresh the list of administrators
+        queryClient.invalidateQueries([
+          QueryKeys.trainingOrganizations,
+          variables.id,
+          'adminInvitations',
+        ]);
+      }
 
-      // Invalidate the trainer invitations query to refresh the list of trainers
-      queryClient.invalidateQueries([
-        QueryKeys.trainingOrganizations,
-        variables.id,
-        'trainerInvitations',
-      ]);
+      if (invalidateQueries?.trainerInvitations) {
+        // Invalidate the trainer invitations query to refresh the list of trainers
+        queryClient.invalidateQueries([
+          QueryKeys.trainingOrganizations,
+          variables.id,
+          'trainerInvitations',
+        ]);
+      }
 
       return options?.onSuccess?.(updatedOrg, variables);
     },
@@ -128,7 +136,7 @@ export const useAddAdministratorMutation = (
   return useMutation(
     ({ id, email }: { id: string; email: string }) =>
       dataService.addAdministratorToOrganization(id, email),
-    getOrgMutationOptions(queryClient, options),
+    getOrgMutationOptions(queryClient, options, { adminInvitations: true }),
   );
 };
 
@@ -142,7 +150,7 @@ export const useRemoveAdministratorMutation = (
   return useMutation(
     ({ id, email }: { id: string; email: string }) =>
       dataService.removeAdministratorFromOrganization(id, email),
-    getOrgMutationOptions(queryClient, options),
+    getOrgMutationOptions(queryClient, options, { adminInvitations: true }),
   );
 };
 
@@ -156,7 +164,7 @@ export const useAddTrainerMutation = (
   return useMutation(
     ({ id, email }: { id: string; email: string }) =>
       dataService.addTrainerToOrganization(id, email),
-    getOrgMutationOptions(queryClient, options),
+    getOrgMutationOptions(queryClient, options, { trainerInvitations: true }),
   );
 };
 
@@ -170,7 +178,7 @@ export const useRemoveTrainerMutation = (
   return useMutation(
     ({ id, email }: { id: string; email: string }) =>
       dataService.removeTrainerFromOrganization(id, email),
-    getOrgMutationOptions(queryClient, options),
+    getOrgMutationOptions(queryClient, options, { trainerInvitations: true }),
   );
 };
 
