@@ -3,6 +3,9 @@ const { getBalanceConfig } = require('~/server/services/Config');
 const signPayload = require('~/server/services/signPayload');
 const Balance = require('./Balance');
 const User = require('./User');
+const { logger } = require('~/config');
+const { SystemRoles } = require('librechat-data-provider');
+const { getOngoingTrainings, getUpcomingTrainings } = require('~/models/Training');
 
 /**
  * Retrieve a user by ID and convert the found user document to a plain object.
@@ -230,6 +233,31 @@ const generateTraineeUsers = async (count) => {
   return users;
 };
 
+const removeExpiredTraineeAccounts = async () => {
+  logger.info('[removeExpiredTraineeAccounts] Trying to remove expired trainee accounts');
+  const trainees = await findUsers({
+    role: SystemRoles.TRAINEE,
+  });
+  const [ongoingTrainings, upcomingTrainings] = await Promise.all([
+    getOngoingTrainings(),
+    getUpcomingTrainings(),
+  ]);
+
+  const matchingUsers = trainees.filter((trainee) => {
+    const currentEmail = trainee.email;
+    const isUserInTraining = (training) =>
+      training.trainees.some((t) => t.username === currentEmail);
+    return !(ongoingTrainings.some(isUserInTraining) || upcomingTrainings.some(isUserInTraining));
+  });
+
+  logger.info(`[removeExpiredTraineeAccounts] Accounts to delete: ${matchingUsers.length}`);
+
+  matchingUsers.map((user) => {
+    logger.info(`[removeExpiredTraineeAccounts] Deleting trainee account ${user.email}`);
+    deleteUserById(user._id);
+  });
+};
+
 module.exports = {
   comparePassword,
   deleteUserById,
@@ -241,4 +269,5 @@ module.exports = {
   findUser,
   findUsers,
   generateTraineeUsers,
+  removeExpiredTraineeAccounts,
 };
