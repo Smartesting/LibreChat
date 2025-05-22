@@ -1,4 +1,4 @@
-const { FileSources, SystemRoles } = require('librechat-data-provider');
+const { FileSources } = require('librechat-data-provider');
 const {
   Balance,
   getFiles,
@@ -10,7 +10,6 @@ const {
   deleteUserById,
   deleteAllUserSessions,
   generateTraineeUsers,
-  findUsers,
 } = require('~/models');
 const User = require('~/models/User');
 const { updateUserPluginAuth, deleteUserPluginAuth } = require('~/server/services/PluginService');

@@ -16,7 +16,6 @@ import type t from 'librechat-data-provider';
 import type {
   Action,
   TPreset,
-  TPlugin,
   ConversationListResponse,
   ConversationListParams,
   SearchConversationListResponse,
