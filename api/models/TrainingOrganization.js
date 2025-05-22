@@ -40,7 +40,10 @@ const getListTrainingOrganizations = async (user) => {
  * @returns {Promise<Object|null>} The deleted training organization document or null if not found
  */
 const deleteTrainingOrganization = async (orgId) => {
-  return TrainingOrganization.findByIdAndDelete(orgId).lean();
+  return TrainingOrganization.findByIdAndDelete(orgId)
+    .populate('administrators', '_id email name role')
+    .populate('trainers', '_id email name role')
+    .lean();
 };
 
 /**
@@ -151,7 +154,9 @@ const removeTrainerFromOrganization = async (orgId, userId) => {
         },
       },
       { new: true },
-    );
+    )
+      .populate('administrators', '_id email name role')
+      .populate('trainers', '_id email name role');
   } catch (error) {
     logger.error(
       `[removeTrainerFromOrganization] Error removing user ${userId} as trainer from organization ${orgId}:`,

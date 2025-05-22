@@ -108,6 +108,14 @@ const deleteTrainingOrganizationHandler = async (req, res) => {
       return res.status(404).json({ error: 'Training organization not found' });
     }
 
+    for (const admin of deletedOrg.administrators) {
+      await removeOrgAdminRoleIfNecessary(admin);
+    }
+
+    for (const trainer of deletedOrg.trainers) {
+      await removeTrainerRoleIfNecessary(trainer);
+    }
+
     res.status(204).send();
   } catch (error) {
     logger.error(
@@ -248,17 +256,7 @@ const removeAdministratorHandler = async (req, res) => {
       const updatedOrg = await removeAdminFromOrganization(id, existingAdmin._id);
 
       if (updatedOrg) {
-        const orgsWithUserAsAdmin = await findTrainingOrganizationsByAdmin(existingAdmin._id);
-
-        // If the user is not an administrator of any organization, remove the orgadmin role
-        if (orgsWithUserAsAdmin.length === 0 && existingAdmin.role.includes(SystemRoles.ORGADMIN)) {
-          await updateUser(existingAdmin._id, {
-            role: existingAdmin.role.filter((role) => role !== SystemRoles.ORGADMIN),
-          });
-          logger.info(
-            `Removed ${SystemRoles.ORGADMIN} role from user ${existingAdmin.email} as he is no longer an administrator of any organization`,
-          );
-        }
+        await removeOrgAdminRoleIfNecessary(existingAdmin);
       }
 
       return res.status(200).json(updatedOrg);
@@ -384,20 +382,7 @@ const removeTrainerHandler = async (req, res) => {
       const updatedOrg = await removeTrainerFromOrganization(id, existingTrainer._id);
 
       if (updatedOrg) {
-        const orgsWithUserAsTrainer = await findTrainingOrganizationsByTrainer(existingTrainer._id);
-
-        // If the user is not a trainer in any organization, remove the trainer role
-        if (
-          orgsWithUserAsTrainer.length === 0 &&
-          existingTrainer.role.includes(SystemRoles.TRAINER)
-        ) {
-          await updateUser(existingTrainer._id, {
-            role: existingTrainer.role.filter((role) => role !== SystemRoles.TRAINER),
-          });
-          logger.info(
-            `Removed ${SystemRoles.TRAINER} role from user ${existingTrainer.email} as he is no longer a trainer in any organization`,
-          );
-        }
+        await removeTrainerRoleIfNecessary(existingTrainer);
       }
 
       return res.status(200).json(updatedOrg);
@@ -416,7 +401,9 @@ const removeTrainerHandler = async (req, res) => {
         );
         return res.status(200).json(trainingOrganization);
       } else {
-        return res.status(404).json({ error: 'Trainer not found and no pending invitation exists' });
+        return res
+          .status(404)
+          .json({ error: 'Trainer not found and no pending invitation exists' });
       }
     }
   } catch (error) {
@@ -425,6 +412,34 @@ const removeTrainerHandler = async (req, res) => {
       error,
     );
     res.status(500).json({ error: error.message });
+  }
+};
+
+const removeOrgAdminRoleIfNecessary = async (user) => {
+  const orgsWithUserAsAdmin = await findTrainingOrganizationsByAdmin(user._id);
+
+  // If the user is not an administrator of any organization, remove the orgadmin role
+  if (orgsWithUserAsAdmin.length === 0 && user.role.includes(SystemRoles.ORGADMIN)) {
+    await updateUser(user._id, {
+      role: user.role.filter((role) => role !== SystemRoles.ORGADMIN),
+    });
+    logger.info(
+      `Removed ${SystemRoles.ORGADMIN} role from user ${user.email} as he is no longer an administrator of any organization`,
+    );
+  }
+};
+
+const removeTrainerRoleIfNecessary = async (user) => {
+  const orgsWithUserAsTrainer = await findTrainingOrganizationsByTrainer(user._id);
+
+  // If the user is not a trainer in any organization, remove the trainer role
+  if (orgsWithUserAsTrainer.length === 0 && user.role.includes(SystemRoles.TRAINER)) {
+    await updateUser(user._id, {
+      role: user.role.filter((role) => role !== SystemRoles.TRAINER),
+    });
+    logger.info(
+      `Removed ${SystemRoles.TRAINER} role from user ${user.email} as he is no longer a trainer in any organization`,
+    );
   }
 };
 
