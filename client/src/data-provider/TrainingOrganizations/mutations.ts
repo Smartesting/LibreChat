@@ -194,7 +194,8 @@ export const useCreateTrainingMutation = (
 ): UseMutationResult<t.Training, Error, t.TrainingCreateParams> => {
   const queryClient = useQueryClient();
   return useMutation(
-    (newTrainingData: t.TrainingCreateParams) => dataService.createTraining(newTrainingData),
+    (newTrainingData: t.TrainingCreateParams) =>
+      dataService.createTraining(newTrainingData.trainingOrganizationId, newTrainingData),
     {
       onMutate: (variables) => options?.onMutate?.(variables),
       onError: (error, variables, context) => options?.onError?.(error, variables, context),
@@ -215,16 +216,20 @@ export const useCreateTrainingMutation = (
  */
 export const useDeleteTrainingMutation = (
   options?: t.DeleteTrainingMutationOptions,
-): UseMutationResult<void, Error, string> => {
+): UseMutationResult<void, Error, { organizationId: string; trainingId: string }> => {
   const queryClient = useQueryClient();
-  return useMutation((id: string) => dataService.deleteTraining(id), {
-    onMutate: (trainingId) => options?.onMutate?.(trainingId),
-    onError: (error, trainingId, context) => options?.onError?.(error, trainingId, context),
-    onSuccess: (data, trainingId, context) => {
-      queryClient.invalidateQueries([QueryKeys.trainingOrganizations]);
-      return options?.onSuccess?.(data, trainingId, context);
+  return useMutation(
+    ({ organizationId, trainingId }: { organizationId: string; trainingId: string }) =>
+      dataService.deleteTraining(organizationId, trainingId),
+    {
+      onMutate: (variables) => options?.onMutate?.(variables),
+      onError: (error, variables, context) => options?.onError?.(error, variables, context),
+      onSuccess: (data, variables, context) => {
+        queryClient.invalidateQueries([QueryKeys.trainingOrganizations]);
+        return options?.onSuccess?.(data, variables, context);
+      },
     },
-  });
+  );
 };
 
 /**
@@ -232,11 +237,22 @@ export const useDeleteTrainingMutation = (
  */
 export const useUpdateTrainingMutation = (
   options?: t.UpdateTrainingMutationOptions,
-): UseMutationResult<t.Training, Error, { id: string; data: Partial<t.Training> }> => {
+): UseMutationResult<
+  t.Training,
+  Error,
+  { organizationId: string; id: string; data: Partial<t.Training> }
+> => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ id, data }: { id: string; data: Partial<t.Training> }) =>
-      dataService.updateTraining(id, data),
+    ({
+      organizationId,
+      id,
+      data,
+    }: {
+      organizationId: string;
+      id: string;
+      data: Partial<t.Training>;
+    }) => dataService.updateTraining(organizationId, id, data),
     {
       onMutate: (variables) => options?.onMutate?.(variables),
       onError: (error, variables, context) => options?.onError?.(error, variables, context),

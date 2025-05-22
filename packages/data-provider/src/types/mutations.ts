@@ -137,7 +137,10 @@ export type CreateTrainingOrganizationMutationOptions = MutationOptions<
 
 export type CreateTrainingMutationOptions = MutationOptions<Training, TrainingCreateParams>;
 
-export type DeleteTrainingMutationOptions = MutationOptions<void, string>;
+export type DeleteTrainingMutationOptions = MutationOptions<
+  void,
+  { organizationId: string; trainingId: string }
+>;
 
 export type UpdateTrainingMutationOptions = MutationOptions<
   Training,

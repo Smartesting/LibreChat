@@ -31,18 +31,24 @@ interface MultiSelectProps<T extends string> {
   selectItemsClassName?: string;
   selectedValues: T[];
   setSelectedValues: (values: T[]) => void;
+  disabled?: boolean;
+  displayValues?: boolean;
 }
 
 function defaultRender<T extends string>(
   values: T[],
   placeholder?: string,
   selectedItemsText?: string,
+  displayValues?: boolean,
 ) {
   if (values.length === 0) {
     return placeholder || 'Select...';
   }
   if (values.length === 1) {
     return values[0];
+  }
+  if (displayValues) {
+    return values.join(', ');
   }
   return `${values.length} ${selectedItemsText || 'items selected'}`;
 }
@@ -64,6 +70,8 @@ export default function MultiSelect<T extends string>({
   selectItemsClassName,
   selectedValues = [],
   setSelectedValues,
+  disabled = false,
+  displayValues = false,
 }: MultiSelectProps<T>) {
   const selectRef = useRef<HTMLButtonElement>(null);
   // const [selectedValues, setSelectedValues] = React.useState<T[]>(defaultSelectedValues);
@@ -84,6 +92,7 @@ export default function MultiSelect<T extends string>({
           </SelectLabel>
         )}
         <Select
+          disabled={disabled}
           ref={selectRef}
           className={cn(
             'flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm',
@@ -96,7 +105,7 @@ export default function MultiSelect<T extends string>({
         >
           {selectIcon && selectIcon}
           <span className="mr-auto hidden truncate md:block">
-            {renderSelectedValues(selectedValues, placeholder, selectedItemsText)}
+            {renderSelectedValues(selectedValues, placeholder, selectedItemsText, displayValues)}
           </span>
           <SelectArrow className="ml-1 hidden stroke-1 text-base opacity-75 md:block" />
         </Select>

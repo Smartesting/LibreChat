@@ -17,11 +17,11 @@ const { checkAdmin, checkOrgAccess } = require('~/server/middleware/roles');
 
 router.post('/', requireJwtAuth, checkAdmin, createTrainingOrganization);
 router.get('/', requireJwtAuth, getListTrainingOrganizations);
-router.get('/:id', requireJwtAuth, checkOrgAccess, getTrainingOrganizationById);
-router.delete('/:id', requireJwtAuth, checkAdmin, deleteTrainingOrganization);
-router.post('/:id/administrators', requireJwtAuth, checkOrgAccess, addAdministrator);
-router.delete('/:id/administrators/:email', requireJwtAuth, checkOrgAccess, removeAdministrator);
-router.post('/:id/trainers', requireJwtAuth, checkOrgAccess, addTrainer);
-router.delete('/:id/trainers/:email', requireJwtAuth, checkOrgAccess, removeTrainer);
+router.get('/:organizationId', requireJwtAuth, checkOrgAccess, getTrainingOrganizationById);
+router.delete('/:organizationId', requireJwtAuth, checkAdmin, deleteTrainingOrganization);
+router.post('/:organizationId/administrators', requireJwtAuth, checkOrgAccess, addAdministrator);
+router.delete('/:organizationId/administrators/:email', requireJwtAuth, checkOrgAccess, removeAdministrator);
+router.post('/:organizationId/trainers', requireJwtAuth, checkOrgAccess, addTrainer);
+router.delete('/:organizationId/trainers/:email', requireJwtAuth, checkOrgAccess, removeTrainer);
 
 module.exports = router;

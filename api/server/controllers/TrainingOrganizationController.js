@@ -87,7 +87,7 @@ const getListTrainingOrganizationsHandler = async (req, res) => {
 
 /**
  * Deletes a training organization by ID.
- * @route DELETE /training-organizations/:id
+ * @route DELETE /training-organizations/:organizationId
  * @param {ServerRequest} req - The request object.
  * @param {Object} req.params - The request parameters.
  * @param {string} req.params.id - The ID of the training organization to delete.
@@ -96,13 +96,13 @@ const getListTrainingOrganizationsHandler = async (req, res) => {
  */
 const deleteTrainingOrganizationHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { organizationId } = req.params;
 
-    if (!id) {
+    if (!organizationId) {
       return res.status(400).json({ error: 'Missing organization ID' });
     }
 
-    const deletedOrg = await deleteTrainingOrganization(id);
+    const deletedOrg = await deleteTrainingOrganization(organizationId);
 
     if (!deletedOrg) {
       return res.status(404).json({ error: 'Training organization not found' });
@@ -119,7 +119,7 @@ const deleteTrainingOrganizationHandler = async (req, res) => {
     res.status(204).send();
   } catch (error) {
     logger.error(
-      `[/training-organizations/${req.params.id}] Error deleting training organization`,
+      `[/training-organizations/${req.params.organizationId}] Error deleting training organization`,
       error,
     );
     res.status(500).json({ error: error.message });
@@ -128,7 +128,7 @@ const deleteTrainingOrganizationHandler = async (req, res) => {
 
 /**
  * Retrieves a training organization by ID.
- * @route GET /training-organizations/:id
+ * @route GET /training-organizations/:organizationId
  * @param {ServerRequest} req - The request object.
  * @param {Object} req.params - The request parameters.
  * @param {string} req.params.id - The ID of the training organization to retrieve.
@@ -137,13 +137,13 @@ const deleteTrainingOrganizationHandler = async (req, res) => {
  */
 const getTrainingOrganizationByIdHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { organizationId } = req.params;
 
-    if (!id) {
+    if (!organizationId) {
       return res.status(400).json({ error: 'Missing organization ID' });
     }
 
-    const trainingOrganization = await getTrainingOrganizationById(id);
+    const trainingOrganization = await getTrainingOrganizationById(organizationId);
 
     if (!trainingOrganization) {
       return res.status(404).json({ error: 'Training organization not found' });
@@ -152,7 +152,7 @@ const getTrainingOrganizationByIdHandler = async (req, res) => {
     return res.json(trainingOrganization);
   } catch (error) {
     logger.error(
-      `[/training-organizations/${req.params.id}] Error retrieving training organization`,
+      `[/training-organizations/${req.params.organizationId}] Error retrieving training organization`,
       error,
     );
     res.status(500).json({ error: error.message });
@@ -161,7 +161,7 @@ const getTrainingOrganizationByIdHandler = async (req, res) => {
 
 /**
  * Adds an administrator to a training organization.
- * @route POST /training-organizations/:id/administrators
+ * @route POST /training-organizations/:organizationId/administrators
  * @param {ServerRequest} req - The request object.
  * @param {Object} req.params - The request parameters.
  * @param {string} req.params.id - The ID of the training organization.
@@ -172,10 +172,10 @@ const getTrainingOrganizationByIdHandler = async (req, res) => {
  */
 const addAdministratorHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { organizationId } = req.params;
     const { email } = req.body;
 
-    if (!id) {
+    if (!organizationId) {
       return res.status(400).json({ error: 'Missing organization ID' });
     }
 
@@ -183,7 +183,7 @@ const addAdministratorHandler = async (req, res) => {
       return res.status(400).json({ error: 'Invalid email address' });
     }
 
-    const trainingOrganization = await getTrainingOrganizationById(id);
+    const trainingOrganization = await getTrainingOrganizationById(organizationId);
     if (!trainingOrganization) {
       return res.status(404).json({ error: 'Training organization not found' });
     }
@@ -196,7 +196,7 @@ const addAdministratorHandler = async (req, res) => {
       return res.status(400).json({ error: 'Administrator already exists in this organization' });
     }
 
-    const adminInvitations = await findOrgAdminInvitationsByOrgId(id);
+    const adminInvitations = await findOrgAdminInvitationsByOrgId(organizationId);
     const existingInvitation = adminInvitations.find(
       (invitation) => invitation.email.toLowerCase() === email.toLowerCase(),
     );
@@ -205,9 +205,9 @@ const addAdministratorHandler = async (req, res) => {
       return res.status(400).json({ error: 'Administrator already invited in this organization' });
     }
 
-    await processAdministrators([email], id, trainingOrganization.name);
+    await processAdministrators([email], organizationId, trainingOrganization.name);
 
-    const updatedOrg = await getTrainingOrganizationById(id);
+    const updatedOrg = await getTrainingOrganizationById(organizationId);
 
     if (!updatedOrg) {
       return res.status(500).json({ error: 'Failed to find updated training organization' });
@@ -216,7 +216,7 @@ const addAdministratorHandler = async (req, res) => {
     res.status(200).json(updatedOrg);
   } catch (error) {
     logger.error(
-      `[/training-organizations/${req.params.id}/administrators] Error adding administrator`,
+      `[/training-organizations/${req.params.organizationId}/administrators] Error adding administrator`,
       error,
     );
     res.status(500).json({ error: error.message });
@@ -225,7 +225,7 @@ const addAdministratorHandler = async (req, res) => {
 
 /**
  * Removes an administrator from a training organization.
- * @route DELETE /training-organizations/:id/administrators/:email
+ * @route DELETE /training-organizations/:organizationId/administrators/:email
  * @param {ServerRequest} req - The request object.
  * @param {Object} req.params - The request parameters.
  * @param {string} req.params.id - The ID of the training organization.
@@ -235,15 +235,15 @@ const addAdministratorHandler = async (req, res) => {
  */
 const removeAdministratorHandler = async (req, res) => {
   try {
-    const { id, email } = req.params;
-    if (!id) {
+    const { organizationId, email } = req.params;
+    if (!organizationId) {
       return res.status(400).json({ error: 'Missing organization ID' });
     }
     if (!email) {
       return res.status(400).json({ error: 'Missing administrator email' });
     }
 
-    const trainingOrganization = await getTrainingOrganizationById(id);
+    const trainingOrganization = await getTrainingOrganizationById(organizationId);
     if (!trainingOrganization) {
       return res.status(404).json({ error: 'Training organization not found' });
     }
@@ -253,7 +253,7 @@ const removeAdministratorHandler = async (req, res) => {
     );
 
     if (existingAdmin) {
-      const updatedOrg = await removeAdminFromOrganization(id, existingAdmin._id);
+      const updatedOrg = await removeAdminFromOrganization(organizationId, existingAdmin._id);
 
       if (updatedOrg) {
         await removeOrgAdminRoleIfNecessary(existingAdmin);
@@ -280,7 +280,7 @@ const removeAdministratorHandler = async (req, res) => {
     }
   } catch (error) {
     logger.error(
-      `[/training-organizations/${req.params.id}/administrators/${req.params.email}] Error removing administrator`,
+      `[/training-organizations/${req.params.organizationId}/administrators/${req.params.email}] Error removing administrator`,
       error,
     );
     res.status(500).json({ error: error.message });
@@ -289,7 +289,7 @@ const removeAdministratorHandler = async (req, res) => {
 
 /**
  * Adds a trainer to a training organization.
- * @route POST /training-organizations/:id/trainers
+ * @route POST /training-organizations/:organizationId/trainers
  * @param {ServerRequest} req - The request object.
  * @param {Object} req.params - The request parameters.
  * @param {string} req.params.id - The ID of the training organization.
@@ -300,10 +300,10 @@ const removeAdministratorHandler = async (req, res) => {
  */
 const addTrainerHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { organizationId } = req.params;
     const { email } = req.body;
 
-    if (!id) {
+    if (!organizationId) {
       return res.status(400).json({ error: 'Missing organization ID' });
     }
 
@@ -311,7 +311,7 @@ const addTrainerHandler = async (req, res) => {
       return res.status(400).json({ error: 'Invalid email address' });
     }
 
-    const trainingOrganization = await getTrainingOrganizationById(id);
+    const trainingOrganization = await getTrainingOrganizationById(organizationId);
 
     if (!trainingOrganization) {
       return res.status(404).json({ error: 'Training organization not found' });
@@ -325,7 +325,7 @@ const addTrainerHandler = async (req, res) => {
       return res.status(400).json({ error: 'Trainer already exists in this organization' });
     }
 
-    const trainerInvitations = await findTrainerInvitationsByOrgId(id);
+    const trainerInvitations = await findTrainerInvitationsByOrgId(organizationId);
     const existingInvitation = trainerInvitations.find(
       (invitation) => invitation.email.toLowerCase() === email.toLowerCase(),
     );
@@ -334,9 +334,9 @@ const addTrainerHandler = async (req, res) => {
       return res.status(400).json({ error: 'Trainer already invited in this organization' });
     }
 
-    await processTrainers([email], id, trainingOrganization.name);
+    await processTrainers([email], organizationId, trainingOrganization.name);
 
-    const updatedOrg = await getTrainingOrganizationById(id);
+    const updatedOrg = await getTrainingOrganizationById(organizationId);
 
     if (!updatedOrg) {
       return res.status(500).json({ error: 'Failed to find updated training organization' });
@@ -344,14 +344,14 @@ const addTrainerHandler = async (req, res) => {
 
     res.status(200).json(updatedOrg);
   } catch (error) {
-    logger.error(`[/training-organizations/${req.params.id}/trainers] Error adding trainer`, error);
+    logger.error(`[/training-organizations/${req.params.organizationId}/trainers] Error adding trainer`, error);
     res.status(500).json({ error: error.message });
   }
 };
 
 /**
  * Removes a trainer from a training organization.
- * @route DELETE /training-organizations/:id/trainers/:email
+ * @route DELETE /training-organizations/:organizationId/trainers/:email
  * @param {ServerRequest} req - The request object.
  * @param {Object} req.params - The request parameters.
  * @param {string} req.params.id - The ID of the training organization.
@@ -361,15 +361,15 @@ const addTrainerHandler = async (req, res) => {
  */
 const removeTrainerHandler = async (req, res) => {
   try {
-    const { id, email } = req.params;
-    if (!id) {
+    const { organizationId, email } = req.params;
+    if (!organizationId) {
       return res.status(400).json({ error: 'Missing organization ID' });
     }
     if (!email) {
       return res.status(400).json({ error: 'Missing trainer email' });
     }
 
-    const trainingOrganization = await getTrainingOrganizationById(id);
+    const trainingOrganization = await getTrainingOrganizationById(organizationId);
     if (!trainingOrganization) {
       return res.status(404).json({ error: 'Training organization not found' });
     }
@@ -379,7 +379,7 @@ const removeTrainerHandler = async (req, res) => {
     );
 
     if (existingTrainer) {
-      const updatedOrg = await removeTrainerFromOrganization(id, existingTrainer._id);
+      const updatedOrg = await removeTrainerFromOrganization(organizationId, existingTrainer._id);
 
       if (updatedOrg) {
         await removeTrainerRoleIfNecessary(existingTrainer);
@@ -408,7 +408,7 @@ const removeTrainerHandler = async (req, res) => {
     }
   } catch (error) {
     logger.error(
-      `[/training-organizations/${req.params.id}/trainers/${req.params.email}] Error removing trainer`,
+      `[/training-organizations/${req.params.organizationId}/trainers/${req.params.email}] Error removing trainer`,
       error,
     );
     res.status(500).json({ error: error.message });

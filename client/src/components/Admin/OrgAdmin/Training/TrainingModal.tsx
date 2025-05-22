@@ -1,38 +1,43 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { cn } from '~/utils';
-import TrainingCreationForm from '~/components/Admin/OrgAdmin/Training/TrainingCreationForm';
+import TrainingForm from '~/components/Admin/OrgAdmin/Training/TrainingForm';
 import { useLocalize, useSmaLocalize } from '~/hooks';
 import { Training } from 'librechat-data-provider';
 import UserMultiSelect from '~/components/ui/UserMultiSelect';
 import GenericList from '~/components/ui/GenericList';
+import { ClipboardCopy, MonitorCheck, MonitorX } from 'lucide-react';
+import { useToastContext } from '~/Providers';
 
-interface TrainingCreationModalProps {
+type Trainee = {
+  username: string;
+  password: string;
+  hasLoggedIn: boolean;
+};
+
+interface TrainingModalProps {
   isOpen: boolean;
   onClose: () => void;
   organizationId: string;
   training?: Training;
   organizationTrainers?: { email: string }[];
+  disabled?: boolean;
 }
 
-const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
+const TrainingModal: FC<TrainingModalProps> = ({
   isOpen,
   onClose,
   organizationId,
   training,
   organizationTrainers = [],
+  disabled = false,
 }) => {
+  const { showToast } = useToastContext();
   const smaLocalize = useSmaLocalize();
   const localize = useLocalize();
   const isEditing = !!training;
   const [trainers, setTrainers] = useState<{ email: string }[]>([]);
-  const [trainees, setTrainees] = useState<
-    {
-      username: string;
-      password: string;
-      hasLoggedIn: boolean;
-    }[]
-  >([]);
+  const [trainees, setTrainees] = useState<Trainee[]>([]);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -44,8 +49,47 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
     }
     if (training && training.trainees) {
       setTrainees(training.trainees);
+    } else {
+      setTrainees([]);
     }
   }, [training]);
+
+  const copyToClipboard = async (trainees: Trainee[]) => {
+    const textToCopy = trainees
+      .map((trainee) => `${trainee.username}:${trainee.password}`)
+      .join('\n');
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      showToast({
+        message: smaLocalize('com_orgadmin_copy_success'),
+        status: 'success',
+      });
+    } catch (err) {
+      showToast({
+        message: `${smaLocalize('com_orgadmin_copy_error')}: ${err.response.data.message}`,
+        status: 'error',
+      });
+    }
+  };
+
+  const renderTrainee = (trainee: Trainee) => {
+    const LoginIcon = () =>
+      trainee.hasLoggedIn ? (
+        <MonitorCheck size={24} color="green">
+          <title>{smaLocalize('com_orgadmin_trainee_hasLoggedIn')}</title>
+        </MonitorCheck>
+      ) : (
+        <MonitorX size={24} color="grey">
+          <title>{smaLocalize('com_orgadmin_trainee_notLoggedIn')}</title>
+        </MonitorX>
+      );
+    return (
+      <div className="flex items-center gap-3 text-sm text-text-primary">
+        <LoginIcon />
+        {trainee.username}
+      </div>
+    );
+  };
 
   return (
     <Transition appear show={isOpen}>
@@ -72,7 +116,7 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
           <div className={cn('fixed inset-0 flex w-screen items-center justify-center p-4')}>
             <DialogPanel
               className={cn(
-                'flex min-h-[600px] flex-col overflow-hidden rounded-xl rounded-b-lg bg-background shadow-2xl backdrop-blur-2xl animate-in sm:rounded-2xl md:min-h-[373px] md:w-[900px]',
+                'flex max-h-full min-h-[600px] flex-col overflow-hidden rounded-xl rounded-b-lg bg-background shadow-2xl backdrop-blur-2xl animate-in sm:rounded-2xl md:min-h-[373px] md:w-[900px]',
               )}
             >
               <DialogTitle
@@ -110,7 +154,7 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
 
               <div className="flex flex-1 overflow-hidden">
                 <div className="w-1/2 overflow-auto border-r border-border-light p-6">
-                  <TrainingCreationForm
+                  <TrainingForm
                     onSubmit={onClose}
                     onCancel={onClose}
                     organizationId={organizationId}
@@ -118,12 +162,14 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
                     hideButtons={true}
                     trainers={trainers.map((t) => t.email)}
                     formRef={formRef}
+                    disabled={disabled}
                   />
                 </div>
 
                 <div className="w-1/2 overflow-auto p-6">
                   <UserMultiSelect
                     title={smaLocalize('com_orgadmin_trainers')}
+                    disabled={disabled}
                     users={organizationTrainers}
                     selectedUsers={trainers.map((t) => t.email)}
                     onSelectedUsersChange={(selectedEmails) => {
@@ -135,9 +181,28 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
                   <br />
                   <GenericList
                     title={smaLocalize('com_orgadmin_participants_title')}
+                    titleButton={(trainees) => (
+                      <button
+                        onClick={() => copyToClipboard(trainees)}
+                        className="rounded-full p-1 hover:bg-surface-secondary"
+                        aria-label={smaLocalize('com_orgadmin_copy')}
+                      >
+                        <ClipboardCopy size={16} className="text-text-primary" />
+                      </button>
+                    )}
                     items={trainees}
                     getKey={(trainee) => trainee.username}
-                    renderItem={(trainee) => trainee.username}
+                    renderItem={renderTrainee}
+                    extraButtons={(trainee) => [
+                      <button
+                        key={`copy-${trainee.username}`}
+                        onClick={() => copyToClipboard([trainee])}
+                        className="rounded-full p-1 hover:bg-surface-secondary"
+                        aria-label={smaLocalize('com_orgadmin_copy')}
+                      >
+                        <ClipboardCopy size={16} className="text-text-primary" />
+                      </button>,
+                    ]}
                   />
                 </div>
               </div>
@@ -151,6 +216,7 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
                   {localize('com_ui_cancel')}
                 </button>
                 <button
+                  disabled={disabled}
                   className="btn btn-primary focus:shadow-outline h-9 px-4 py-2 font-semibold text-white hover:bg-green-600 focus:border-green-500"
                   type="button"
                   onClick={() => {
@@ -172,4 +238,4 @@ const TrainingCreationModal: FC<TrainingCreationModalProps> = ({
   );
 };
 
-export default TrainingCreationModal;
+export default TrainingModal;

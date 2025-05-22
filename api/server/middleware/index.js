@@ -12,6 +12,7 @@ const setBalanceConfig = require('./setBalanceConfig');
 const requireLdapAuth = require('./requireLdapAuth');
 const abortMiddleware = require('./abortMiddleware');
 const checkInviteUser = require('./checkInviteUser');
+const checkTrainingAccess = require('./checkTrainingAccess');
 const requireJwtAuth = require('./requireJwtAuth');
 const validateModel = require('./validateModel');
 const moderateText = require('./moderateText');
@@ -38,6 +39,7 @@ module.exports = {
   validateModel,
   requireJwtAuth,
   checkInviteUser,
+  checkTrainingAccess,
   requireLdapAuth,
   requireLocalAuth,
   canDeleteAccount,

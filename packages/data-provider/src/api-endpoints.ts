@@ -142,6 +142,8 @@ export const resendVerificationEmail = () => '/api/user/verify/resend';
 
 export const generateTrainees = () => '/api/user/generate-trainees';
 
+export const removeExpiredTrainees = () => '/api/user/remove-expired-trainees';
+
 export const plugins = () => '/api/plugins';
 
 export const config = () => '/api/config';
@@ -215,10 +217,17 @@ export const trainingOrganizations = (id?: string, path?: string, email?: string
   return url;
 };
 
-export const trainings = () => '/api/trainings';
-
-export const trainingsByOrganization = (organizationId: string) =>
-  `${trainings()}/organization/${organizationId}`;
+export const trainings = (
+  organizationId: string,
+  action: 'create' | 'update' | 'delete' | 'getByOrg' | 'get',
+  trainingId?: string,
+) => {
+  let endpoint = `/api/organization/${organizationId}/trainings/${action}`;
+  if (trainingId) {
+    endpoint += `/${trainingId}`;
+  }
+  return endpoint;
+};
 
 export const files = () => '/api/files';
 

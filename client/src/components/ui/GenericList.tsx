@@ -4,6 +4,7 @@ import { useLocalize } from '~/hooks';
 
 type ListProps<T> = {
   title: string;
+  titleButton?: (items: T[]) => React.ReactNode;
   items: T[];
   getKey: (item: T) => string;
   renderItem: (item: T) => React.ReactNode;
@@ -13,10 +14,12 @@ type ListProps<T> = {
   maxEntries?: number;
   placeholder?: string;
   className?: string;
+  extraButtons?: (item: T) => React.ReactNode[];
 };
 
 const GenericList = <T,>({
   title,
+  titleButton,
   items,
   getKey,
   renderItem,
@@ -26,6 +29,7 @@ const GenericList = <T,>({
   maxEntries,
   placeholder,
   className,
+  extraButtons,
 }: ListProps<T>) => {
   const localize = useLocalize();
   const [showNewItemInput, setShowNewItemInput] = useState(false);
@@ -35,7 +39,9 @@ const GenericList = <T,>({
   return (
     <div className={className}>
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
+        <h2 className="text-lg font-semibold text-text-primary">
+          {title} {titleButton && <React.Fragment>{titleButton(items)}</React.Fragment>}
+        </h2>
         {(handleAddItem || onAddButtonClick) && (
           <button
             onClick={() => {
@@ -73,6 +79,10 @@ const GenericList = <T,>({
                 <X size={16} className="text-text-primary" />
               </button>
             )}
+            {extraButtons &&
+              extraButtons(item).map((button, idx) => (
+                <React.Fragment key={idx}>{button}</React.Fragment>
+              ))}
           </li>
         ))}
 

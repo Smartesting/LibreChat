@@ -1,15 +1,26 @@
 import React, { FC, useState } from 'react';
 import { useSmaLocalize } from '~/hooks';
-import { ChevronDown, ChevronUp, Edit, Trash2, User } from 'lucide-react';
+import { ChevronDown, ChevronUp, Edit, Search, Trash2, User } from 'lucide-react';
 import TrainingDetails from './TrainingDetails';
 import { Training, TrainingWithStatus } from 'librechat-data-provider';
 
 const TrainingItem: FC<{
   training: TrainingWithStatus;
-  setTrainingToEdit?: (trainingToEdit: Training) => void;
-  setIsTrainingModalOpen?: (isOpen: boolean) => void;
-  setTrainingToDelete?: (trainingToDelete: string) => void;
-}> = ({ training, setTrainingToEdit, setIsTrainingModalOpen, setTrainingToDelete }) => {
+  setTrainingToEdit: (trainingToEdit: Training) => void;
+  setIsTrainingModalOpen: (isOpen: boolean) => void;
+  setTrainingToDelete: (trainingToDelete: string) => void;
+  setIsEditDisabled: (isEditDisabled: boolean) => void;
+  editable?: boolean;
+  deletable?: boolean;
+}> = ({
+  training,
+  setTrainingToEdit,
+  setIsTrainingModalOpen,
+  setTrainingToDelete,
+  setIsEditDisabled,
+  editable,
+  deletable,
+}) => {
   const smaLocalize = useSmaLocalize();
   const [expandedTrainingId, setExpandedTrainingId] = useState<string | null>(null);
 
@@ -36,20 +47,32 @@ const TrainingItem: FC<{
         </div>
 
         <div className="flex items-center">
-          {setTrainingToEdit && (
+          <button
+            className="mr-2 rounded-full p-1 hover:bg-surface-secondary"
+            aria-label={smaLocalize('com_ui_details')}
+            onClick={(e) => {
+              e.stopPropagation();
+              setTrainingToEdit(training);
+              setIsEditDisabled(true);
+              setIsTrainingModalOpen(true);
+            }}
+          >
+            <Search size={16} className="text-text-primary" />
+          </button>
+          {editable && (
             <button
               className="mr-1 rounded-full p-1 hover:bg-surface-secondary"
               aria-label={smaLocalize('com_ui_edit')}
               onClick={(e) => {
                 e.stopPropagation();
                 setTrainingToEdit(training);
-                setIsTrainingModalOpen && setIsTrainingModalOpen(true);
+                setIsTrainingModalOpen(true);
               }}
             >
               <Edit size={16} className="text-text-primary" />
             </button>
           )}
-          {setTrainingToDelete && (
+          {deletable && (
             <button
               className="mr-2 rounded-full p-1 hover:bg-surface-secondary"
               aria-label={smaLocalize('com_ui_delete')}

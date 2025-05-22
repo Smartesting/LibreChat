@@ -3,6 +3,9 @@ const { getBalanceConfig } = require('~/server/services/Config');
 const signPayload = require('~/server/services/signPayload');
 const Balance = require('./Balance');
 const User = require('./User');
+const { logger } = require('~/config');
+const { SystemRoles } = require('librechat-data-provider');
+const { getOngoingTrainings, getUpcomingTrainings } = require('~/models/Training');
 
 /**
  * Retrieve a user by ID and convert the found user document to a plain object.
@@ -27,6 +30,20 @@ const getUserById = async function (userId, fieldsToSelect = null) {
  */
 const findUser = async function (searchCriteria, fieldsToSelect = null) {
   const query = User.findOne(searchCriteria);
+  if (fieldsToSelect) {
+    query.select(fieldsToSelect);
+  }
+  return await query.lean();
+};
+
+/**
+ * Search for multiple users based on partial data and return matching user documents as plain objects.
+ * @param {Partial<MongoUser>} searchCriteria - The partial data to use for searching the user.
+ * @param {string|string[]} [fieldsToSelect] - The fields to include or exclude in the returned document.
+ * @returns {Promise<MongoUser[]>} An array of plain objects representing the user documents, or an empty array if no user is found.
+ */
+const findUsers = async function (searchCriteria, fieldsToSelect = null) {
+  const query = User.find(searchCriteria);
   if (fieldsToSelect) {
     query.select(fieldsToSelect);
   }
@@ -193,17 +210,17 @@ const generateTraineeUsers = async (count) => {
     const uuid = crypto.randomUUID();
     const email = `${uuid}@smartesting.com`;
 
-    const password = crypto.randomBytes(16).toString('hex');
+    const password = crypto.randomBytes(8).toString('hex');
     const salt = bcrypt.genSaltSync(10);
 
     const userData = {
+      username: 'Training account',
       email,
       password: bcrypt.hashSync(password, salt),
       provider: 'local',
       role: [SystemRoles.TRAINEE],
       emailVerified: true,
     };
-
     const userId = await createUser(userData);
 
     users.push({
@@ -216,6 +233,31 @@ const generateTraineeUsers = async (count) => {
   return users;
 };
 
+const removeExpiredTraineeAccounts = async () => {
+  logger.info('[removeExpiredTraineeAccounts] Trying to remove expired trainee accounts');
+  const trainees = await findUsers({
+    role: SystemRoles.TRAINEE,
+  });
+  const [ongoingTrainings, upcomingTrainings] = await Promise.all([
+    getOngoingTrainings(),
+    getUpcomingTrainings(),
+  ]);
+
+  const matchingUsers = trainees.filter((trainee) => {
+    const currentEmail = trainee.email;
+    const isUserInTraining = (training) =>
+      training.trainees.some((t) => t.username === currentEmail);
+    return !(ongoingTrainings.some(isUserInTraining) || upcomingTrainings.some(isUserInTraining));
+  });
+
+  logger.info(`[removeExpiredTraineeAccounts] Accounts to delete: ${matchingUsers.length}`);
+
+  matchingUsers.map((user) => {
+    logger.info(`[removeExpiredTraineeAccounts] Deleting trainee account ${user.email}`);
+    deleteUserById(user._id);
+  });
+};
+
 module.exports = {
   comparePassword,
   deleteUserById,
@@ -225,5 +267,7 @@ module.exports = {
   createUser,
   updateUser,
   findUser,
+  findUsers,
   generateTraineeUsers,
+  removeExpiredTraineeAccounts,
 };

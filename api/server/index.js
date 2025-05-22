@@ -21,6 +21,7 @@ const AppService = require('./services/AppService');
 const staticCache = require('./utils/staticCache');
 const noIndex = require('./middleware/noIndex');
 const routes = require('./routes');
+const { startCrons } = require('~/server/cron');
 
 const { PORT, HOST, ALLOW_SOCIAL_LOGIN, DISABLE_COMPRESSION, TRUST_PROXY } = process.env ?? {};
 
@@ -112,10 +113,9 @@ const startServer = async () => {
   app.use('/api/banner', routes.banner);
   app.use('/api/bedrock', routes.bedrock);
   app.use('/api/training-organizations', routes.trainingOrganizations);
-  app.use('/api/trainings', routes.trainings);
+  app.use('/api/organization', routes.trainings);
   app.use('/api/admins', routes.admins);
   app.use('/api/invitations', routes.invitations);
-
   app.use('/api/tags', routes.tags);
 
   app.use((req, res) => {
@@ -144,6 +144,7 @@ const startServer = async () => {
 };
 
 startServer();
+startCrons();
 
 let messageCount = 0;
 process.on('uncaughtException', (err) => {

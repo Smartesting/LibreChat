@@ -9,30 +9,32 @@ const {
   getById,
   update,
   remove,
-  addTrainee,
-  removeTrainee,
-  updateTrainee,
 } = require('~/server/controllers/TrainingController');
 const { checkOrgAccess } = require('~/server/middleware/roles');
 
 // Create a new training
-router.post('/', requireJwtAuth, checkOrgAccess, create);
+router.post('/:organizationId/trainings/create', requireJwtAuth, checkOrgAccess, create);
 
 // Get all trainings for a specific organization
-router.get('/organization/:organizationId', requireJwtAuth, checkOrgAccess, getByOrganization);
+router.get(
+  '/:organizationId/trainings/getByOrg',
+  requireJwtAuth,
+  checkOrgAccess,
+  getByOrganization,
+);
 
 // Get a training by ID
-router.get('/:id', requireJwtAuth, checkOrgAccess, getById);
+router.get('/:organizationId/trainings/get/:trainingId', requireJwtAuth, checkOrgAccess, getById);
 
 // Update a training
-router.put('/:id', requireJwtAuth, checkOrgAccess, update);
+router.put('/:organizationId/trainings/update/:trainingId', requireJwtAuth, checkOrgAccess, update);
 
 // Delete a training
-router.delete('/:id', requireJwtAuth, checkOrgAccess, remove);
-
-// Trainee routes
-router.post('/:id/trainees', requireJwtAuth, checkOrgAccess, addTrainee);
-router.delete('/:id/trainees/:username', requireJwtAuth, checkOrgAccess, removeTrainee);
-router.patch('/:id/trainees/:username', requireJwtAuth, checkOrgAccess, updateTrainee);
+router.delete(
+  '/:organizationId/trainings/delete/:trainingId',
+  requireJwtAuth,
+  checkOrgAccess,
+  remove,
+);
 
 module.exports = router;

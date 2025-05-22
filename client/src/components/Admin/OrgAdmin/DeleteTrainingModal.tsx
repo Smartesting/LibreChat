@@ -5,11 +5,16 @@ import { useDeleteTrainingMutation } from '~/data-provider/TrainingOrganizations
 import { AxiosError } from 'axios';
 
 interface DeleteTrainingModalProps {
+  organizationId: string;
   trainingId: string | null;
   onClose: () => void;
 }
 
-const DeleteTrainingModal: FC<DeleteTrainingModalProps> = ({ trainingId, onClose }) => {
+const DeleteTrainingModal: FC<DeleteTrainingModalProps> = ({
+  organizationId,
+  trainingId,
+  onClose,
+}) => {
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
 
@@ -35,8 +40,8 @@ const DeleteTrainingModal: FC<DeleteTrainingModalProps> = ({ trainingId, onClose
   });
 
   const confirmDeleteTraining = () => {
-    if (trainingId) {
-      deleteTrainingMutation.mutate(trainingId);
+    if (organizationId && trainingId) {
+      deleteTrainingMutation.mutate({ organizationId, trainingId });
     }
   };
 

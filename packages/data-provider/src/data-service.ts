@@ -780,19 +780,26 @@ export const removeTrainerFromOrganization = (
 export const getTrainingsByOrganization = (
   organizationId: string,
 ): Promise<q.TrainingWithStatus[]> => {
-  return request.get(endpoints.trainingsByOrganization(organizationId));
+  return request.get(endpoints.trainings(organizationId, 'getByOrg'));
 };
 
-export const createTraining = (data: q.TrainingCreateParams): Promise<q.Training> => {
-  return request.post(endpoints.trainings(), data);
+export const createTraining = (
+  organizationId: string,
+  data: q.TrainingCreateParams,
+): Promise<q.Training> => {
+  return request.post(endpoints.trainings(organizationId, 'create'), data);
 };
 
-export const deleteTraining = (id: string): Promise<void> => {
-  return request.delete(`${endpoints.trainings()}/${id}`);
+export const deleteTraining = (organizationId: string, trainingId: string): Promise<void> => {
+  return request.delete(endpoints.trainings(organizationId, 'delete', trainingId));
 };
 
-export const updateTraining = (id: string, data: Partial<q.Training>): Promise<q.Training> => {
-  return request.put(`${endpoints.trainings()}/${id}`, data);
+export const updateTraining = (
+  organizationId: string,
+  id: string,
+  data: Partial<q.Training>,
+): Promise<q.Training> => {
+  return request.put(endpoints.trainings(organizationId, 'update', id), data);
 };
 
 /* Tags */

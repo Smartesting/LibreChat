@@ -20,13 +20,13 @@ async function checkOrgAccess(req, res, next) {
     }
 
     // Get the organization ID from the request parameters
-    const { id } = req.params;
-    if (!id) {
+    const { organizationId } = req.params;
+    if (!organizationId) {
       return res.status(400).json({ message: 'Missing organization ID' });
     }
 
     // Get the organization
-    const organization = await getTrainingOrganizationById(id);
+    const organization = await getTrainingOrganizationById(organizationId);
     if (!organization) {
       return res.status(404).json({ message: 'Organization not found' });
     }

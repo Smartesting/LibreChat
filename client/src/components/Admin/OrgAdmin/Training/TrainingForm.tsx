@@ -11,6 +11,8 @@ import {
 import { useToastContext } from '~/Providers/ToastContext';
 import { AxiosError } from 'axios';
 import { Training, TrainingCreateParams } from 'librechat-data-provider';
+import { formatDateToTimezoneLocalString, parseDatetimeLocalToDate } from './dateMethods';
+import HoverCardSettings from '~/components/Nav/SettingsTabs/HoverCardSettings';
 
 const labelClass = 'mb-2 text-token-text-primary block font-medium';
 const inputClass = cn(
@@ -32,7 +34,7 @@ const defaultTrainingFormValues: TrainingCreateParams = {
   location: '',
 };
 
-const TrainingCreationForm: FC<{
+const TrainingForm: FC<{
   onSubmit: () => void;
   onCancel: () => void;
   organizationId: string;
@@ -40,12 +42,25 @@ const TrainingCreationForm: FC<{
   hideButtons?: boolean;
   trainers?: string[];
   formRef?: React.RefObject<HTMLFormElement>;
-}> = ({ onSubmit, onCancel, organizationId, training, hideButtons = false, trainers, formRef }) => {
+  disabled?: boolean;
+}> = ({
+  onSubmit,
+  onCancel,
+  organizationId,
+  training,
+  hideButtons = false,
+  trainers,
+  formRef,
+  disabled = false,
+}) => {
   const smaLocalize = useSmaLocalize();
   const localize = useLocalize();
   const { showToast } = useToastContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditing = !!training;
+  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [startDateValue, setStartDateValue] = useState('');
+  const [endDateValue, setEndDateValue] = useState('');
 
   const methods = useForm<TrainingCreateParams>({
     defaultValues: {
@@ -64,6 +79,20 @@ const TrainingCreationForm: FC<{
 
   useEffect(() => {
     if (training) {
+      if (training.startDateTime) {
+        setStartDateValue(
+          formatDateToTimezoneLocalString(new Date(training.startDateTime), training.timezone),
+        );
+      }
+      if (training.endDateTime) {
+        setEndDateValue(
+          formatDateToTimezoneLocalString(new Date(training.endDateTime), training.timezone),
+        );
+      }
+      if (training.timezone) {
+        setTimezone(training.timezone);
+      }
+
       reset({
         name: training.name,
         description: training.description || '',
@@ -105,6 +134,7 @@ const TrainingCreationForm: FC<{
       if (isEditing && training) {
         updateTraining.mutate(
           {
+            organizationId: training.trainingOrganizationId,
             id: training._id,
             data: formattedData,
           },
@@ -176,6 +206,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="name"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_name_required'),
@@ -208,6 +239,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="description"
+              disabled={disabled}
               control={control}
               render={({ field }) => (
                 <>
@@ -229,6 +261,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="location"
+              disabled={disabled}
               control={control}
               render={({ field }) => (
                 <>
@@ -251,13 +284,22 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="timezone"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_timezone_required'),
               }}
               render={({ field }) => (
                 <>
-                  <select {...field} className={inputClass} aria-label="Training timezone">
+                  <select
+                    {...field}
+                    className={inputClass}
+                    aria-label={smaLocalize('com_orgadmin_timezone')}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setTimezone(e.target.value);
+                    }}
+                  >
                     {Intl.supportedValuesOf('timeZone').map((timezone) => (
                       <option key={timezone} value={timezone}>
                         {timezone}
@@ -274,10 +316,17 @@ const TrainingCreationForm: FC<{
 
           <div className="mb-4">
             <label className={labelClass} htmlFor="startDateTime">
-              {smaLocalize('com_orgadmin_start_date')}
+              <div className="flex items-center space-x-2">
+                <div>{smaLocalize('com_orgadmin_start_date')}</div>
+                <HoverCardSettings
+                  side="bottom"
+                  text={smaLocalize('com_orgadmin_datetime_tooltip')}
+                />
+              </div>
             </label>
             <Controller
               name="startDateTime"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_start_date_required'),
@@ -286,13 +335,15 @@ const TrainingCreationForm: FC<{
                 <>
                   <input
                     {...field}
-                    value={
-                      field.value instanceof Date ? field.value.toISOString().slice(0, 16) : ''
-                    }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
-                    className={inputClass}
                     type="datetime-local"
-                    aria-label="Training start date and time"
+                    className={inputClass}
+                    aria-label={smaLocalize('com_orgadmin_start_date')}
+                    value={startDateValue}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setStartDateValue(val);
+                      field.onChange(parseDatetimeLocalToDate(val, timezone));
+                    }}
                   />
                   {errors.startDateTime && (
                     <p className="mt-1 text-sm text-red-500">{errors.startDateTime.message}</p>
@@ -304,10 +355,17 @@ const TrainingCreationForm: FC<{
 
           <div className="mb-4">
             <label className={labelClass} htmlFor="endDateTime">
-              {smaLocalize('com_orgadmin_end_date')}
+              <div className="flex items-center space-x-2">
+                <div>{smaLocalize('com_orgadmin_end_date')}</div>
+                <HoverCardSettings
+                  side="bottom"
+                  text={smaLocalize('com_orgadmin_datetime_tooltip')}
+                />
+              </div>
             </label>
             <Controller
               name="endDateTime"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_end_date_required'),
@@ -325,13 +383,15 @@ const TrainingCreationForm: FC<{
                 <>
                   <input
                     {...field}
-                    value={
-                      field.value instanceof Date ? field.value.toISOString().slice(0, 16) : ''
-                    }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
-                    className={inputClass}
                     type="datetime-local"
-                    aria-label="Training end date and time"
+                    className={inputClass}
+                    aria-label={smaLocalize('com_orgadmin_end_date')}
+                    value={endDateValue}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEndDateValue(val);
+                      field.onChange(parseDatetimeLocalToDate(val, timezone));
+                    }}
                   />
                   {errors.endDateTime && (
                     <p className="mt-1 text-sm text-red-500">{errors.endDateTime.message}</p>
@@ -347,6 +407,7 @@ const TrainingCreationForm: FC<{
             </label>
             <Controller
               name="participantCount"
+              disabled={disabled}
               control={control}
               rules={{
                 required: smaLocalize('com_orgadmin_error_participant_count_required'),
@@ -364,6 +425,7 @@ const TrainingCreationForm: FC<{
                   <input
                     {...field}
                     value={field.value ?? 0}
+                    disabled={disabled}
                     onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
                     className={inputClass}
                     type="number"
@@ -392,7 +454,7 @@ const TrainingCreationForm: FC<{
               <button
                 className="btn btn-primary focus:shadow-outline flex h-9 w-full items-center justify-center px-4 py-2 font-semibold text-white hover:bg-green-600 focus:border-green-500 disabled:opacity-50"
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || disabled}
               >
                 {isSubmitting
                   ? localize('com_ui_loading')
@@ -408,4 +470,4 @@ const TrainingCreationForm: FC<{
   );
 };
 
-export default TrainingCreationForm;
+export default TrainingForm;
