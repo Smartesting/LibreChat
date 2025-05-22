@@ -142,6 +142,8 @@ export const resendVerificationEmail = () => '/api/user/verify/resend';
 
 export const generateTrainees = () => '/api/user/generate-trainees';
 
+export const removeExpiredTrainees = () => '/api/user/remove-expired-trainees';
+
 export const plugins = () => '/api/plugins';
 
 export const config = () => '/api/config';

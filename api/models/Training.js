@@ -130,6 +130,20 @@ const getOngoingTrainings = async () => {
 };
 
 /**
+ * Get upcoming trainings
+ * @returns {Promise<Training[]|null>}
+ */
+const getUpcomingTrainings = async () => {
+  const trainings = await Training.find().lean();
+  const trainingsWithStatus = trainings.map((training) => {
+    const status = calculateTrainingStatus(training.startDateTime, training.endDateTime);
+    return { ...training, status };
+  });
+
+  return trainingsWithStatus.filter((training) => training.status === TrainingStatus.UPCOMING);
+};
+
+/**
  * Calculate the training status given its start and end times.
  * @param startDateTime
  * @param endDateTime
@@ -158,4 +172,5 @@ module.exports = {
   deleteTraining,
   calculateTrainingStatus,
   getOngoingTrainings,
+  getUpcomingTrainings,
 };

@@ -1,4 +1,4 @@
-const { FileSources } = require('librechat-data-provider');
+const { FileSources, SystemRoles } = require('librechat-data-provider');
 const {
   Balance,
   getFiles,
@@ -10,6 +10,7 @@ const {
   deleteUserById,
   deleteAllUserSessions,
   generateTraineeUsers,
+  findUsers,
 } = require('~/models');
 const User = require('~/models/User');
 const { updateUserPluginAuth, deleteUserPluginAuth } = require('~/server/services/PluginService');
@@ -21,6 +22,7 @@ const { deleteAllSharedLinks } = require('~/models/Share');
 const { deleteToolCalls } = require('~/models/ToolCall');
 const { Transaction } = require('~/models/Transaction');
 const { logger } = require('~/config');
+const { getUpcomingTrainings, getOngoingTrainings } = require('~/models/Training');
 
 const getUserController = async (req, res) => {
   /** @type {MongoUser} */
@@ -209,6 +211,33 @@ const generateTraineesController = async (req, res) => {
   }
 };
 
+const removeExpiredTraineeAccountsController = async (req, res) => {
+  try {
+    const trainees = await findUsers({
+      role: SystemRoles.TRAINEE,
+    });
+    const [ongoingTrainings, upcomingTrainings] = await Promise.all([
+      getOngoingTrainings(),
+      getUpcomingTrainings(),
+    ]);
+
+    const matchingUsers = trainees.filter((trainee) => {
+      const currentEmail = trainee.email;
+      const isUserInTraining = (training) =>
+        training.trainees.some((t) => t.username === currentEmail);
+      return !(ongoingTrainings.some(isUserInTraining) || upcomingTrainings.some(isUserInTraining));
+    });
+
+    matchingUsers.map((user) => {
+      deleteUserById(user._id);
+    });
+    return res.status(200).send();
+  } catch (error) {
+    logger.error('[removeExpiredTraineeAccounts]', error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getUserController,
   getTermsStatusController,
@@ -218,4 +247,5 @@ module.exports = {
   updateUserPluginsController,
   resendVerificationController,
   generateTraineesController,
+  removeExpiredTraineeAccountsController,
 };

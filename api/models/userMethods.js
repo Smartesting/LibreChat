@@ -34,6 +34,20 @@ const findUser = async function (searchCriteria, fieldsToSelect = null) {
 };
 
 /**
+ * Search for multiple users based on partial data and return matching user documents as plain objects.
+ * @param {Partial<MongoUser>} searchCriteria - The partial data to use for searching the user.
+ * @param {string|string[]} [fieldsToSelect] - The fields to include or exclude in the returned document.
+ * @returns {Promise<MongoUser[]>} An array of plain objects representing the user documents, or an empty array if no user is found.
+ */
+const findUsers = async function (searchCriteria, fieldsToSelect = null) {
+  const query = User.find(searchCriteria);
+  if (fieldsToSelect) {
+    query.select(fieldsToSelect);
+  }
+  return await query.lean();
+};
+
+/**
  * Update a user with new data without overwriting existing properties.
  *
  * @param {string} userId - The ID of the user to update.
@@ -225,5 +239,6 @@ module.exports = {
   createUser,
   updateUser,
   findUser,
+  findUsers,
   generateTraineeUsers,
 };
