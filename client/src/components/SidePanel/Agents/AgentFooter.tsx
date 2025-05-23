@@ -53,7 +53,7 @@ export default function AgentFooter({
   return (
     <div className="mx-1 mb-1 flex w-full flex-col gap-2">
       {activePanel !== Panel.advanced && <AdvancedButton setActivePanel={setActivePanel} />}
-      {user?.role.includes(SystemRoles.ADMIN) && <AdminSettings />}
+      {/*user?.role.includes(SystemRoles.ADMIN) && <AdminSettings />*/}
       {/* Context Button */}
       <div className="flex items-center justify-end gap-2">
         <DeleteButton

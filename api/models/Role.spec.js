@@ -326,16 +326,12 @@ describe('initializeRoles', () => {
     await initializeRoles();
 
     const adminRoles = await Role.find({ name: SystemRoles.ADMIN });
-    const userRoles = await Role.find({ name: SystemRoles.USER });
 
     expect(adminRoles).toHaveLength(1);
-    expect(userRoles).toHaveLength(1);
 
     const adminPerms = adminRoles[0].toObject().permissions;
-    const userPerms = userRoles[0].toObject().permissions;
     Object.values(PermissionTypes).forEach((permType) => {
       expect(adminPerms[permType]).toBeDefined();
-      expect(userPerms[permType]).toBeDefined();
     });
   });
 

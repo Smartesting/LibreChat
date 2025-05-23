@@ -185,7 +185,6 @@ const initializeRoles = async function () {
   for (const roleName of [
     SystemRoles.ADMIN,
     SystemRoles.ORGADMIN,
-    SystemRoles.USER,
     SystemRoles.TRAINER,
     SystemRoles.TRAINEE,
   ]) {

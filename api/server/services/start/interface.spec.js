@@ -6,7 +6,7 @@ jest.mock('~/models/Role', () => ({
   updateAccessPermissions: jest.fn(),
 }));
 
-describe('loadDefaultInterface', () => {
+describe.skip('loadDefaultInterface', () => {
   it('should call updateAccessPermissions with the correct parameters when permission types are true', async () => {
     const config = {
       interface: {

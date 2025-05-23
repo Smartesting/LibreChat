@@ -122,7 +122,7 @@ const ldapLogin = new LdapStrategy(ldapOptions, async (userinfo, done) => {
         email: mail,
         emailVerified: true, // The ldap server administrator should verify the email
         name: fullName,
-        role: isFirstRegisteredUser ? SystemRoles.ADMIN : SystemRoles.USER,
+        role: isFirstRegisteredUser ? [SystemRoles.ADMIN] : [],
       };
       const userId = await createUser(user);
       user._id = userId;

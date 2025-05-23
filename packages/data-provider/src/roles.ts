@@ -20,10 +20,6 @@ export enum SystemRoles {
    */
   ADMIN = 'ADMIN',
   /**
-   * The default user role
-   */
-  USER = 'USER',
-  /**
    * The organization admin role
    */
   ORGADMIN = 'ORGADMIN',
@@ -76,10 +72,6 @@ const defaultRolesSchema = z.object({
       }),
     }),
   }),
-  [SystemRoles.USER]: roleSchema.extend({
-    name: z.literal(SystemRoles.USER),
-    permissions: permissionsSchema,
-  }),
   [SystemRoles.ORGADMIN]: roleSchema.extend({
     name: z.literal(SystemRoles.ORGADMIN),
     permissions: permissionsSchema,
@@ -120,17 +112,6 @@ export const roleDefaults = defaultRolesSchema.parse({
       [PermissionTypes.RUN_CODE]: {
         [Permissions.USE]: true,
       },
-    },
-  },
-  [SystemRoles.USER]: {
-    name: SystemRoles.USER,
-    permissions: {
-      [PermissionTypes.PROMPTS]: {},
-      [PermissionTypes.BOOKMARKS]: {},
-      [PermissionTypes.AGENTS]: {},
-      [PermissionTypes.MULTI_CONVO]: {},
-      [PermissionTypes.TEMPORARY_CHAT]: {},
-      [PermissionTypes.RUN_CODE]: {},
     },
   },
   [SystemRoles.ORGADMIN]: {

@@ -77,7 +77,7 @@ const AdminSettings = () => {
   });
 
   const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<SystemRoles>(SystemRoles.USER);
+  const [selectedRole, setSelectedRole] = useState<SystemRoles>(SystemRoles.ADMIN);
 
   const defaultValues = useMemo(() => {
     if (roles?.[selectedRole]?.permissions) {
@@ -130,12 +130,6 @@ const AdminSettings = () => {
   };
 
   const roleDropdownItems = [
-    {
-      label: SystemRoles.USER,
-      onClick: () => {
-        setSelectedRole(SystemRoles.USER);
-      },
-    },
     {
       label: SystemRoles.ADMIN,
       onClick: () => {
