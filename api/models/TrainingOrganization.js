@@ -40,10 +40,7 @@ const getListTrainingOrganizations = async (user) => {
  * @returns {Promise<Object|null>} The deleted training organization document or null if not found
  */
 const deleteTrainingOrganization = async (orgId) => {
-  return TrainingOrganization.findByIdAndDelete(orgId)
-    .populate('administrators', '_id email name role')
-    .populate('trainers', '_id email name role')
-    .lean();
+  return TrainingOrganization.findByIdAndDelete(orgId).lean();
 };
 
 /**
@@ -52,10 +49,7 @@ const deleteTrainingOrganization = async (orgId) => {
  * @returns {Promise<Object|null>} The training organization document or null if not found
  */
 const getTrainingOrganizationById = async (orgId) => {
-  return TrainingOrganization.findById(orgId)
-    .populate('administrators', '_id email name role')
-    .populate('trainers', '_id email name role')
-    .lean();
+  return TrainingOrganization.findById(orgId).lean();
 };
 
 /**
@@ -126,9 +120,7 @@ const removeAdminFromOrganization = async (orgId, userId) => {
         },
       },
       { new: true },
-    )
-      .populate('administrators', '_id email name role')
-      .populate('trainers', '_id email name role');
+    );
   } catch (error) {
     logger.error(
       `[removeAdminFromOrganization] Error removing user ${userId} as admin from organization ${orgId}:`,
@@ -154,9 +146,7 @@ const removeTrainerFromOrganization = async (orgId, userId) => {
         },
       },
       { new: true },
-    )
-      .populate('administrators', '_id email name role')
-      .populate('trainers', '_id email name role');
+    );
   } catch (error) {
     logger.error(
       `[removeTrainerFromOrganization] Error removing user ${userId} as trainer from organization ${orgId}:`,

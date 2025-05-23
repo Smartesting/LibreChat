@@ -32,4 +32,13 @@ const trainingOrganizationSchema = new Schema<ITrainingOrganization>(
   },
 );
 
+trainingOrganizationSchema.pre(/^find/, function (next) {
+  // @ts-ignore
+  this.populate('administrators', '_id email name role').populate(
+    'trainers',
+    '_id email name role',
+  );
+  next();
+});
+
 export default trainingOrganizationSchema;
