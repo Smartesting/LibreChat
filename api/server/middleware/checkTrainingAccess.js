@@ -47,7 +47,7 @@ async function checkTrainingAccess(req, res, next) {
       return next();
     }
 
-    return next();
+    return res.status(403).json({ message: 'no_ongoing_training' });
   } catch (error) {
     return res.status(403).json({ message: error.message });
   }
