@@ -39,7 +39,7 @@ beforeEach(async () => {
 describe('updateAccessPermissions', () => {
   it('should update permissions when changes are needed', async () => {
     await new Role({
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]: {
           CREATE: true,
@@ -49,7 +49,7 @@ describe('updateAccessPermissions', () => {
       },
     }).save();
 
-    await updateAccessPermissions(SystemRoles.USER, {
+    await updateAccessPermissions(SystemRoles.TRAINER, {
       [PermissionTypes.PROMPTS]: {
         CREATE: true,
         USE: true,
@@ -57,7 +57,7 @@ describe('updateAccessPermissions', () => {
       },
     });
 
-    const updatedRole = await getRoleByName(SystemRoles.USER);
+    const updatedRole = await getRoleByName(SystemRoles.TRAINER);
     expect(updatedRole.permissions[PermissionTypes.PROMPTS]).toEqual({
       CREATE: true,
       USE: true,
@@ -67,7 +67,7 @@ describe('updateAccessPermissions', () => {
 
   it('should not update permissions when no changes are needed', async () => {
     await new Role({
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]: {
           CREATE: true,
@@ -77,7 +77,7 @@ describe('updateAccessPermissions', () => {
       },
     }).save();
 
-    await updateAccessPermissions(SystemRoles.USER, {
+    await updateAccessPermissions(SystemRoles.TRAINER, {
       [PermissionTypes.PROMPTS]: {
         CREATE: true,
         USE: true,
@@ -85,7 +85,7 @@ describe('updateAccessPermissions', () => {
       },
     });
 
-    const updatedRole = await getRoleByName(SystemRoles.USER);
+    const updatedRole = await getRoleByName(SystemRoles.TRAINER);
     expect(updatedRole.permissions[PermissionTypes.PROMPTS]).toEqual({
       CREATE: true,
       USE: true,
@@ -103,7 +103,7 @@ describe('updateAccessPermissions', () => {
 
   it('should update only specified permissions', async () => {
     await new Role({
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]: {
           CREATE: true,
@@ -113,11 +113,11 @@ describe('updateAccessPermissions', () => {
       },
     }).save();
 
-    await updateAccessPermissions(SystemRoles.USER, {
+    await updateAccessPermissions(SystemRoles.TRAINER, {
       [PermissionTypes.PROMPTS]: { SHARED_GLOBAL: true },
     });
 
-    const updatedRole = await getRoleByName(SystemRoles.USER);
+    const updatedRole = await getRoleByName(SystemRoles.TRAINER);
     expect(updatedRole.permissions[PermissionTypes.PROMPTS]).toEqual({
       CREATE: true,
       USE: true,
@@ -127,7 +127,7 @@ describe('updateAccessPermissions', () => {
 
   it('should handle partial updates', async () => {
     await new Role({
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]: {
           CREATE: true,
@@ -137,11 +137,11 @@ describe('updateAccessPermissions', () => {
       },
     }).save();
 
-    await updateAccessPermissions(SystemRoles.USER, {
+    await updateAccessPermissions(SystemRoles.TRAINER, {
       [PermissionTypes.PROMPTS]: { USE: false },
     });
 
-    const updatedRole = await getRoleByName(SystemRoles.USER);
+    const updatedRole = await getRoleByName(SystemRoles.TRAINER);
     expect(updatedRole.permissions[PermissionTypes.PROMPTS]).toEqual({
       CREATE: true,
       USE: false,
@@ -151,19 +151,19 @@ describe('updateAccessPermissions', () => {
 
   it('should update multiple permission types at once', async () => {
     await new Role({
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]: { CREATE: true, USE: true, SHARED_GLOBAL: false },
         [PermissionTypes.BOOKMARKS]: { USE: true },
       },
     }).save();
 
-    await updateAccessPermissions(SystemRoles.USER, {
+    await updateAccessPermissions(SystemRoles.TRAINER, {
       [PermissionTypes.PROMPTS]: { USE: false, SHARED_GLOBAL: true },
       [PermissionTypes.BOOKMARKS]: { USE: false },
     });
 
-    const updatedRole = await getRoleByName(SystemRoles.USER);
+    const updatedRole = await getRoleByName(SystemRoles.TRAINER);
     expect(updatedRole.permissions[PermissionTypes.PROMPTS]).toEqual({
       CREATE: true,
       USE: false,
@@ -174,17 +174,17 @@ describe('updateAccessPermissions', () => {
 
   it('should handle updates for a single permission type', async () => {
     await new Role({
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]: { CREATE: true, USE: true, SHARED_GLOBAL: false },
       },
     }).save();
 
-    await updateAccessPermissions(SystemRoles.USER, {
+    await updateAccessPermissions(SystemRoles.TRAINER, {
       [PermissionTypes.PROMPTS]: { USE: false, SHARED_GLOBAL: true },
     });
 
-    const updatedRole = await getRoleByName(SystemRoles.USER);
+    const updatedRole = await getRoleByName(SystemRoles.TRAINER);
     expect(updatedRole.permissions[PermissionTypes.PROMPTS]).toEqual({
       CREATE: true,
       USE: false,
@@ -194,35 +194,35 @@ describe('updateAccessPermissions', () => {
 
   it('should update MULTI_CONVO permissions', async () => {
     await new Role({
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.MULTI_CONVO]: { USE: false },
       },
     }).save();
 
-    await updateAccessPermissions(SystemRoles.USER, {
+    await updateAccessPermissions(SystemRoles.TRAINER, {
       [PermissionTypes.MULTI_CONVO]: { USE: true },
     });
 
-    const updatedRole = await getRoleByName(SystemRoles.USER);
+    const updatedRole = await getRoleByName(SystemRoles.TRAINER);
     expect(updatedRole.permissions[PermissionTypes.MULTI_CONVO]).toEqual({ USE: true });
   });
 
   it('should update MULTI_CONVO permissions along with other permission types', async () => {
     await new Role({
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]: { CREATE: true, USE: true, SHARED_GLOBAL: false },
         [PermissionTypes.MULTI_CONVO]: { USE: false },
       },
     }).save();
 
-    await updateAccessPermissions(SystemRoles.USER, {
+    await updateAccessPermissions(SystemRoles.TRAINER, {
       [PermissionTypes.PROMPTS]: { SHARED_GLOBAL: true },
       [PermissionTypes.MULTI_CONVO]: { USE: true },
     });
 
-    const updatedRole = await getRoleByName(SystemRoles.USER);
+    const updatedRole = await getRoleByName(SystemRoles.TRAINER);
     expect(updatedRole.permissions[PermissionTypes.PROMPTS]).toEqual({
       CREATE: true,
       USE: true,
@@ -233,17 +233,17 @@ describe('updateAccessPermissions', () => {
 
   it('should not update MULTI_CONVO permissions when no changes are needed', async () => {
     await new Role({
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.MULTI_CONVO]: { USE: true },
       },
     }).save();
 
-    await updateAccessPermissions(SystemRoles.USER, {
+    await updateAccessPermissions(SystemRoles.TRAINER, {
       [PermissionTypes.MULTI_CONVO]: { USE: true },
     });
 
-    const updatedRole = await getRoleByName(SystemRoles.USER);
+    const updatedRole = await getRoleByName(SystemRoles.TRAINER);
     expect(updatedRole.permissions[PermissionTypes.MULTI_CONVO]).toEqual({ USE: true });
   });
 });
@@ -257,7 +257,7 @@ describe('initializeRoles', () => {
     await initializeRoles();
 
     const adminRole = await getRoleByName(SystemRoles.ADMIN);
-    const userRole = await getRoleByName(SystemRoles.USER);
+    const userRole = await getRoleByName(SystemRoles.TRAINER);
 
     expect(adminRole).toBeTruthy();
     expect(userRole).toBeTruthy();
@@ -276,7 +276,7 @@ describe('initializeRoles', () => {
 
   it('should not modify existing permissions for existing roles', async () => {
     const customUserRole = {
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]: {
           [Permissions.USE]: false,
@@ -290,7 +290,7 @@ describe('initializeRoles', () => {
     await new Role(customUserRole).save();
     await initializeRoles();
 
-    const userRole = await getRoleByName(SystemRoles.USER);
+    const userRole = await getRoleByName(SystemRoles.TRAINER);
     expect(userRole.permissions[PermissionTypes.PROMPTS]).toEqual(
       customUserRole.permissions[PermissionTypes.PROMPTS],
     );
@@ -302,19 +302,19 @@ describe('initializeRoles', () => {
 
   it('should add new permission types to existing roles', async () => {
     const partialUserRole = {
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]:
-          roleDefaults[SystemRoles.USER].permissions[PermissionTypes.PROMPTS],
+          roleDefaults[SystemRoles.TRAINER].permissions[PermissionTypes.PROMPTS],
         [PermissionTypes.BOOKMARKS]:
-          roleDefaults[SystemRoles.USER].permissions[PermissionTypes.BOOKMARKS],
+          roleDefaults[SystemRoles.TRAINER].permissions[PermissionTypes.BOOKMARKS],
       },
     };
 
     await new Role(partialUserRole).save();
     await initializeRoles();
 
-    const userRole = await getRoleByName(SystemRoles.USER);
+    const userRole = await getRoleByName(SystemRoles.TRAINER);
     expect(userRole.permissions[PermissionTypes.AGENTS]).toBeDefined();
     expect(userRole.permissions[PermissionTypes.AGENTS].CREATE).toBeDefined();
     expect(userRole.permissions[PermissionTypes.AGENTS].USE).toBeDefined();
@@ -366,7 +366,7 @@ describe('initializeRoles', () => {
     await initializeRoles();
 
     const adminRole = await getRoleByName(SystemRoles.ADMIN);
-    const userRole = await getRoleByName(SystemRoles.USER);
+    const userRole = await getRoleByName(SystemRoles.TRAINER);
 
     expect(adminRole.permissions[PermissionTypes.MULTI_CONVO]).toBeDefined();
     expect(userRole.permissions[PermissionTypes.MULTI_CONVO]).toBeDefined();
@@ -374,25 +374,25 @@ describe('initializeRoles', () => {
       roleDefaults[SystemRoles.ADMIN].permissions[PermissionTypes.MULTI_CONVO].USE,
     );
     expect(userRole.permissions[PermissionTypes.MULTI_CONVO].USE).toBe(
-      roleDefaults[SystemRoles.USER].permissions[PermissionTypes.MULTI_CONVO].USE,
+      roleDefaults[SystemRoles.TRAINER].permissions[PermissionTypes.MULTI_CONVO].USE,
     );
   });
 
   it('should add MULTI_CONVO permissions to existing roles without them', async () => {
     const partialUserRole = {
-      name: SystemRoles.USER,
+      name: SystemRoles.TRAINER,
       permissions: {
         [PermissionTypes.PROMPTS]:
-          roleDefaults[SystemRoles.USER].permissions[PermissionTypes.PROMPTS],
+          roleDefaults[SystemRoles.TRAINER].permissions[PermissionTypes.PROMPTS],
         [PermissionTypes.BOOKMARKS]:
-          roleDefaults[SystemRoles.USER].permissions[PermissionTypes.BOOKMARKS],
+          roleDefaults[SystemRoles.TRAINER].permissions[PermissionTypes.BOOKMARKS],
       },
     };
 
     await new Role(partialUserRole).save();
     await initializeRoles();
 
-    const userRole = await getRoleByName(SystemRoles.USER);
+    const userRole = await getRoleByName(SystemRoles.TRAINER);
     expect(userRole.permissions[PermissionTypes.MULTI_CONVO]).toBeDefined();
     expect(userRole.permissions[PermissionTypes.MULTI_CONVO].USE).toBeDefined();
   });

@@ -149,7 +149,7 @@ describe('TrainingOrganizationController', () => {
       expect(processAdministrators).toHaveBeenCalledWith(
         ['admin@example.com'],
         'org-id',
-        'Test Organization'
+        'Test Organization',
       );
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
@@ -267,12 +267,16 @@ describe('TrainingOrganizationController', () => {
   describe('deleteTrainingOrganization', () => {
     it('should delete a training organization successfully', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       const deletedOrg = {
         _id: 'org-id',
         name: 'Test Organization',
-        administrators: [{ _id: 'admin-id', email: 'admin@example.com', role: [SystemRoles.ORGADMIN] }],
-        trainers: [{ _id: 'trainer-id', email: 'trainer@example.com', role: [SystemRoles.TRAINER] }],
+        administrators: [
+          { _id: 'admin-id', email: 'admin@example.com', role: [SystemRoles.ORGADMIN] },
+        ],
+        trainers: [
+          { _id: 'trainer-id', email: 'trainer@example.com', role: [SystemRoles.TRAINER] },
+        ],
       };
       deleteTrainingOrganizationMock.mockResolvedValue(deletedOrg);
       findTrainingOrganizationsByAdminMock.mockResolvedValue([]);
@@ -293,7 +297,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if organization ID is missing', async () => {
       // Setup
-      req.params.id = '';
+      req.params.organizationId = '';
 
       // Execute
       await deleteTrainingOrganization(req, res);
@@ -306,7 +310,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 404 if organization is not found', async () => {
       // Setup
-      req.params.id = 'non-existent-id';
+      req.params.organizationId = 'non-existent-id';
       deleteTrainingOrganizationMock.mockResolvedValue(null);
 
       // Execute
@@ -320,7 +324,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should handle errors', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       deleteTrainingOrganizationMock.mockRejectedValue(new Error('Database error'));
 
       // Execute
@@ -337,7 +341,7 @@ describe('TrainingOrganizationController', () => {
   describe('getTrainingOrganizationById', () => {
     it('should return a training organization by ID', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       const organization = {
         _id: 'org-id',
         name: 'Test Organization',
@@ -356,7 +360,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if organization ID is missing', async () => {
       // Setup
-      req.params.id = '';
+      req.params.organizationId = '';
 
       // Execute
       await getTrainingOrganizationById(req, res);
@@ -369,7 +373,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 404 if organization is not found', async () => {
       // Setup
-      req.params.id = 'non-existent-id';
+      req.params.organizationId = 'non-existent-id';
       getTrainingOrganizationByIdMock.mockResolvedValue(null);
 
       // Execute
@@ -383,7 +387,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should handle errors', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       getTrainingOrganizationByIdMock.mockRejectedValue(new Error('Database error'));
 
       // Execute
@@ -400,7 +404,7 @@ describe('TrainingOrganizationController', () => {
   describe('addAdministrator', () => {
     it('should add an administrator successfully', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'newadmin@example.com';
       const organization = {
         _id: 'org-id',
@@ -425,14 +429,18 @@ describe('TrainingOrganizationController', () => {
       // Assert
       expect(getTrainingOrganizationByIdMock).toHaveBeenCalledWith('org-id');
       expect(findOrgAdminInvitationsByOrgId).toHaveBeenCalledWith('org-id');
-      expect(processAdministrators).toHaveBeenCalledWith(['newadmin@example.com'], 'org-id', 'Test Organization');
+      expect(processAdministrators).toHaveBeenCalledWith(
+        ['newadmin@example.com'],
+        'org-id',
+        'Test Organization',
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(updatedOrg);
     });
 
     it('should return 400 if organization ID is missing', async () => {
       // Setup
-      req.params.id = '';
+      req.params.organizationId = '';
       req.body.email = 'newadmin@example.com';
 
       // Execute
@@ -446,7 +454,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if email is invalid', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'invalid-email';
 
       // Execute
@@ -460,7 +468,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 404 if organization is not found', async () => {
       // Setup
-      req.params.id = 'non-existent-id';
+      req.params.organizationId = 'non-existent-id';
       req.body.email = 'newadmin@example.com';
       getTrainingOrganizationByIdMock.mockResolvedValue(null);
 
@@ -475,7 +483,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if administrator already exists in organization', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'existingadmin@example.com';
       const organization = {
         _id: 'org-id',
@@ -491,12 +499,14 @@ describe('TrainingOrganizationController', () => {
       // Assert
       expect(getTrainingOrganizationByIdMock).toHaveBeenCalledWith('org-id');
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Administrator already exists in this organization' });
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Administrator already exists in this organization',
+      });
     });
 
     it('should return 400 if administrator is already invited', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'invitedadmin@example.com';
       const organization = {
         _id: 'org-id',
@@ -516,12 +526,14 @@ describe('TrainingOrganizationController', () => {
       expect(getTrainingOrganizationByIdMock).toHaveBeenCalledWith('org-id');
       expect(findOrgAdminInvitationsByOrgId).toHaveBeenCalledWith('org-id');
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Administrator already invited in this organization' });
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Administrator already invited in this organization',
+      });
     });
 
     it('should handle errors', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'newadmin@example.com';
       getTrainingOrganizationByIdMock.mockRejectedValue(new Error('Database error'));
 
@@ -539,12 +551,14 @@ describe('TrainingOrganizationController', () => {
   describe('removeAdministrator', () => {
     it('should remove an administrator successfully', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = 'admin@example.com';
       const organization = {
         _id: 'org-id',
         name: 'Test Organization',
-        administrators: [{ _id: 'admin-id', email: 'admin@example.com', role: [SystemRoles.ORGADMIN] }],
+        administrators: [
+          { _id: 'admin-id', email: 'admin@example.com', role: [SystemRoles.ORGADMIN] },
+        ],
         trainers: [],
       };
       const updatedOrg = {
@@ -572,7 +586,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if organization ID is missing', async () => {
       // Setup
-      req.params.id = '';
+      req.params.organizationId = '';
       req.params.email = 'admin@example.com';
 
       // Execute
@@ -586,7 +600,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if email is missing', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = '';
 
       // Execute
@@ -600,7 +614,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 404 if organization is not found', async () => {
       // Setup
-      req.params.id = 'non-existent-id';
+      req.params.organizationId = 'non-existent-id';
       req.params.email = 'admin@example.com';
       getTrainingOrganizationByIdMock.mockResolvedValue(null);
 
@@ -615,7 +629,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should remove admin role from invitation if user does not exist but has invitation', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = 'invited@example.com';
       const organization = {
         _id: 'org-id',
@@ -642,7 +656,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 404 if user not found and no pending invitation exists', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = 'nonexistent@example.com';
       const organization = {
         _id: 'org-id',
@@ -660,12 +674,14 @@ describe('TrainingOrganizationController', () => {
       expect(getTrainingOrganizationByIdMock).toHaveBeenCalledWith('org-id');
       expect(findOrgAdminInvitationsByOrgId).toHaveBeenCalledWith('org-id');
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ error: 'User not found and no pending invitation exists' });
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'User not found and no pending invitation exists',
+      });
     });
 
     it('should handle errors', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = 'admin@example.com';
       getTrainingOrganizationByIdMock.mockRejectedValue(new Error('Database error'));
 
@@ -683,7 +699,7 @@ describe('TrainingOrganizationController', () => {
   describe('addTrainer', () => {
     it('should add a trainer successfully', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'newtrainer@example.com';
       const organization = {
         _id: 'org-id',
@@ -708,14 +724,18 @@ describe('TrainingOrganizationController', () => {
       // Assert
       expect(getTrainingOrganizationByIdMock).toHaveBeenCalledWith('org-id');
       expect(findTrainerInvitationsByOrgId).toHaveBeenCalledWith('org-id');
-      expect(processTrainers).toHaveBeenCalledWith(['newtrainer@example.com'], 'org-id', 'Test Organization');
+      expect(processTrainers).toHaveBeenCalledWith(
+        ['newtrainer@example.com'],
+        'org-id',
+        'Test Organization',
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(updatedOrg);
     });
 
     it('should return 400 if organization ID is missing', async () => {
       // Setup
-      req.params.id = '';
+      req.params.organizationId = '';
       req.body.email = 'newtrainer@example.com';
 
       // Execute
@@ -729,7 +749,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if email is invalid', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'invalid-email';
 
       // Execute
@@ -743,7 +763,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 404 if organization is not found', async () => {
       // Setup
-      req.params.id = 'non-existent-id';
+      req.params.organizationId = 'non-existent-id';
       req.body.email = 'newtrainer@example.com';
       getTrainingOrganizationByIdMock.mockResolvedValue(null);
 
@@ -758,7 +778,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if trainer already exists in organization', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'existingtrainer@example.com';
       const organization = {
         _id: 'org-id',
@@ -774,12 +794,14 @@ describe('TrainingOrganizationController', () => {
       // Assert
       expect(getTrainingOrganizationByIdMock).toHaveBeenCalledWith('org-id');
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Trainer already exists in this organization' });
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Trainer already exists in this organization',
+      });
     });
 
     it('should return 400 if trainer is already invited', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'invitedtrainer@example.com';
       const organization = {
         _id: 'org-id',
@@ -799,12 +821,14 @@ describe('TrainingOrganizationController', () => {
       expect(getTrainingOrganizationByIdMock).toHaveBeenCalledWith('org-id');
       expect(findTrainerInvitationsByOrgId).toHaveBeenCalledWith('org-id');
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Trainer already invited in this organization' });
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Trainer already invited in this organization',
+      });
     });
 
     it('should handle errors', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.body.email = 'newtrainer@example.com';
       getTrainingOrganizationByIdMock.mockRejectedValue(new Error('Database error'));
 
@@ -822,13 +846,15 @@ describe('TrainingOrganizationController', () => {
   describe('removeTrainer', () => {
     it('should remove a trainer successfully', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = 'trainer@example.com';
       const organization = {
         _id: 'org-id',
         name: 'Test Organization',
         administrators: [],
-        trainers: [{ _id: 'trainer-id', email: 'trainer@example.com', role: [SystemRoles.TRAINER] }],
+        trainers: [
+          { _id: 'trainer-id', email: 'trainer@example.com', role: [SystemRoles.TRAINER] },
+        ],
       };
       const updatedOrg = {
         _id: 'org-id',
@@ -855,7 +881,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if organization ID is missing', async () => {
       // Setup
-      req.params.id = '';
+      req.params.organizationId = '';
       req.params.email = 'trainer@example.com';
 
       // Execute
@@ -869,7 +895,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 400 if email is missing', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = '';
 
       // Execute
@@ -883,7 +909,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 404 if organization is not found', async () => {
       // Setup
-      req.params.id = 'non-existent-id';
+      req.params.organizationId = 'non-existent-id';
       req.params.email = 'trainer@example.com';
       getTrainingOrganizationByIdMock.mockResolvedValue(null);
 
@@ -898,7 +924,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should remove trainer role from invitation if user does not exist but has invitation', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = 'invited@example.com';
       const organization = {
         _id: 'org-id',
@@ -925,7 +951,7 @@ describe('TrainingOrganizationController', () => {
 
     it('should return 404 if user not found and no pending invitation exists', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = 'nonexistent@example.com';
       const organization = {
         _id: 'org-id',
@@ -943,12 +969,14 @@ describe('TrainingOrganizationController', () => {
       expect(getTrainingOrganizationByIdMock).toHaveBeenCalledWith('org-id');
       expect(findTrainerInvitationsByOrgId).toHaveBeenCalledWith('org-id');
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ error: 'Trainer not found and no pending invitation exists' });
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Trainer not found and no pending invitation exists',
+      });
     });
 
     it('should handle errors', async () => {
       // Setup
-      req.params.id = 'org-id';
+      req.params.organizationId = 'org-id';
       req.params.email = 'trainer@example.com';
       getTrainingOrganizationByIdMock.mockRejectedValue(new Error('Database error'));
 
