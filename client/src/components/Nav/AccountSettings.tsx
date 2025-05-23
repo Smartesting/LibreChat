@@ -113,10 +113,16 @@ function AccountSettings() {
           <GearIcon className="icon-md" aria-hidden="true" />
           {localize('com_nav_settings')}
         </Select.SelectItem>
-        {user?.role.includes(SystemRoles.ADMIN) && (
+        {user?.role.some((userRole) =>
+          [SystemRoles.ADMIN, SystemRoles.ORGADMIN].includes(userRole),
+        ) && (
           <Select.SelectItem
             value=""
-            onClick={() => (window.location.href = '/admin')}
+            onClick={() =>
+              (window.location.href = user?.role.includes(SystemRoles.ADMIN)
+                ? '/admin'
+                : '/training-organizations')
+            }
             className="select-item text-sm"
           >
             <ShieldEllipsis aria-hidden="true" className="icon-md" />
