@@ -34,7 +34,7 @@ async function checkOrgAccess(req, res, next) {
     // Check if the user is an administrator of the organization
     const isOrgAdmin = organization.administrators.some(
       (admin) =>
-        admin.userId && admin.userId.toString() === req.user.id && admin.status === 'active',
+        admin._id && admin._id.toString() === req.user.id,
     );
 
     if (!isOrgAdmin) {
