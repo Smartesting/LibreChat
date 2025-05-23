@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.post('/accept', acceptInvitationController);
 router.get('/admins', requireJwtAuth, checkAdmin, getAdminInvitationsController);
-router.get('/organizations/:orgId/admins', requireJwtAuth, checkOrgAccess, getOrgAdminInvitationsController);
-router.get('/organizations/:orgId/trainers', requireJwtAuth, checkOrgAccess, getOrgTrainerInvitationsController);
+router.get('/organizations/:organizationId/admins', requireJwtAuth, checkOrgAccess, getOrgAdminInvitationsController);
+router.get('/organizations/:organizationId/trainers', requireJwtAuth, checkOrgAccess, getOrgTrainerInvitationsController);
 
 module.exports = router;

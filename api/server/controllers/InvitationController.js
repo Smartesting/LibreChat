@@ -126,18 +126,18 @@ const getAdminInvitationsController = async (req, res) => {
  * @param {Object} res - Express response object
  */
 const getOrgAdminInvitationsController = async (req, res) => {
-  const { orgId } = req.params;
+  const { organizationId } = req.params;
 
-  if (!orgId) {
+  if (!organizationId) {
     return res.status(400).json({ message: 'Missing required orgId' });
   }
 
   try {
-    const orgAdminInvitations = await findOrgAdminInvitationsByOrgId(orgId);
+    const orgAdminInvitations = await findOrgAdminInvitationsByOrgId(organizationId);
     res.status(200).json(orgAdminInvitations);
   } catch (error) {
     logger.error(
-      '[/invitations/organizations/:orgId/admins] Error getting organization admin invitations',
+      '[/invitations/organizations/:organizationId/admins] Error getting organization admin invitations',
       error,
     );
     res.status(500).json({ message: 'Error retrieving organization admin invitations' });
@@ -150,18 +150,18 @@ const getOrgAdminInvitationsController = async (req, res) => {
  * @param {Object} res - Express response object
  */
 const getOrgTrainerInvitationsController = async (req, res) => {
-  const { orgId } = req.params;
+  const { organizationId } = req.params;
 
-  if (!orgId) {
+  if (!organizationId) {
     return res.status(400).json({ message: 'Missing required orgId' });
   }
 
   try {
-    const orgTrainerInvitations = await findTrainerInvitationsByOrgId(orgId);
+    const orgTrainerInvitations = await findTrainerInvitationsByOrgId(organizationId);
     res.status(200).json(orgTrainerInvitations);
   } catch (error) {
     logger.error(
-      '[/invitations/organizations/:orgId/trainers] Error getting organization trainer invitations',
+      '[/invitations/organizations/:organizationId/trainers] Error getting organization trainer invitations',
       error,
     );
     res.status(500).json({ message: 'Error retrieving organization trainer invitations' });
