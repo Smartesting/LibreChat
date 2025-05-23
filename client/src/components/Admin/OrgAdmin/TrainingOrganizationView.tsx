@@ -14,7 +14,8 @@ import TrainingsList from '~/components/Admin/OrgAdmin/TrainingsList';
 const TrainingOrganizationView: FC<{
   trainingOrganization: TrainingOrganization;
   showUtilityButtons?: boolean;
-}> = ({ trainingOrganization, showUtilityButtons }) => {
+  showBackButton?: boolean;
+}> = ({ trainingOrganization, showUtilityButtons, showBackButton }) => {
   const { data: trainings = [], isLoading: isLoadingTrainings } = useTrainingsByOrganizationQuery(
     trainingOrganization._id,
   );
@@ -37,7 +38,7 @@ const TrainingOrganizationView: FC<{
   return (
     <div className="p-6">
       {showUtilityButtons && <UtilityButtons />}
-      <TrainingOrganizationHeader organizationName={trainingOrganization.name} />
+      <TrainingOrganizationHeader organizationName={trainingOrganization.name} showBackButton={showBackButton} />
       <div className="flex flex-col gap-6 md:flex-row">
         <div className="md:w-1/3">
           <OrgAdminList

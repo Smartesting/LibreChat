@@ -6,6 +6,7 @@ import { NotificationSeverity } from '~/common';
 import { useToastContext } from '~/Providers';
 import TrainingOrganizationView from '~/components/Admin/OrgAdmin/TrainingOrganizationView';
 import axios from 'axios';
+import { SystemRoles } from 'librechat-data-provider';
 
 const TrainingOrganizationRoute: FC = () => {
   const { orgId } = useParams<{ orgId: string }>();
@@ -14,7 +15,7 @@ const TrainingOrganizationRoute: FC = () => {
     isLoading,
     error,
   } = useTrainingOrganizationByIdQuery(orgId || '');
-  const { isAuthenticated } = useAuthContext();
+  const { isAuthenticated, user } = useAuthContext();
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
 
@@ -34,7 +35,11 @@ const TrainingOrganizationRoute: FC = () => {
   }
 
   return (
-    <TrainingOrganizationView trainingOrganization={trainingOrganization!} showUtilityButtons />
+    <TrainingOrganizationView
+      trainingOrganization={trainingOrganization!}
+      showUtilityButtons
+      showBackButton={user?.role.includes(SystemRoles.ADMIN)}
+    />
   );
 };
 export default TrainingOrganizationRoute;
