@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import * as Select from '@ariakit/react/select';
-import { FileText, LogOut } from 'lucide-react';
+import { FileText, LogOut, ShieldEllipsis } from 'lucide-react';
 import { DropdownMenuSeparator, GearIcon, LinkIcon } from '~/components';
 import { useGetStartupConfig, useGetUserBalance } from '~/data-provider';
 import FilesView from '~/components/Chat/Input/Files/FilesView';
@@ -119,7 +119,7 @@ function AccountSettings() {
             onClick={() => (window.location.href = '/admin')}
             className="select-item text-sm"
           >
-            <UserIcon aria-hidden="true" />
+            <ShieldEllipsis aria-hidden="true" className="icon-md" />
             {smaLocalize('com_nav_admin')}
           </Select.SelectItem>
         )}
