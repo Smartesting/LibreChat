@@ -81,10 +81,7 @@ const AuthContextProvider = ({
         return;
       }
       setError(undefined);
-      const redirectPath = user?.role.includes(SystemRoles.ORGADMIN)
-        ? '/training-organizations'
-        : '/c/new';
-      setUserContext({ token, isAuthenticated: true, user, redirect: redirectPath });
+      setUserContext({ token, isAuthenticated: true, user, redirect: '/c/new' });
     },
     onError: (error: TResError | unknown) => {
       const resError = error as TResError;
