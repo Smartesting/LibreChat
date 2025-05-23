@@ -103,6 +103,22 @@ function getOrgMutationOptions(
         updatedOrg,
       );
 
+      // Update the organization in the main list cache
+      const listRes = queryClient.getQueryData<t.TrainingOrganization[]>([
+        QueryKeys.trainingOrganizations,
+      ]);
+
+      if (listRes) {
+        const updatedList = listRes.map((org) =>
+          org._id === variables.id ? updatedOrg : org
+        );
+
+        queryClient.setQueryData<t.TrainingOrganization[]>(
+          [QueryKeys.trainingOrganizations],
+          updatedList
+        );
+      }
+
       if (invalidateQueries?.adminInvitations) {
         // Invalidate the admin invitations query to refresh the list of administrators
         queryClient.invalidateQueries([
