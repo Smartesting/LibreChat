@@ -5,11 +5,11 @@ async function checkTrainingAccess(req, res, next) {
   const { role, _id, email } = req.user;
 
   try {
-    if ([SystemRoles.ADMIN, SystemRoles.ORGADMIN].includes(role)) {
+    if (role.some((userRole) => [SystemRoles.ADMIN, SystemRoles.ORGADMIN].includes(userRole))) {
       return next();
     }
 
-    if ([SystemRoles.TRAINER, SystemRoles.TRAINEE].includes(role)) {
+    if (role.some((userRole) => [SystemRoles.TRAINER, SystemRoles.TRAINEE].includes(userRole))) {
       const ongoingTrainings = await getOngoingTrainings();
 
       if (!ongoingTrainings || ongoingTrainings.length === 0) {
@@ -18,11 +18,11 @@ async function checkTrainingAccess(req, res, next) {
 
       let matchingTrainings = [];
       const hasAccess = ongoingTrainings.some((training) => {
-        if (role === SystemRoles.TRAINER) {
+        if (role.includes(SystemRoles.TRAINER)) {
           return training.trainers?.some((trainerId) => trainerId.equals(_id));
         }
 
-        if (role === SystemRoles.TRAINEE) {
+        if (role.includes(SystemRoles.TRAINEE)) {
           const match = training.trainees?.some((trainee) => trainee.username === email);
           if (match) {
             matchingTrainings.push(training);
