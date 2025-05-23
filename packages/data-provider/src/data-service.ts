@@ -904,3 +904,11 @@ export function revokeAdminAccess(data: { email: string }): Promise<{ message: s
 export function getAdminUsers(): Promise<t.TUser[]> {
   return request.get(endpoints.admins());
 }
+
+/**
+ * Check if the current user is an active trainer in any ongoing training
+ * @returns Promise with isActiveTrainer boolean
+ */
+export function isActiveTrainer(): Promise<{ isActiveTrainer: boolean }> {
+  return request.get(endpoints.isActiveTrainer());
+}

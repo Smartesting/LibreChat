@@ -1,20 +1,29 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { SystemRoles } from 'librechat-data-provider';
 import { useAuthContext } from '~/hooks/AuthContext';
+import { useIsActiveTrainerQuery } from '~/data-provider/TrainingOrganizations/queries';
 
 /**
- * A route wrapper that redirects ORGADMIN users to /training-organizations
- * if they try to access any other route
+ * A route wrapper that redirects ORGADMIN users with no ongoing trainings
+ * to /training-organizations if they try to access any other route
  */
 const OrgAdminProtectedRoute = () => {
   const { user } = useAuthContext();
+  const { data: trainerData, isLoading } = useIsActiveTrainerQuery();
 
-  // If the user is an ORGADMIN, redirect them to /training-organizations
-  if (user?.role.includes(SystemRoles.ORGADMIN)) {
+  if (isLoading) {
+    return null;
+  }
+
+  const isSuperAdmin = user?.role.includes(SystemRoles.ADMIN);
+  const isOrgAdmin = user?.role.includes(SystemRoles.ORGADMIN);
+  const isTrainerWithOngoingTraining =
+    user?.role.includes(SystemRoles.TRAINER) && trainerData?.isActiveTrainer;
+
+  if (isOrgAdmin && !isSuperAdmin && !isTrainerWithOngoingTraining) {
     return <Navigate to="/training-organizations" replace />;
   }
 
-  // Otherwise, render the child routes
   return <Outlet />;
 };
 

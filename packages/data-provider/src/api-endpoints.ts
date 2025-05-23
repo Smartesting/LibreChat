@@ -229,6 +229,8 @@ export const trainings = (
   return endpoint;
 };
 
+export const isActiveTrainer = () => '/api/organization/is-active-trainer';
+
 export const files = () => '/api/files';
 
 export const images = () => `${files()}/images`;

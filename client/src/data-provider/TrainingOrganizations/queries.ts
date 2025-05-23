@@ -101,3 +101,22 @@ export const useOrgTrainerInvitationsQuery = <
     },
   );
 };
+
+/**
+ * Hook for checking if the current user is an active trainer in any ongoing training
+ */
+export const useIsActiveTrainerQuery = <
+  TData = { isActiveTrainer: boolean },
+>(): QueryObserverResult<TData> => {
+  return useQuery<{ isActiveTrainer: boolean }, unknown, TData>(
+    [QueryKeys.trainingOrganizations, 'isActiveTrainer'],
+    () => dataService.isActiveTrainer(),
+    {
+      staleTime: 1000 * 60, // 1 minute
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+    },
+  );
+};
