@@ -19,22 +19,23 @@ const UserList: FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
-  const getRoleName = useCallback((role) => {
-    switch (role) {
-      case SystemRoles.ADMIN:
-        return smaLocalize('com_userlist_role_admin');
-      case SystemRoles.ORGADMIN:
-        return smaLocalize('com_userlist_role_org_admin');
-      case SystemRoles.TRAINER:
-        return smaLocalize('com_userlist_role_trainer');
-      case SystemRoles.USER:
-        return smaLocalize('com_userlist_role_user');
-      case SystemRoles.TRAINEE:
-        return smaLocalize('com_userlist_role_trainee');
-      default:
-        return role;
-    }
-  }, [smaLocalize]);
+  const getRoleName = useCallback(
+    (role) => {
+      switch (role.toString()) {
+        case SystemRoles.ADMIN:
+          return smaLocalize('com_userlist_role_admin');
+        case SystemRoles.ORGADMIN:
+          return smaLocalize('com_userlist_role_org_admin');
+        case SystemRoles.TRAINER:
+          return smaLocalize('com_userlist_role_trainer');
+        case SystemRoles.TRAINEE:
+          return smaLocalize('com_userlist_role_trainee');
+        default:
+          return role;
+      }
+    },
+    [smaLocalize],
+  );
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
