@@ -93,7 +93,6 @@ const UserList: FC = () => {
     });
   }, [users, sortColumn, searchTerm, getRoleName, sortDirection]);
 
-
   return (
     <div className="rounded-lg border border-border-light bg-surface-primary p-4">
       <div className="mb-4 flex items-center justify-between">
