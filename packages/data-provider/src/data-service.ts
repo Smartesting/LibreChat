@@ -881,8 +881,16 @@ export function verifyTwoFactorTemp(
   return request.post(endpoints.verifyTwoFactorTemp(), payload);
 }
 
-export function getPendingAdminInvitations(): Promise<q.AdminInvitation[]> {
-  return request.get(endpoints.pendingAdminInvitations());
+export function getAdminInvitations(): Promise<q.Invitation[]> {
+  return request.get(endpoints.adminInvitations());
+}
+
+export function getOrgAdminInvitations(orgId: string): Promise<q.Invitation[]> {
+  return request.get(endpoints.orgAdminInvitations(orgId));
+}
+
+export function getOrgTrainerInvitations(orgId: string): Promise<q.Invitation[]> {
+  return request.get(endpoints.orgTrainerInvitations(orgId));
 }
 
 export function grantAdminAccess(data: { email: string }): Promise<{ message: string }> {
@@ -906,3 +914,10 @@ export const getActiveOrganizationMembers = (
 ): Promise<{ activeAdministrators: t.TUser[]; activeTrainers: t.TUser[] }> => {
   return request.get(endpoints.trainingOrganizations(id, 'active-members'));
 };
+/**
+ * Check if the current user is an active trainer in any ongoing training
+ * @returns Promise with isActiveTrainer boolean
+ */
+export function isActiveTrainer(): Promise<{ isActiveTrainer: boolean }> {
+  return request.get(endpoints.isActiveTrainer());
+}

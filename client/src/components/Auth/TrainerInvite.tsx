@@ -38,7 +38,7 @@ function TrainerInvite() {
   // Create a mutation for accepting the invitation
   const acceptTrainerInvitation = useMutation({
     mutationFn: (data: TTrainerInviteForm) => {
-      return axios.post('/api/training-organizations/accept-trainer-invitation', data);
+      return axios.post('/api/invitations/accept', data);
     },
     onMutate: () => {
       setIsSubmitting(true);

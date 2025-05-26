@@ -12,7 +12,7 @@ const router = express.Router();
 // If the user has ADMIN role
 // then action edition is possible even if not owner of the assistant
 const isAdmin = (req) => {
-  return req.user.role === SystemRoles.ADMIN;
+  return req.user.role.includes(SystemRoles.ADMIN);
 };
 
 /**

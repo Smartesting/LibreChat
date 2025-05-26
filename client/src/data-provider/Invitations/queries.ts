@@ -1,18 +1,18 @@
 import { QueryObserverResult, useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { dataService, PendingAdminInvitation, QueryKeys } from 'librechat-data-provider';
+import { dataService, QueryKeys, Invitation } from 'librechat-data-provider';
 import { useRecoilValue } from 'recoil';
 import store from '~/store';
 
 /**
- * Hook to fetch pending admin invitations
+ * Hook to fetch admin invitations
  */
-export const useGetPendingAdminInvitationsQuery = (
-  config?: UseQueryOptions<PendingAdminInvitation[]>,
-): QueryObserverResult<PendingAdminInvitation[]> => {
+export const useGetAdminInvitationsQuery = (
+  config?: UseQueryOptions<Invitation[]>,
+): QueryObserverResult<Invitation[]> => {
   const queriesEnabled = useRecoilValue<boolean>(store.queriesEnabled);
-  return useQuery<PendingAdminInvitation[]>(
-    [QueryKeys.pendingAdminInvitations],
-    () => dataService.getPendingAdminInvitations(),
+  return useQuery<Invitation[]>(
+    [QueryKeys.adminInvitations],
+    () => dataService.getAdminInvitations(),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,

@@ -14,7 +14,7 @@ const { logger } = require('~/config');
  * @param {SystemRoles} [roleName] - The role to load the default interface for, defaults to `'USER'`.
  * @returns {Promise<TCustomConfig['interface']>} The default interface object.
  */
-async function loadDefaultInterface(config, configDefaults, roleName = SystemRoles.USER) {
+async function loadDefaultInterface(config, configDefaults) {
   const { interface: interfaceConfig } = config ?? {};
   const { interface: defaults } = configDefaults;
   const hasModelSpecs = config?.modelSpecs?.list?.length > 0;
@@ -41,14 +41,6 @@ async function loadDefaultInterface(config, configDefaults, roleName = SystemRol
     customWelcome: interfaceConfig?.customWelcome ?? defaults.customWelcome,
   });
 
-  await updateAccessPermissions(roleName, {
-    [PermissionTypes.PROMPTS]: { [Permissions.USE]: loadedInterface.prompts },
-    [PermissionTypes.BOOKMARKS]: { [Permissions.USE]: loadedInterface.bookmarks },
-    [PermissionTypes.MULTI_CONVO]: { [Permissions.USE]: loadedInterface.multiConvo },
-    [PermissionTypes.AGENTS]: { [Permissions.USE]: loadedInterface.agents },
-    [PermissionTypes.TEMPORARY_CHAT]: { [Permissions.USE]: loadedInterface.temporaryChat },
-    [PermissionTypes.RUN_CODE]: { [Permissions.USE]: loadedInterface.runCode },
-  });
   await updateAccessPermissions(SystemRoles.ADMIN, {
     [PermissionTypes.PROMPTS]: { [Permissions.USE]: loadedInterface.prompts },
     [PermissionTypes.BOOKMARKS]: { [Permissions.USE]: loadedInterface.bookmarks },

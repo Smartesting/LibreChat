@@ -3,6 +3,9 @@ jest.mock('~/models/Role', () => ({
   updateAccessPermissions: jest.fn(),
   getRoleByName: jest.fn(),
   updateRoleByName: jest.fn(),
+  migrateUserRoles: jest.fn(),
+  removeAdminInvitationsMigration: jest.fn(),
+  migrateTrainingOrgUsers: jest.fn(),
 }));
 
 jest.mock('~/config', () => ({

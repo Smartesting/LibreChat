@@ -19,8 +19,8 @@ export const useGrantAdminAccessMutation = (options?: {
       onMutate: (variables) => options?.onMutate?.(variables),
       onError: (error, variables, context) => options?.onError?.(error, variables, context),
       onSuccess: (data, variables, context) => {
-        // Invalidate the pendingAdminInvitations query to refresh the list
-        queryClient.invalidateQueries([QueryKeys.pendingAdminInvitations]);
+        // Invalidate the adminInvitations query to refresh the list
+        queryClient.invalidateQueries([QueryKeys.adminInvitations]);
         // Invalidate the adminUsers query to refresh the list
         queryClient.invalidateQueries([QueryKeys.adminUsers]);
         options?.onSuccess?.(data, variables, context);
@@ -47,8 +47,8 @@ export const useRevokeAdminAccessMutation = (options?: {
       onMutate: (variables) => options?.onMutate?.(variables),
       onError: (error, variables, context) => options?.onError?.(error, variables, context),
       onSuccess: (data, variables, context) => {
-        // Invalidate the pendingAdminInvitations query to refresh the list
-        queryClient.invalidateQueries([QueryKeys.pendingAdminInvitations]);
+        // Invalidate the adminInvitations query to refresh the list
+        queryClient.invalidateQueries([QueryKeys.adminInvitations]);
         // Invalidate the adminUsers query to refresh the list
         queryClient.invalidateQueries([QueryKeys.adminUsers]);
         options?.onSuccess?.(data, variables, context);

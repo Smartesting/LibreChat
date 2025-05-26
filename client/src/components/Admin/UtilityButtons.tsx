@@ -9,6 +9,7 @@ import { useLocalize } from '~/hooks';
 import { useRecoilState } from 'recoil';
 import Cookies from 'js-cookie';
 import store from '~/store';
+import { useIsActiveTrainerQuery } from '~/data-provider';
 
 const UtilityButtons: FC = () => {
   const { theme, setTheme } = useContext(ThemeContext);
@@ -16,6 +17,9 @@ const UtilityButtons: FC = () => {
   const navigate = useNavigate();
   const localize = useLocalize();
   const [langcode, setLangcode] = useRecoilState(store.lang);
+  const { data: trainerData } = useIsActiveTrainerQuery();
+  const isSuperAdmin = user?.role.includes(SystemRoles.ADMIN);
+  const isTrainerWithOngoingTraining = user?.role.includes(SystemRoles.TRAINER) && trainerData?.isActiveTrainer;
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -52,7 +56,7 @@ const UtilityButtons: FC = () => {
 
   return (
     <div className="absolute right-4 top-4 flex space-x-2">
-      {user?.role === SystemRoles.ADMIN && (
+      {(isSuperAdmin || isTrainerWithOngoingTraining) && (
         <TooltipAnchor
           aria-label={localize('com_ui_new_chat')}
           description={localize('com_ui_new_chat')}

@@ -10,6 +10,7 @@ const {
 const getLogStores = require('~/cache/getLogStores');
 const { roleSchema } = require('@librechat/data-schemas');
 const { logger } = require('~/config');
+const User = require('~/models/User');
 
 const Role = mongoose.model('Role', roleSchema);
 
@@ -184,7 +185,6 @@ const initializeRoles = async function () {
   for (const roleName of [
     SystemRoles.ADMIN,
     SystemRoles.ORGADMIN,
-    SystemRoles.USER,
     SystemRoles.TRAINER,
     SystemRoles.TRAINEE,
   ]) {
@@ -205,6 +205,124 @@ const initializeRoles = async function () {
       }
     }
     await role.save();
+  }
+};
+
+const migrateUserRoles = async function () {
+  let updateCount = 0;
+
+  const users = await User.find({}).lean();
+  for (const user of users) {
+    const role = user.role;
+    if (typeof role === 'string') {
+      await User.updateOne({ _id: user._id }, [
+        {
+          $set: {
+            role: [role],
+          },
+        },
+      ]);
+      updateCount++;
+    }
+  }
+
+  logger.info(`[migrateUserRoles] Updated ${updateCount} users with role as string`);
+};
+
+const removeAdminInvitationsMigration = async function () {
+  try {
+    await mongoose.connection.db.dropCollection('admininvitations');
+    logger.info(
+      '[removeAdminInvitationsMigration] Successfully dropped admininvitations collection',
+    );
+  } catch (error) {
+    logger.error('[removeAdminInvitationsMigration] Error dropping collection: ' + error);
+  }
+};
+
+const migrateTrainingOrgUsers = async function () {
+  try {
+    const result = {
+      totalOrganizations: 0,
+      migratedOrganizations: 0,
+      skippedOrganizations: 0,
+      errors: [],
+    };
+
+    // Accéder directement à la collection via la connexion MongoDB
+    const organizationsCollection = mongoose.connection.db.collection('trainingorganizations');
+
+    // Trouver toutes les organisations (utilisation de l'API native MongoDB)
+    const organizations = await organizationsCollection.find({}).toArray();
+    result.totalOrganizations = organizations.length;
+
+    for (const org of organizations) {
+      try {
+        let needsUpdate = false;
+
+        // Vérifier si administrators est dans l'ancien format (tableau d'objets)
+        if (
+          org.administrators &&
+          org.administrators.length > 0 &&
+          org.administrators.some(
+            (admin) => typeof admin === 'object' && !(admin instanceof mongoose.Types.ObjectId),
+          )
+        ) {
+          // Filtrer les entrées où userId est undefined et extraire uniquement les userIds
+          org.administrators = org.administrators
+            .filter((admin) => admin.userId)
+            .map((admin) => admin.userId);
+          needsUpdate = true;
+        }
+
+        // Vérifier si trainers est dans l'ancien format (tableau d'objets)
+        if (
+          org.trainers &&
+          org.trainers.length > 0 &&
+          org.trainers.some(
+            (trainer) =>
+              typeof trainer === 'object' && !(trainer instanceof mongoose.Types.ObjectId),
+          )
+        ) {
+          // Filtrer les entrées où userId est undefined et extraire uniquement les userIds
+          org.trainers = org.trainers
+            .filter((trainer) => trainer.userId)
+            .map((trainer) => trainer.userId);
+          needsUpdate = true;
+        }
+
+        if (needsUpdate) {
+          // Mettre à jour directement dans la base de données avec l'API native de MongoDB
+          await organizationsCollection.updateOne(
+            { _id: org._id },
+            {
+              $set: {
+                administrators: org.administrators,
+                trainers: org.trainers,
+              },
+            },
+          );
+          result.migratedOrganizations++;
+        } else {
+          result.skippedOrganizations++;
+        }
+      } catch (error) {
+        logger.error(`[migrateTrainingOrgUsers] Error migrating organization ${org._id}:`, error);
+        result.errors.push({
+          orgId: org._id,
+          error: error.message,
+        });
+      }
+    }
+
+    logger.info(
+      `[migrateTrainingOrgUsers] Migration completed successfully: ${result.migratedOrganizations} organizations migrated, ${result.skippedOrganizations} organizations skipped, ${result.errors.length} errors`,
+    );
+
+    return result;
+  } catch (error) {
+    logger.error('[migrateTrainingOrgUsers] Error during migration:', error);
+    throw error;
   }
 };
 
@@ -294,4 +412,7 @@ module.exports = {
   updateRoleByName,
   updateAccessPermissions,
   migrateRoleSchema,
+  migrateUserRoles,
+  removeAdminInvitationsMigration,
+  migrateTrainingOrgUsers,
 };

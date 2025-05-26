@@ -9,6 +9,7 @@ const {
   getById,
   update,
   remove,
+  isActiveTrainer,
 } = require('~/server/controllers/TrainingController');
 const { checkOrgAccess } = require('~/server/middleware/roles');
 
@@ -27,7 +28,7 @@ router.get(
 router.get('/:organizationId/trainings/get/:trainingId', requireJwtAuth, checkOrgAccess, getById);
 
 // Update a training
-router.put('/:organizationId/trainings/update/:trainingId', requireJwtAuth, checkOrgAccess, update);
+router.put('/:organization/trainings/update/:trainingId', requireJwtAuth, checkOrgAccess, update);
 
 // Delete a training
 router.delete(
@@ -36,5 +37,8 @@ router.delete(
   checkOrgAccess,
   remove,
 );
+
+// Check if the current user is a trainer in any ongoing training
+router.get('/is-active-trainer', requireJwtAuth, isActiveTrainer);
 
 module.exports = router;

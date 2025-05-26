@@ -4,6 +4,7 @@ const {
   getTrainingById,
   updateTraining,
   deleteTraining,
+  getOngoingTrainings,
 } = require('../../models/Training');
 const { generateTraineeUsers, deleteUserById } = require('../../models/userMethods');
 const { findUser } = require('~/models/userMethods');
@@ -201,10 +202,42 @@ const remove = async (req, res) => {
   }
 };
 
+/**
+ * Check if the current user is a trainer in any ongoing training
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with isTrainer boolean
+ */
+const isActiveTrainer = async (req, res) => {
+  try {
+    const { _id } = req.user;
+
+    if (!_id) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const ongoingTrainings = await getOngoingTrainings();
+
+    if (!ongoingTrainings || ongoingTrainings.length === 0) {
+      return res.status(200).json({ isActiveTrainer: false });
+    }
+
+    const isUserTrainer = ongoingTrainings.some((training) =>
+      training.trainers?.some((trainerId) => trainerId.equals(_id)),
+    );
+
+    return res.status(200).json({ isActiveTrainer: isUserTrainer });
+  } catch (error) {
+    console.error('Error checking trainer status:', error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   create,
   getByOrganization,
   getById,
   update,
   remove,
+  isActiveTrainer,
 };

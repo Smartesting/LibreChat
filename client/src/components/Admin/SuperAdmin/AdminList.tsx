@@ -4,7 +4,7 @@ import GenericList from '~/components/ui/GenericList';
 import { useToastContext } from '~/Providers';
 import {
   useGetAdminUsersQuery,
-  useGetPendingAdminInvitationsQuery,
+  useGetAdminInvitationsQuery,
   useGrantAdminAccessMutation,
   useRevokeAdminAccessMutation,
 } from '~/data-provider';
@@ -14,7 +14,7 @@ import { isValidEmail } from '~/utils';
 
 const AdminList: FC = () => {
   const { data: adminUsers = [] } = useGetAdminUsersQuery();
-  const { data: pendingInvitations = [] } = useGetPendingAdminInvitationsQuery();
+  const { data: adminInvitations = [] } = useGetAdminInvitationsQuery();
   const smaLocalize = useSmaLocalize();
   const { showToast } = useToastContext();
 
@@ -22,13 +22,13 @@ const AdminList: FC = () => {
   const [adminToRevoke, setAdminToRevoke] = useState<{ email: string; name: string } | null>(null);
 
   const existingAndInvitedAdmins = useMemo(() => {
-    const invitedUsers = pendingInvitations.map((invitation) => ({
+    const invitedUsers = adminInvitations.map((invitation) => ({
       email: invitation.email,
       name: smaLocalize('com_ui_invited'),
     }));
 
     return [...adminUsers, ...invitedUsers];
-  }, [adminUsers, pendingInvitations, smaLocalize]);
+  }, [adminUsers, adminInvitations, smaLocalize]);
 
   const grantAdminAccessMutation = useGrantAdminAccessMutation({
     onSuccess: () => {

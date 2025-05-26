@@ -218,7 +218,7 @@ const generateTraineeUsers = async (count) => {
       email,
       password: bcrypt.hashSync(password, salt),
       provider: 'local',
-      role: SystemRoles.TRAINEE,
+      role: [SystemRoles.TRAINEE],
       emailVerified: true,
     };
     const userId = await createUser(userData);

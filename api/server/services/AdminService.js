@@ -3,10 +3,7 @@ const { updateUser } = require('~/models');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
 const { SystemRoles } = require('librechat-data-provider');
-const {
-  createAdminInvitation,
-  findPendingAdminInvitationByEmail,
-} = require('~/models/AdminInvitation');
+const { findAdminInvitationByEmail, createAdminInvitation } = require('~/models/Invitation');
 
 /**
  * Grant admin access
@@ -29,7 +26,7 @@ const processGrantAdminAccess = async (email) => {
 
     if (existingUser) {
       // If user already exists and already has ADMIN role, return an error
-      if (existingUser.role === SystemRoles.ADMIN) {
+      if (existingUser.role.includes(SystemRoles.ADMIN)) {
         return {
           success: false,
           status: 400,
@@ -37,7 +34,9 @@ const processGrantAdminAccess = async (email) => {
         };
       }
 
-      const updatedUser = await updateUser(existingUser._id, { role: SystemRoles.ADMIN });
+      const updatedUser = await updateUser(existingUser._id, {
+        role: [...existingUser.role, SystemRoles.ADMIN],
+      });
 
       if (!updatedUser) {
         return {
@@ -61,7 +60,7 @@ const processGrantAdminAccess = async (email) => {
     }
 
     // Check if there's already a pending invitation for this email
-    const existingInvitation = await findPendingAdminInvitationByEmail(email);
+    const existingInvitation = await findAdminInvitationByEmail(email);
 
     if (existingInvitation) {
       return {
@@ -72,9 +71,7 @@ const processGrantAdminAccess = async (email) => {
     }
 
     // Create a new invitation
-    const { invitation, token } = await createAdminInvitation({
-      email,
-    });
+    const { invitation, token } = await createAdminInvitation(email);
 
     // Send invitation email
     await sendAdminInvitationEmail(email, token);
@@ -160,9 +157,7 @@ const sendNotificationEmail = async (email) => {
       template: 'adminNotification.handlebars',
     });
 
-    logger.info(
-      `[sendNotificationEmail] Notification sent. [Email: ${email}]`,
-    );
+    logger.info(`[sendNotificationEmail] Notification sent. [Email: ${email}]`);
   } catch (error) {
     logger.error(`[sendNotificationEmail] Error sending notification: ${error.message}`);
   }
@@ -170,6 +165,4 @@ const sendNotificationEmail = async (email) => {
 
 module.exports = {
   processGrantAdminAccess,
-  sendAdminInvitationEmail,
-  sendAdminRoleGrantedEmail: sendNotificationEmail,
 };

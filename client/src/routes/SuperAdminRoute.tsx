@@ -11,7 +11,7 @@ const SuperAdminRoute: FC = () => {
     return null;
   }
 
-  if (user?.role !== SystemRoles.ADMIN) {
+  if (!user?.role.includes(SystemRoles.ADMIN)) {
     return <Navigate to="/" replace />;
   }
 

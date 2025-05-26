@@ -63,25 +63,60 @@ export const useTrainingsByOrganizationQuery = <
 };
 
 /**
- * Hook for fetching active organization members (administrators and trainers)
+ * Hook for fetching organization admin invitations by organization ID
  */
-export const useActiveOrganizationMembersQuery = <
-  TData = { activeAdministrators: t.TUser[]; activeTrainers: t.TUser[] },
->(organizationId: string): QueryObserverResult<TData> => {
-  return useQuery<
-    { activeAdministrators: t.TUser[]; activeTrainers: t.TUser[] },
-    unknown,
-    TData
-  >(
-    [QueryKeys.trainingOrganizations, organizationId, 'active-members'],
-    () => dataService.getActiveOrganizationMembers(organizationId),
+export const useOrgAdminInvitationsQuery = <
+  TData = t.Invitation[],
+>(orgId: string): QueryObserverResult<TData> => {
+  return useQuery<t.Invitation[], unknown, TData>(
+    [QueryKeys.trainingOrganizations, orgId, 'adminInvitations'],
+    () => dataService.getOrgAdminInvitations(orgId),
     {
       staleTime: 1000 * 5,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       refetchOnMount: false,
       retry: false,
-      enabled: !!organizationId,
+      enabled: !!orgId,
+    },
+  );
+};
+
+/**
+ * Hook for fetching organization trainer invitations by organization ID
+ */
+export const useOrgTrainerInvitationsQuery = <
+  TData = t.Invitation[],
+>(orgId: string): QueryObserverResult<TData> => {
+  return useQuery<t.Invitation[], unknown, TData>(
+    [QueryKeys.trainingOrganizations, orgId, 'trainerInvitations'],
+    () => dataService.getOrgTrainerInvitations(orgId),
+    {
+      staleTime: 1000 * 5,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
+      enabled: !!orgId,
+    },
+  );
+};
+
+/**
+ * Hook for checking if the current user is an active trainer in any ongoing training
+ */
+export const useIsActiveTrainerQuery = <
+  TData = { isActiveTrainer: boolean },
+>(): QueryObserverResult<TData> => {
+  return useQuery<{ isActiveTrainer: boolean }, unknown, TData>(
+    [QueryKeys.trainingOrganizations, 'isActiveTrainer'],
+    () => dataService.isActiveTrainer(),
+    {
+      staleTime: 1000 * 60, // 1 minute
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: false,
     },
   );
 };

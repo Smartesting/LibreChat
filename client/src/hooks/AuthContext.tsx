@@ -38,14 +38,11 @@ const AuthContextProvider = ({
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const logoutRedirectRef = useRef<string | undefined>(undefined);
 
-  const { data: userRole = null } = useGetRole(SystemRoles.USER, {
-    enabled: !!(isAuthenticated && (user?.role ?? '')),
-  });
   const { data: adminRole = null } = useGetRole(SystemRoles.ADMIN, {
-    enabled: !!(isAuthenticated && user?.role === SystemRoles.ADMIN),
+    enabled: !!(isAuthenticated && user?.role.includes(SystemRoles.ADMIN)),
   });
   const { data: orgAdminRole = null } = useGetRole(SystemRoles.ORGADMIN, {
-    enabled: !!(isAuthenticated && user?.role === SystemRoles.ORGADMIN),
+    enabled: !!(isAuthenticated && user?.role.includes(SystemRoles.ORGADMIN)),
   });
 
   const navigate = useNavigate();
@@ -84,9 +81,7 @@ const AuthContextProvider = ({
         return;
       }
       setError(undefined);
-      const redirectPath =
-        user?.role === SystemRoles.ORGADMIN ? '/training-organizations' : '/c/new';
-      setUserContext({ token, isAuthenticated: true, user, redirect: redirectPath });
+      setUserContext({ token, isAuthenticated: true, user, redirect: '/c/new' });
     },
     onError: (error: TResError | unknown) => {
       const resError = error as TResError;
@@ -213,14 +208,13 @@ const AuthContextProvider = ({
       logout,
       setError,
       roles: {
-        [SystemRoles.USER]: userRole,
         [SystemRoles.ADMIN]: adminRole,
         [SystemRoles.ORGADMIN]: orgAdminRole,
       },
       isAuthenticated,
     }),
 
-    [user, error, isAuthenticated, token, userRole, adminRole, orgAdminRole],
+    [user, error, isAuthenticated, token, adminRole, orgAdminRole],
   );
 
   return <AuthContext.Provider value={memoedValue}>{children}</AuthContext.Provider>;

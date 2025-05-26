@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import * as Select from '@ariakit/react/select';
-import { FileText, LogOut } from 'lucide-react';
+import { FileText, LogOut, ShieldEllipsis } from 'lucide-react';
 import { DropdownMenuSeparator, GearIcon, LinkIcon } from '~/components';
 import { useGetStartupConfig, useGetUserBalance } from '~/data-provider';
 import FilesView from '~/components/Chat/Input/Files/FilesView';
@@ -113,13 +113,19 @@ function AccountSettings() {
           <GearIcon className="icon-md" aria-hidden="true" />
           {localize('com_nav_settings')}
         </Select.SelectItem>
-        {user?.role === SystemRoles.ADMIN && (
+        {user?.role.some((userRole) =>
+          [SystemRoles.ADMIN, SystemRoles.ORGADMIN].includes(userRole),
+        ) && (
           <Select.SelectItem
             value=""
-            onClick={() => (window.location.href = '/admin')}
+            onClick={() =>
+              (window.location.href = user?.role.includes(SystemRoles.ADMIN)
+                ? '/admin'
+                : '/training-organizations')
+            }
             className="select-item text-sm"
           >
-            <UserIcon aria-hidden="true" />
+            <ShieldEllipsis aria-hidden="true" className="icon-md" />
             {smaLocalize('com_nav_admin')}
           </Select.SelectItem>
         )}

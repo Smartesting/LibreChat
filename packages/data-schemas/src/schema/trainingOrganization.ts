@@ -2,56 +2,9 @@ import { Document, Schema, Types } from 'mongoose';
 
 export interface ITrainingOrganization extends Omit<Document, 'model'> {
   name: string;
-  administrators: Array<{
-    userId?: Types.ObjectId;
-    email: string;
-    invitationToken?: string;
-    invitationExpires?: Date;
-    invitedAt?: Date;
-    activatedAt?: Date;
-  }>;
-  trainers: Array<{
-    userId?: Types.ObjectId;
-    email: string;
-    invitationToken?: string;
-    invitationExpires?: Date;
-    invitedAt?: Date;
-    activatedAt?: Date;
-  }>;
+  administrators: Types.ObjectId[];
+  trainers: Types.ObjectId[];
 }
-
-const OrgAdminSchema = new Schema(
-  {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
-      required: false,
-    },
-    email: {
-      type: String,
-      required: true,
-      lowercase: true,
-      match: [/\S+@\S+\.\S+/, 'is invalid'],
-    },
-    invitationToken: {
-      type: String,
-      required: false,
-    },
-    invitationExpires: {
-      type: Date,
-      required: false,
-    },
-    invitedAt: {
-      type: Date,
-      default: Date.now,
-    },
-    activatedAt: {
-      type: Date,
-      required: false,
-    },
-  },
-  { _id: false },
-);
 
 const trainingOrganizationSchema = new Schema<ITrainingOrganization>(
   {
@@ -66,11 +19,11 @@ const trainingOrganizationSchema = new Schema<ITrainingOrganization>(
       },
     },
     administrators: {
-      type: [OrgAdminSchema],
+      type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
       default: [],
     },
     trainers: {
-      type: [OrgAdminSchema],
+      type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
       default: [],
     },
   },
@@ -78,5 +31,14 @@ const trainingOrganizationSchema = new Schema<ITrainingOrganization>(
     timestamps: true,
   },
 );
+
+trainingOrganizationSchema.pre(/^find/, function (next) {
+  // @ts-ignore
+  this.populate('administrators', '_id email name role').populate(
+    'trainers',
+    '_id email name role',
+  );
+  next();
+});
 
 export default trainingOrganizationSchema;

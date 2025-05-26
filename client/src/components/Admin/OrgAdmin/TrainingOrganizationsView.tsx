@@ -8,7 +8,6 @@ const TrainingOrganizationsView: FC<{
   trainingOrganizations: ReadonlyArray<TrainingOrganization>;
 }> = ({ trainingOrganizations }) => {
   const smaLocalize = useSmaLocalize();
-
   return trainingOrganizations.length === 0 ? (
     <div className="p-6 relative">
       <UtilityButtons />

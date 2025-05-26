@@ -15,10 +15,10 @@ const jwtLogin = async () =>
         const user = await getUserById(payload?.id, '-password -__v -totpSecret');
         if (user) {
           user.id = user._id.toString();
-          if (!user.role) {
+          /*if (!user.role) {
             user.role = SystemRoles.USER;
             await updateUser(user.id, { role: user.role });
-          }
+          }*/
           done(null, user);
         } else {
           logger.warn('[jwtLogin] JwtStrategy => no user found: ' + payload?.id);
