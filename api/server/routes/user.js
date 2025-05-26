@@ -15,6 +15,7 @@ const {
   acceptTermsController,
   generateTraineesController,
   removeExpiredTraineeAccountsController,
+  getAllUsersController,
 } = require('~/server/controllers/UserController');
 
 const router = express.Router();
@@ -28,5 +29,6 @@ router.post('/verify', verifyEmailController);
 router.post('/verify/resend', verifyEmailLimiter, resendVerificationController);
 router.post('/generate-trainees', requireJwtAuth, checkAdmin, generateTraineesController);
 router.get('/remove-expired-trainees', requireJwtAuth, checkAdmin, removeExpiredTraineeAccountsController);
+router.get('/all', requireJwtAuth, checkAdmin, getAllUsersController);
 
 module.exports = router;

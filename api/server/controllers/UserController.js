@@ -220,6 +220,21 @@ const removeExpiredTraineeAccountsController = async (req, res) => {
   }
 };
 
+/**
+ * Get all users with their roles
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getAllUsersController = async (req, res) => {
+  try {
+    const users = await User.find({}, { password: 0, totpSecret: 0 });
+    res.status(200).json(users);
+  } catch (error) {
+    logger.error('Error fetching all users:', error);
+    res.status(500).json({ message: 'Error fetching all users' });
+  }
+};
+
 module.exports = {
   getUserController,
   getTermsStatusController,
@@ -230,4 +245,5 @@ module.exports = {
   resendVerificationController,
   generateTraineesController,
   removeExpiredTraineeAccountsController,
+  getAllUsersController,
 };

@@ -22,7 +22,7 @@ const inputClass = cn(
 );
 
 const defaultTrainingFormValues: TrainingCreateParams = {
-  name: '',
+  name: 'Accelerate your Testing Processes with GenAI',
   description: '',
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Default to browser timezone
   startDateTime: new Date(),

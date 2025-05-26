@@ -27,6 +27,8 @@ export const user = () => '/api/user';
 
 export const adminUsers = () => '/api/user/admins';
 
+export const allUsers = () => '/api/user/all';
+
 export const balance = () => '/api/balance';
 
 export const userPlugins = () => '/api/user/plugins';

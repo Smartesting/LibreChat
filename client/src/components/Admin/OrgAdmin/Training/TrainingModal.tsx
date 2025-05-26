@@ -203,6 +203,7 @@ const TrainingModal: FC<TrainingModalProps> = ({
                         <ClipboardCopy size={16} className="text-text-primary" />
                       </button>,
                     ]}
+                    defaultText={smaLocalize('com_orgadmin_participants_description')}
                   />
                 </div>
               </div>

@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import OrgList from '~/components/Admin/SuperAdmin/OrgList';
 import UtilityButtons from '~/components/Admin/UtilityButtons';
 import AdminList from '~/components/Admin/SuperAdmin/AdminList';
+import UserList from '~/components/Admin/SuperAdmin/UserList';
 import { useSmaLocalize } from '~/hooks';
 
 const SuperAdminView: FC = () => {
@@ -22,6 +23,9 @@ const SuperAdminView: FC = () => {
         <div className="md:w-2/3">
           <OrgList />
         </div>
+      </div>
+      <div className="mt-6">
+        <UserList />
       </div>
     </div>
   );

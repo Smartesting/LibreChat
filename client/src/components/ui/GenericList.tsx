@@ -15,6 +15,7 @@ type ListProps<T> = {
   placeholder?: string;
   className?: string;
   extraButtons?: (item: T) => React.ReactNode[];
+  defaultText?: string;
 };
 
 const GenericList = <T,>({
@@ -30,6 +31,7 @@ const GenericList = <T,>({
   placeholder,
   className,
   extraButtons,
+  defaultText,
 }: ListProps<T>) => {
   const localize = useLocalize();
   const [showNewItemInput, setShowNewItemInput] = useState(false);
@@ -58,6 +60,7 @@ const GenericList = <T,>({
       </div>
 
       <ul className="space-y-2">
+        {items.length === 0 && <p>{defaultText}</p>}
         {items.map((item) => (
           <li
             key={getKey(item)}

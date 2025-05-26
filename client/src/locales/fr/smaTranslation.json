@@ -99,11 +99,22 @@
   "com_orgadmin_trainee_hasLoggedIn": "L'utilisateur s'est connecté au moins une fois",
   "com_orgadmin_trainee_notLoggedIn": "L'utilisateur ne s'est pas connecté au moins une fois",
   "com_orgadmin_datetime_tooltip": "Cette date et cette heure correspondent au fuseau horaire sélectionné ci-dessus.",
+  "com_orgadmin_participants_description": "Après validation du formulaire, les comptes formation correspondants seront générés et apparaîtront ici.",
   "com_ui_confirm_admin_revocation": "Confirmer la révocation des droits d'administrateur",
   "com_ui_admin_revocation_message": "Êtes-vous sûr de vouloir révoquer les droits d'administrateur de {{email}} ({{name}}) ?",
   "com_ui_confirm_trainer_revocation": "Confirmer la révocation des droits de formateur",
   "com_ui_trainer_revocation_message": "Êtes-vous sûr de vouloir révoquer les droits de formateur de {{email}} ({{name}}) ?",
   "com_superadmin_past_trainings": "Formations passées :",
   "com_superadmin_upcoming_trainings": "Formations à venir :",
-  "com_superadmin_in_progress_trainings": "Formations en cours :"
+  "com_superadmin_in_progress_trainings": "Formations en cours :",
+  "com_userlist_role_admin": "Administrateur",
+  "com_userlist_role_org_admin": "Administrateur d'organisme",
+  "com_userlist_role_trainer": "Formateur",
+  "com_userlist_role_user": "Utilisateur",
+  "com_userlist_role_trainee": "Compte formation",
+  "com_userlist_users": "Utilisateurs",
+  "com_userlist_email": "Email",
+  "com_userlist_username": "Nom d'utilisateur",
+  "com_userlist_role": "Rôle",
+  "com_userlist_search": "Recherche"
 }

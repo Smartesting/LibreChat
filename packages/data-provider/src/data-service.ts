@@ -897,6 +897,10 @@ export function getAdminUsers(): Promise<t.TUser[]> {
   return request.get(endpoints.admins());
 }
 
+export function getAllUsers(): Promise<t.TUser[]> {
+  return request.get(endpoints.allUsers());
+}
+
 export const getActiveOrganizationMembers = (
   id: q.TrainingOrganization['_id'],
 ): Promise<{ activeAdministrators: t.TUser[]; activeTrainers: t.TUser[] }> => {
