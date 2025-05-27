@@ -16,7 +16,8 @@ const checkAccess = async (user, permissionType, permissions, bodyProps = {}, ch
     return false;
   }
 
-  const role = await getRoleByName(user.role);
+  //fixme update if multiple roles
+  const role = await getRoleByName(user.role.toString());
   if (role && role.permissions && role.permissions[permissionType]) {
     const hasAnyPermission = permissions.some((permission) => {
       if (role.permissions[permissionType][permission]) {
