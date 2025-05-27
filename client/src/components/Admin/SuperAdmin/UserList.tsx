@@ -94,7 +94,7 @@ const UserList: FC = () => {
   }, [users, sortColumn, searchTerm, getRoleName, sortDirection]);
 
   return (
-    <div className="rounded-lg border border-border-light bg-surface-primary p-4">
+    <div className="rounded-lg border border-border-light bg-token-surface-tertiary p-4">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-text-primary">{smaLocalize('com_userlist_users')}</h2>
         <div className="relative">
@@ -103,7 +103,7 @@ const UserList: FC = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={smaLocalize('com_userlist_search')}
-            className="rounded-md border border-border-light bg-surface-primary px-3 py-2 pl-10 text-text-primary placeholder:text-text-secondary focus:outline-none"
+            className="rounded-md border border-border-light bg-surface-tertiary px-3 py-2 pl-10 text-text-primary placeholder:text-text-secondary focus:outline-none"
           />
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-secondary" />
         </div>
@@ -114,7 +114,7 @@ const UserList: FC = () => {
             <TableRow>
               <TableHead
                 onClick={() => handleSort('email')}
-                className="cursor-pointer hover:bg-surface-tertiary"
+                className="cursor-pointer hover:bg-surface-tertiary text-text-primary"
               >
                 <div className="flex items-center">
                   {smaLocalize('com_userlist_email')}
@@ -125,7 +125,7 @@ const UserList: FC = () => {
               </TableHead>
               <TableHead
                 onClick={() => handleSort('username')}
-                className="cursor-pointer hover:bg-surface-tertiary"
+                className="cursor-pointer hover:bg-surface-tertiary text-text-primary"
               >
                 <div className="flex items-center">
                   {smaLocalize('com_userlist_username')}
@@ -136,7 +136,7 @@ const UserList: FC = () => {
               </TableHead>
               <TableHead
                 onClick={() => handleSort('role')}
-                className="cursor-pointer hover:bg-surface-tertiary"
+                className="cursor-pointer hover:bg-surface-tertiary text-text-primary"
               >
                 <div className="flex items-center">
                   {smaLocalize('com_userlist_role')}
@@ -150,9 +150,9 @@ const UserList: FC = () => {
           <TableBody>
             {filteredAndSortedUsers.map((user) => (
               <TableRow key={user.id}>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>{getRoleName(user.role)}</TableCell>
+                <TableCell className="hover:bg-surface text-text-primary">{user.email}</TableCell>
+                <TableCell className="hover:bg-surface text-text-primary">{user.username}</TableCell>
+                <TableCell className="hover:bg-surface text-text-primary">{getRoleName(user.role)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
