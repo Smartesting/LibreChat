@@ -60,7 +60,7 @@ const GenericList = <T,>({
       </div>
 
       <ul className="space-y-2">
-        {items.length === 0 && <p>{defaultText}</p>}
+        {items.length === 0 && <p className="text-text-primary">{defaultText}</p>}
         {items.map((item) => (
           <li
             key={getKey(item)}
