@@ -101,6 +101,24 @@ describe('AdminService', () => {
       expect(updateUser).not.toHaveBeenCalled();
     });
 
+    it('should return error if user has trainee role', async () => {
+      findUser.mockResolvedValue({
+        _id: 'user-id',
+        email: 'trainee@example.com',
+        role: [SystemRoles.TRAINEE],
+      });
+
+      const result = await processGrantAdminAccess('trainee@example.com');
+
+      expect(result).toEqual({
+        success: false,
+        status: 400,
+        message: 'Trainee user cannot have admin role',
+      });
+      expect(findUser).toHaveBeenCalledWith({ email: 'trainee@example.com' }, 'email _id role');
+      expect(updateUser).not.toHaveBeenCalled();
+    });
+
     it('should update user role if user exists without admin role', async () => {
       findUser.mockResolvedValue({
         _id: 'user-id',

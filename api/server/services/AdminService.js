@@ -34,6 +34,15 @@ const processGrantAdminAccess = async (email) => {
         };
       }
 
+      // If user already exists and has TRAINEE role, return an error
+      if (existingUser.role.includes(SystemRoles.TRAINEE)) {
+        return {
+          success: false,
+          status: 400,
+          message: 'Trainee user cannot have admin role',
+        };
+      }
+
       const updatedUser = await updateUser(existingUser._id, {
         role: [...existingUser.role, SystemRoles.ADMIN],
       });
