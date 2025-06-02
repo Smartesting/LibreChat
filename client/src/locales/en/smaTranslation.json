@@ -121,5 +121,7 @@
   "com_userlist_username": "Username",
   "com_userlist_role": "Role",
   "com_userlist_search": "Search",
-  "com_actions": "Actions"
+  "com_actions": "Actions",
+  "com_ui_error_multiples_connections": "We have detected that your account is being used several times simultaneously. You are about to be disconnected.",
+  "com_ui_error_session_verification": "An error occurred during the session verification. You are about to be disconnected."
 }

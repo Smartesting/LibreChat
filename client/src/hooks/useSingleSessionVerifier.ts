@@ -3,14 +3,16 @@ import { dataService, QueryKeys, Time } from 'librechat-data-provider';
 import { useToastContext } from '~/Providers';
 import { NotificationSeverity } from '~/common';
 import logger from '~/utils/logger';
+import { useSmaLocalize } from '~/hooks/index';
+import { AxiosError } from 'axios';
 
 export default function useSingleSessionVerifier(logout: () => void) {
   const { showToast } = useToastContext();
+  const smaLocalize = useSmaLocalize();
 
-  function showToastAndLogout() {
+  function showToastAndLogout(message) {
     showToast({
-      message:
-        'We have detected that your account is being used several times simultaneously. You are about to be disconnected.',
+      message,
       severity: NotificationSeverity.WARNING,
       duration: 10000,
     });
@@ -23,11 +25,13 @@ export default function useSingleSessionVerifier(logout: () => void) {
       try {
         const session = await dataService.getUserSession();
         if (!session) {
-          showToastAndLogout();
+          showToastAndLogout(smaLocalize('com_ui_error_multiples_connections'));
         }
       } catch (e) {
         logger.error(e);
-        showToastAndLogout();
+        showToastAndLogout(
+          `${smaLocalize('com_ui_error_session_verification')}${e instanceof AxiosError && e.response?.data?.message ? ` ${e.response.data.message}` : ''}`,
+        );
       }
     },
     {
