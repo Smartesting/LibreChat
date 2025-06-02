@@ -4,7 +4,10 @@ import { Training, TrainingWithStatus } from 'librechat-data-provider';
 import { useSmaLocalize } from '~/hooks';
 import TrainingItem from '~/components/Admin/OrgAdmin/Training/TrainingItem';
 import TrainingModal from '~/components/Admin/OrgAdmin/Training/TrainingModal';
-import DeleteTrainingModal from '~/components/Admin/OrgAdmin/DeleteTrainingModal';
+import ConfirmModal from '~/components/ui/ConfirmModal';
+import { useDeleteTrainingMutation } from '~/data-provider';
+import { AxiosError } from 'axios';
+import { useToastContext } from '~/Providers';
 
 type TrainingsListProps = {
   orgId: string;
@@ -20,6 +23,7 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
   const [trainingToEdit, setTrainingToEdit] = useState<Training | null>(null);
   const [trainingToDelete, setTrainingToDelete] = useState<string | null>(null);
   const [isEditDisabled, setIsEditDisabled] = useState<boolean>(false);
+  const { showToast } = useToastContext();
 
   const isUpcoming = type === 'upcoming';
   let titleKey:
@@ -38,12 +42,42 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
       break;
   }
 
+  const deleteTrainingMutation = useDeleteTrainingMutation({
+    onSuccess: () => {
+      showToast({
+        message: smaLocalize('com_orgadmin_training_deleted'),
+        status: 'success',
+      });
+      setTrainingToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Error deleting training:', error);
+      showToast({
+        message:
+          error instanceof AxiosError && error.response?.data?.message
+            ? error.response.data.error
+            : smaLocalize('com_orgadmin_error_delete_training'),
+        status: 'error',
+      });
+      setTrainingToDelete(null);
+    },
+  });
+
+  const confirmDeleteTraining = () => {
+    if (orgId && trainingToDelete) {
+      deleteTrainingMutation.mutate({ organizationId: orgId, trainingId: trainingToDelete });
+    }
+  };
+
   return (
     <>
-      <DeleteTrainingModal
-        organizationId={orgId}
-        trainingId={trainingToDelete}
+      <ConfirmModal
+        isOpen={trainingToDelete !== null}
+        onConfirm={confirmDeleteTraining}
         onClose={() => setTrainingToDelete(null)}
+        confirmTitle={smaLocalize('com_orgadmin_confirm_delete_training')}
+        confirmDescription={smaLocalize('com_orgadmin_delete_training_warning')}
+        confirmButton={smaLocalize('com_ui_delete')}
       />
       <TrainingModal
         isOpen={isTrainingModalOpen}

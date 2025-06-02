@@ -12,7 +12,10 @@ import {
   TableRow,
 } from '~/components/ui/Table';
 import { TooltipAnchor } from '~/components';
-import DeleteUserConfirmationModal from '~/components/Admin/SuperAdmin/DeleteUserConfirmationModal';
+import ConfirmModal from '~/components/ui/ConfirmModal';
+import { useDeleteUserByIdMutation } from '~/data-provider';
+import { AxiosError } from 'axios';
+import { useToastContext } from '~/Providers';
 
 const UserList: FC = () => {
   const { data: users = [] } = useGetAllUsersQuery();
@@ -21,6 +24,7 @@ const UserList: FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [userIdToDelete, setUserIdToDelete] = useState<string | null>(null);
+  const { showToast } = useToastContext();
 
   const getRoleName = useCallback(
     (role) => {
@@ -39,6 +43,34 @@ const UserList: FC = () => {
     },
     [smaLocalize],
   );
+
+  const handleDeleteUser = () => {
+    if (!userIdToDelete) {
+      return;
+    }
+    return deleteUser(userIdToDelete);
+  };
+
+  const { mutate: deleteUser } = useDeleteUserByIdMutation({
+    onSuccess: () => {
+      showToast({
+        message: smaLocalize('com_orgadmin_user_deleted'),
+        status: 'success',
+      });
+      setUserIdToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Error deleting user:', error);
+      showToast({
+        message:
+          error instanceof AxiosError && error.response?.data?.message
+            ? error.response.data.error
+            : smaLocalize('com_orgadmin_error_delete'),
+        status: 'error',
+      });
+      setUserIdToDelete(null);
+    },
+  });
 
   const handleSort = (column: string) => {
     if (sortColumn === column) {
@@ -179,9 +211,13 @@ const UserList: FC = () => {
           </TableBody>
         </Table>
       </div>
-      <DeleteUserConfirmationModal
-        userId={userIdToDelete}
+      <ConfirmModal
+        isOpen={userIdToDelete !== null}
+        onConfirm={handleDeleteUser}
         onClose={() => setUserIdToDelete(null)}
+        confirmTitle={smaLocalize('com_orgadmin_confirm_delete_user')}
+        confirmDescription={smaLocalize('com_orgadmin_delete_user_warning')}
+        confirmButton={smaLocalize('com_ui_delete')}
       />
     </div>
   );

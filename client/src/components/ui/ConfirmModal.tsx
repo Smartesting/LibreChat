@@ -1,35 +1,27 @@
 import React, { FC } from 'react';
+import { useSmaLocalize } from '~/hooks';
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from '@headlessui/react';
 import { cn } from '~/utils';
-import { useLocalize, useSmaLocalize } from '~/hooks';
 import { Button } from '~/components';
 
-interface RevokeConfirmationModalProps {
+interface ConfirmModalProps {
   isOpen: boolean;
+  onConfirm: () => void;
   onClose: () => void;
-  user: { email: string; name: string } | null;
-  onConfirm: (userEmail: string) => void;
-  revocationType: 'admin' | 'trainer';
+  confirmTitle: string;
+  confirmDescription: string;
+  confirmButton: string;
 }
 
-const RevokeConfirmationModal: FC<RevokeConfirmationModalProps> = ({
+const ConfirmModal: FC<ConfirmModalProps> = ({
   isOpen,
-  onClose,
-  user,
   onConfirm,
-  revocationType,
+  onClose,
+  confirmTitle,
+  confirmDescription,
+  confirmButton,
 }) => {
   const smaLocalize = useSmaLocalize();
-  const localize = useLocalize();
-
-  const handleConfirm = () => {
-    if (!user) {
-      return;
-    }
-
-    onConfirm(user.email);
-    onClose();
-  };
 
   return (
     <Transition appear show={isOpen}>
@@ -63,13 +55,7 @@ const RevokeConfirmationModal: FC<RevokeConfirmationModalProps> = ({
                 className="mb-1 flex items-center justify-between p-6 pb-5 text-left"
                 as="div"
               >
-                <h2 className="text-lg font-medium leading-6 text-text-primary">
-                  {smaLocalize(
-                    revocationType === 'admin'
-                      ? 'com_ui_confirm_admin_revocation'
-                      : 'com_ui_confirm_trainer_revocation',
-                  )}
-                </h2>
+                <h2 className="text-lg font-medium leading-6 text-text-primary">{confirmTitle}</h2>
                 <button
                   type="button"
                   className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-border-xheavy focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-surface-primary dark:focus:ring-offset-surface-primary"
@@ -90,22 +76,12 @@ const RevokeConfirmationModal: FC<RevokeConfirmationModalProps> = ({
                     <line x1="18" x2="6" y1="6" y2="18"></line>
                     <line x1="6" x2="18" y1="6" y2="18"></line>
                   </svg>
-                  <span className="sr-only">{localize('com_ui_close')}</span>
+                  <span className="sr-only">{smaLocalize('com_ui_cancel')}</span>
                 </button>
               </DialogTitle>
 
               <div className="px-6">
-                <p className="mb-4 text-text-primary">
-                  {smaLocalize(
-                    revocationType === 'admin'
-                      ? 'com_ui_admin_revocation_message'
-                      : 'com_ui_trainer_revocation_message',
-                    {
-                      email: user?.email || '',
-                      name: user?.name || '',
-                    },
-                  )}
-                </p>
+                <p className="mb-4 text-text-primary">{confirmDescription}</p>
 
                 <div className="flex gap-4">
                   <Button
@@ -115,14 +91,14 @@ const RevokeConfirmationModal: FC<RevokeConfirmationModalProps> = ({
                     type="button"
                     onClick={onClose}
                   >
-                    {localize('com_ui_cancel')}
+                    {smaLocalize('com_ui_cancel')}
                   </Button>
                   <button
                     className="btn btn-danger focus:shadow-outline flex h-9 w-full items-center justify-center bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700 focus:border-red-500"
                     type="button"
-                    onClick={handleConfirm}
+                    onClick={onConfirm}
                   >
-                    {smaLocalize('com_ui_revoke')}
+                    {confirmButton}
                   </button>
                 </div>
               </div>
@@ -134,4 +110,4 @@ const RevokeConfirmationModal: FC<RevokeConfirmationModalProps> = ({
   );
 };
 
-export default RevokeConfirmationModal;
+export default ConfirmModal;

@@ -9,7 +9,7 @@ import GenericList from '~/components/ui/GenericList';
 import { isValidEmail } from '~/utils';
 import { AxiosError } from 'axios';
 import { Invitation, User } from 'librechat-data-provider';
-import RevokeConfirmationModal from '~/components/Admin/RevokeConfirmationModal';
+import ConfirmModal from '~/components/ui/ConfirmModal';
 
 interface TrainersListProps {
   orgId: string;
@@ -59,6 +59,8 @@ const TrainerList: FC<TrainersListProps> = ({ orgId, trainers, trainerInvitation
         message: smaLocalize('com_orgadmin_revoke_trainer_success'),
         status: 'success',
       });
+      setTrainerToRevoke(null);
+      setIsRevokeModalOpen(false);
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response?.data?.error) {
@@ -66,6 +68,8 @@ const TrainerList: FC<TrainersListProps> = ({ orgId, trainers, trainerInvitation
           message: `${smaLocalize('com_orgadmin_revoke_trainer_error')} ${error.response.data.error}`,
           status: 'error',
         });
+        setTrainerToRevoke(null);
+        setIsRevokeModalOpen(false);
       }
     },
   });
@@ -87,18 +91,25 @@ const TrainerList: FC<TrainersListProps> = ({ orgId, trainers, trainerInvitation
     setIsRevokeModalOpen(true);
   };
 
-  const confirmRevokeTrainer = (trainerEmail: string) => {
-    removeTrainerMutation.mutate({ id: orgId, email: trainerEmail });
+  const confirmRevokeTrainer = () => {
+    if (!trainerToRevoke) {
+      return;
+    }
+    removeTrainerMutation.mutate({ id: orgId, email: trainerToRevoke.email });
   };
 
   return (
     <>
-      <RevokeConfirmationModal
+      <ConfirmModal
         isOpen={isRevokeModalOpen}
-        onClose={() => setIsRevokeModalOpen(false)}
-        user={trainerToRevoke}
         onConfirm={confirmRevokeTrainer}
-        revocationType="trainer"
+        onClose={() => setIsRevokeModalOpen(false)}
+        confirmTitle={smaLocalize('com_ui_confirm_trainer_revocation')}
+        confirmDescription={smaLocalize('com_ui_trainer_revocation_message', {
+          email: trainerToRevoke?.email || '',
+          name: trainerToRevoke?.name || '',
+        })}
+        confirmButton={smaLocalize('com_ui_revoke')}
       />
       <GenericList
         title={smaLocalize('com_orgadmin_trainers')}

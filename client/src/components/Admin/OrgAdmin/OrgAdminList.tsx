@@ -9,7 +9,7 @@ import GenericList from '~/components/ui/GenericList';
 import { isValidEmail } from '~/utils';
 import { AxiosError } from 'axios';
 import { Invitation, User } from 'librechat-data-provider';
-import RevokeConfirmationModal from '~/components/Admin/RevokeConfirmationModal';
+import ConfirmModal from '~/components/ui/ConfirmModal';
 
 const OrgAdminList: FC<{
   orgId: string;
@@ -55,6 +55,8 @@ const OrgAdminList: FC<{
         message: smaLocalize('com_ui_revoke_admin_success'),
         status: 'success',
       });
+      setAdminToRevoke(null);
+      setIsRevokeModalOpen(false);
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response?.data?.error) {
@@ -62,6 +64,8 @@ const OrgAdminList: FC<{
           message: `${smaLocalize('com_ui_revoke_admin_error')} ${error.response.data.error}`,
           status: 'error',
         });
+        setAdminToRevoke(null);
+        setIsRevokeModalOpen(false);
       }
     },
   });
@@ -83,18 +87,25 @@ const OrgAdminList: FC<{
     setIsRevokeModalOpen(true);
   };
 
-  const confirmRevokeAdmin = (adminEmail: string) => {
-    removeAdminMutation.mutate({ id: orgId, email: adminEmail });
+  const confirmRevokeAdmin = () => {
+    if (!adminToRevoke) {
+      return;
+    }
+    removeAdminMutation.mutate({ id: orgId, email: adminToRevoke.email });
   };
 
   return (
     <>
-      <RevokeConfirmationModal
+      <ConfirmModal
         isOpen={isRevokeModalOpen}
-        onClose={() => setIsRevokeModalOpen(false)}
-        user={adminToRevoke}
         onConfirm={confirmRevokeAdmin}
-        revocationType="admin"
+        onClose={() => setIsRevokeModalOpen(false)}
+        confirmTitle={smaLocalize('com_ui_confirm_admin_revocation')}
+        confirmDescription={smaLocalize('com_ui_admin_revocation_message', {
+          email: adminToRevoke?.email || '',
+          name: adminToRevoke?.name || '',
+        })}
+        confirmButton={smaLocalize('com_ui_revoke')}
       />
       <GenericList
         className="mb-6"

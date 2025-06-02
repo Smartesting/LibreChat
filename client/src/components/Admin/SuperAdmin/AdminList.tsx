@@ -3,14 +3,14 @@ import useSmaLocalize from '../../../hooks/useSmaLocalize';
 import GenericList from '~/components/ui/GenericList';
 import { useToastContext } from '~/Providers';
 import {
-  useGetAdminUsersQuery,
   useGetAdminInvitationsQuery,
+  useGetAdminUsersQuery,
   useGrantAdminAccessMutation,
   useRevokeAdminAccessMutation,
 } from '~/data-provider';
 import { AxiosError } from 'axios';
-import RevokeConfirmationModal from '../RevokeConfirmationModal';
 import { isValidEmail } from '~/utils';
+import ConfirmModal from '~/components/ui/ConfirmModal';
 
 const AdminList: FC = () => {
   const { data: adminUsers = [] } = useGetAdminUsersQuery();
@@ -53,6 +53,8 @@ const AdminList: FC = () => {
         message: smaLocalize('com_ui_revoke_admin_success'),
         status: 'success',
       });
+      setAdminToRevoke(null);
+      setIsRevokeModalOpen(false);
     },
     onError: (error) => {
       if (error instanceof AxiosError && error.response?.data?.message) {
@@ -60,6 +62,8 @@ const AdminList: FC = () => {
           message: `${smaLocalize('com_ui_revoke_admin_error')} ${error.response.data.message}`,
           status: 'error',
         });
+        setAdminToRevoke(null);
+        setIsRevokeModalOpen(false);
       }
     },
   });
@@ -81,18 +85,25 @@ const AdminList: FC = () => {
     setIsRevokeModalOpen(true);
   };
 
-  const confirmRevokeAdmin = (adminEmail: string) => {
-    revokeAdminAccessMutation.mutate({ email: adminEmail });
+  const confirmRevokeAdmin = () => {
+    if (!adminToRevoke) {
+      return;
+    }
+    revokeAdminAccessMutation.mutate({ email: adminToRevoke.email });
   };
 
   return (
     <>
-      <RevokeConfirmationModal
+      <ConfirmModal
         isOpen={isRevokeModalOpen}
-        onClose={() => setIsRevokeModalOpen(false)}
-        user={adminToRevoke}
         onConfirm={confirmRevokeAdmin}
-        revocationType="admin"
+        onClose={() => setIsRevokeModalOpen(false)}
+        confirmTitle={smaLocalize('com_ui_confirm_admin_revocation')}
+        confirmDescription={smaLocalize('com_ui_admin_revocation_message', {
+          email: adminToRevoke?.email || '',
+          name: adminToRevoke?.name || '',
+        })}
+        confirmButton={smaLocalize('com_ui_revoke')}
       />
       <GenericList
         title={smaLocalize('com_superadmin_administrators')}
