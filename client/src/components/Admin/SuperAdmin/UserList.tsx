@@ -2,7 +2,7 @@ import React, { FC, useCallback, useMemo, useState } from 'react';
 import useSmaLocalize from '../../../hooks/useSmaLocalize';
 import { useGetAllUsersQuery } from '~/data-provider/Users/queries';
 import { SystemRoles } from 'librechat-data-provider';
-import { Search } from 'lucide-react';
+import { Search, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -11,6 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/Table';
+import { TooltipAnchor } from '~/components';
+import DeleteUserConfirmationModal from '~/components/Admin/SuperAdmin/DeleteUserConfirmationModal';
 
 const UserList: FC = () => {
   const { data: users = [] } = useGetAllUsersQuery();
@@ -18,6 +20,7 @@ const UserList: FC = () => {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [userIdToDelete, setUserIdToDelete] = useState<string | null>(null);
 
   const getRoleName = useCallback(
     (role) => {
@@ -94,7 +97,7 @@ const UserList: FC = () => {
   }, [users, sortColumn, searchTerm, getRoleName, sortDirection]);
 
   return (
-    <div className="rounded-lg border border-border-light bg-token-surface-tertiary p-4">
+    <div className="bg-token-surface-tertiary rounded-lg border border-border-light p-4">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold text-text-primary">{smaLocalize('com_userlist_users')}</h2>
         <div className="relative">
@@ -114,7 +117,7 @@ const UserList: FC = () => {
             <TableRow>
               <TableHead
                 onClick={() => handleSort('email')}
-                className="cursor-pointer hover:bg-surface-tertiary text-text-primary"
+                className="cursor-pointer text-text-primary hover:bg-surface-tertiary"
               >
                 <div className="flex items-center">
                   {smaLocalize('com_userlist_email')}
@@ -125,7 +128,7 @@ const UserList: FC = () => {
               </TableHead>
               <TableHead
                 onClick={() => handleSort('username')}
-                className="cursor-pointer hover:bg-surface-tertiary text-text-primary"
+                className="cursor-pointer text-text-primary hover:bg-surface-tertiary"
               >
                 <div className="flex items-center">
                   {smaLocalize('com_userlist_username')}
@@ -136,7 +139,7 @@ const UserList: FC = () => {
               </TableHead>
               <TableHead
                 onClick={() => handleSort('role')}
-                className="cursor-pointer hover:bg-surface-tertiary text-text-primary"
+                className="cursor-pointer text-text-primary hover:bg-surface-tertiary"
               >
                 <div className="flex items-center">
                   {smaLocalize('com_userlist_role')}
@@ -145,19 +148,41 @@ const UserList: FC = () => {
                   )}
                 </div>
               </TableHead>
+              <TableHead className="cursor-pointer text-text-primary hover:bg-surface-tertiary">
+                <div className="flex items-center">{smaLocalize('com_actions')}</div>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredAndSortedUsers.map((user) => (
-              <TableRow key={user.id}>
+              <TableRow key={user._id}>
                 <TableCell className="hover:bg-surface text-text-primary">{user.email}</TableCell>
-                <TableCell className="hover:bg-surface text-text-primary">{user.username}</TableCell>
-                <TableCell className="hover:bg-surface text-text-primary">{getRoleName(user.role)}</TableCell>
+                <TableCell className="hover:bg-surface text-text-primary">
+                  {user.username}
+                </TableCell>
+                <TableCell className="hover:bg-surface text-text-primary">
+                  {getRoleName(user.role)}
+                </TableCell>
+                <TableCell className="hover:bg-surface text-text-primary">
+                  <TooltipAnchor
+                    aria-label={smaLocalize('com_ui_delete')}
+                    description={smaLocalize('com_ui_delete')}
+                    role="button"
+                    onClick={() => setUserIdToDelete(user._id)}
+                    className="inline-flex size-10 flex-shrink-0 items-center justify-center rounded-xl border border-border-light bg-transparent text-text-primary transition-all ease-in-out hover:bg-surface-tertiary disabled:pointer-events-none disabled:opacity-50"
+                  >
+                    <Trash2 size={16} className="h-4 w-4 text-text-primary" />
+                  </TooltipAnchor>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+      <DeleteUserConfirmationModal
+        userId={userIdToDelete}
+        onClose={() => setUserIdToDelete(null)}
+      />
     </div>
   );
 };

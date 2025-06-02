@@ -30,6 +30,10 @@ export function deleteUser(): Promise<s.TPreset> {
   return request.delete(endpoints.deleteUser());
 }
 
+export function deleteUserById(userId: string): Promise<s.TPreset> {
+  return request.delete(endpoints.deleteUserById(userId));
+}
+
 export function getMessagesByConvoId(conversationId: string): Promise<s.TMessage[]> {
   if (
     conversationId === config.Constants.NEW_CONVO ||

@@ -35,6 +35,8 @@ export const userPlugins = () => '/api/user/plugins';
 
 export const deleteUser = () => '/api/user/delete';
 
+export const deleteUserById = (userId: string) => `/api/user/${userId}/delete`;
+
 export const messages = (conversationId: string, messageId?: string) =>
   `/api/messages/${conversationId}${messageId != null && messageId ? `/${messageId}` : ''}`;
 

@@ -86,6 +86,10 @@
   "com_orgadmin_delete_training_warning": "Are you sure to delete this training? This action cannot be undone.",
   "com_orgadmin_training_deleted": "Training deleted successfully",
   "com_orgadmin_error_delete_training": "An error occurred while deleting the training. Please try again.",
+  "com_orgadmin_error_delete": "An error occurred while deleting. Please try again.",
+  "com_orgadmin_confirm_delete_user": "Confirm User Deletion",
+  "com_orgadmin_delete_user_warning": "Are you sure to delete this user? This action cannot be undone.",
+  "com_orgadmin_user_deleted": "User deleted successfully",
   "com_orgadmin_edit_training": "Edit training",
   "com_orgadmin_training_updated": "Training updated successfully",
   "com_orgadmin_error_update_training": "An error occurred while updating the training. Please try again.",
@@ -116,5 +120,6 @@
   "com_userlist_email": "Mail",
   "com_userlist_username": "Username",
   "com_userlist_role": "Role",
-  "com_userlist_search": "Search"
+  "com_userlist_search": "Search",
+  "com_actions": "Actions"
 }

@@ -1,8 +1,8 @@
 import { useResetRecoilState, useSetRecoilState } from 'recoil';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MutationKeys, QueryKeys, dataService, request } from 'librechat-data-provider';
 import type { UseMutationResult } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type * as t from 'librechat-data-provider';
+import { dataService, MutationKeys, QueryKeys, request } from 'librechat-data-provider';
 import useClearStates from '~/hooks/Config/useClearStates';
 import { clearAllConversationStorage } from '~/utils';
 import store from '~/store';
@@ -81,6 +81,20 @@ export const useDeleteUserMutation = (
       resetDefaultPreset();
       clearStates();
       clearAllConversationStorage();
+      queryClient.removeQueries();
+      options?.onSuccess?.(...args);
+    },
+  });
+};
+
+export const useDeleteUserByIdMutation = (
+  options?: t.MutationOptions<unknown, string>,
+): UseMutationResult<unknown, unknown, string, unknown> => {
+  const queryClient = useQueryClient();
+  return useMutation([MutationKeys.deleteUserById], {
+    mutationFn: (userId) => dataService.deleteUserById(userId),
+    ...(options || {}),
+    onSuccess: (...args) => {
       queryClient.removeQueries();
       options?.onSuccess?.(...args);
     },

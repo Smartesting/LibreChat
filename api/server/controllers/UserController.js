@@ -82,6 +82,18 @@ const deleteUserFiles = async (req) => {
   }
 };
 
+const deleteUserFilesByUserId = async (req, userId) => {
+  try {
+    const userFiles = await getFiles({ user: userId });
+    await processDeleteRequest({
+      req,
+      files: userFiles,
+    });
+  } catch (error) {
+    logger.error('[deleteUserFiles]', error);
+  }
+};
+
 const updateUserPluginsController = async (req, res) => {
   const { user } = req;
   const { pluginKey, action, auth, isEntityTool } = req.body;
@@ -132,27 +144,40 @@ const updateUserPluginsController = async (req, res) => {
 const deleteUserController = async (req, res) => {
   const { user } = req;
 
+  if (await deleteUserMethods(req, user.id)) {
+    return res.status(200).send({ message: 'User deleted' });
+  }
+  return res.status(500).json({ message: 'Something went wrong.' });
+};
+
+const deleteUserByIdController = async (req, res) => {
+  const { userId } = req.params;
+  if (await deleteUserMethods(req, userId)) {
+    return res.status(200).send({ message: 'User deleted' });
+  }
+  return res.status(500).json({ message: 'Something went wrong.' });
+};
+
+const deleteUserMethods = async (req, userId) => {
   try {
-    await deleteMessages({ user: user.id }); // delete user messages
-    await deleteAllUserSessions({ userId: user.id }); // delete user sessions
-    await Transaction.deleteMany({ user: user.id }); // delete user transactions
-    await deleteUserKey({ userId: user.id, all: true }); // delete user keys
-    await Balance.deleteMany({ user: user._id }); // delete user balances
-    await deletePresets(user.id); // delete user presets
-    /* TODO: Delete Assistant Threads */
-    await deleteConvos(user.id); // delete user convos
-    await deleteUserPluginAuth(user.id, null, true); // delete user plugin auth
-    await deleteUserById(user.id); // delete user
-    await deleteAllSharedLinks(user.id); // delete user shared links
-    await deleteUserFiles(req); // delete user files
-    await deleteFiles(null, user.id); // delete database files in case of orphaned files from previous steps
-    await deleteToolCalls(user.id); // delete user tool calls
-    /* TODO: queue job for cleaning actions and assistants of non-existant users */
-    logger.info(`User deleted account. Email: ${user.email} ID: ${user.id}`);
-    res.status(200).send({ message: 'User deleted' });
+    await deleteMessages({ user: userId }); // delete user messages
+    await deleteAllUserSessions({ userId: userId }); // delete user sessions
+    await Transaction.deleteMany({ user: userId }); // delete user transactions
+    await deleteUserKey({ userId: userId, all: true }); // delete user keys
+    await Balance.deleteMany({ user: userId }); // delete user balances
+    await deletePresets(userId); // delete user presets
+    await deleteConvos(userId); // delete user convos
+    await deleteUserPluginAuth(userId, null, true); // delete user plugin auth
+    await deleteUserById(userId); // delete user
+    await deleteAllSharedLinks(userId); // delete user shared links
+    await deleteUserFilesByUserId(req, userId); // delete user files
+    await deleteFiles(null, userId); // delete database files in case of orphaned files from previous steps
+    await deleteToolCalls(userId); // delete user tool calls
+    logger.info(`User deleted account. ID: ${userId}`);
+    return true;
   } catch (err) {
     logger.error('[deleteUserController]', err);
-    return res.status(500).json({ message: 'Something went wrong.' });
+    return false;
   }
 };
 
@@ -240,6 +265,7 @@ module.exports = {
   getTermsStatusController,
   acceptTermsController,
   deleteUserController,
+  deleteUserByIdController,
   verifyEmailController,
   updateUserPluginsController,
   resendVerificationController,
