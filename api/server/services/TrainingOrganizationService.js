@@ -3,7 +3,14 @@ const { findUser, updateUser } = require('~/models/userMethods');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
 const { createOrgAdminInvitation, createTrainerInvitation } = require('~/models/Invitation');
-const { addAdminToOrganization, addTrainerToOrganization } = require('~/models/TrainingOrganization');
+const {
+  addAdminToOrganization,
+  addTrainerToOrganization,
+  removeAdminFromOrganization,
+  removeTrainerFromOrganization,
+  findTrainingOrganizationsByAdmin,
+  findTrainingOrganizationsByTrainer,
+} = require('~/models/TrainingOrganization');
 
 /**
  * Process administrators for a training organization
@@ -258,6 +265,44 @@ const sendTrainerInvitationEmail = async (email, token, orgName) => {
   }
 };
 
+/**
+ * Delete a user from all training organizations where he is an administrator or trainer
+ * @param {string} userId - The ID of the user to remove
+ * @returns {Promise<void>}
+ */
+const deleteUserFromOrganizations = async (userId) => {
+  try {
+    // Find all organizations where the user is an administrator
+    const adminOrgs = await findTrainingOrganizationsByAdmin(userId);
+
+    // Find all organizations where the user is a trainer
+    const trainerOrgs = await findTrainingOrganizationsByTrainer(userId);
+
+    // Remove user from administrators in all organizations
+    for (const org of adminOrgs) {
+      await removeAdminFromOrganization(org._id, userId);
+      logger.info(
+        `[deleteUserFromOrganizations] User ${userId} removed as administrator from organization ${org._id} (${org.name})`,
+      );
+    }
+
+    // Remove user from trainers in all organizations
+    for (const org of trainerOrgs) {
+      await removeTrainerFromOrganization(org._id, userId);
+      logger.info(
+        `[deleteUserFromOrganizations] User ${userId} removed as trainer from organization ${org._id} (${org.name})`,
+      );
+    }
+
+    logger.info(
+      `[deleteUserFromOrganizations] User ${userId} removed from ${adminOrgs.length} organizations as administrator and ${trainerOrgs.length} organizations as trainer`,
+    );
+  } catch (error) {
+    logger.error(`[deleteUserFromOrganizations] Error removing user ${userId} from organizations: ${error.message}`);
+    throw error;
+  }
+};
+
 module.exports = {
   processAdministrators,
   processTrainers,
@@ -265,4 +310,5 @@ module.exports = {
   sendOrgAdminInvitationEmail,
   sendTrainerNotificationEmail,
   sendTrainerInvitationEmail,
+  deleteUserFromOrganizations,
 };

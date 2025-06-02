@@ -22,6 +22,7 @@ const { deleteToolCalls } = require('~/models/ToolCall');
 const { Transaction } = require('~/models/Transaction');
 const { logger } = require('~/config');
 const { removeExpiredTraineeAccounts } = require('~/models/userMethods');
+const { deleteUserFromOrganizations } = require('~/server/services/TrainingOrganizationService');
 
 const getUserController = async (req, res) => {
   /** @type {MongoUser} */
@@ -173,6 +174,7 @@ const deleteUserMethods = async (req, userId) => {
     await deleteUserFilesByUserId(req, userId); // delete user files
     await deleteFiles(null, userId); // delete database files in case of orphaned files from previous steps
     await deleteToolCalls(userId); // delete user tool calls
+    await deleteUserFromOrganizations(userId); // delete user from organizations
     logger.info(`User deleted account. ID: ${userId}`);
     return true;
   } catch (err) {
