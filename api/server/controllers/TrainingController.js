@@ -187,7 +187,9 @@ const remove = async (req, res) => {
 
     for (const trainee of trainingToDelete.trainees) {
       const user = await findUser({ email: trainee.username });
-      await deleteUserById(user._id);
+      if (user) {
+        await deleteUserById(user._id);
+      }
     }
 
     const training = await deleteTraining(trainingId);
