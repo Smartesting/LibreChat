@@ -1,21 +1,9 @@
-const { webcrypto } = require('node:crypto');
-const bcrypt = require('bcryptjs');
 const { SystemRoles } = require('librechat-data-provider');
 const { findUser, updateUser } = require('~/models/userMethods');
 const { sendEmail, checkEmailConfig } = require('~/server/utils');
 const { logger } = require('~/config');
 const { createOrgAdminInvitation, createTrainerInvitation } = require('~/models/Invitation');
 const { addAdminToOrganization, addTrainerToOrganization } = require('~/models/TrainingOrganization');
-
-/**
- * Creates Token and corresponding Hash for verification
- * @returns {[string, string]}
- */
-const createTokenHash = () => {
-  const token = Buffer.from(webcrypto.getRandomValues(new Uint8Array(32))).toString('hex');
-  const hash = bcrypt.hashSync(token, 10);
-  return [token, hash];
-};
 
 /**
  * Process administrators for a training organization
