@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import type { TConversation, TMessage } from 'librechat-data-provider';
-import { EditIcon, Clipboard, CheckMark, ContinueIcon, RegenerateIcon } from '~/components/svg';
+import { CheckMark, Clipboard, ContinueIcon, EditIcon, RegenerateIcon } from '~/components/svg';
 import { useGenerationsByLatest, useLocalize } from '~/hooks';
 import { Fork } from '~/components/Conversations';
 import MessageAudio from './MessageAudio';
@@ -147,7 +147,6 @@ export default function HoverButtons({
       >
         {isCopied ? <CheckMark className="h-[18px] w-[18px]" /> : <Clipboard size="19" />}
       </button>
-      {renderRegenerate()}
       {fork && (
         <Fork
           isLast={isLast}
