@@ -27,6 +27,11 @@ const processAdministrators = async (administrators, orgId, orgName) => {
     const existingUser = await findUser({ email }, 'email _id name username role');
 
     if (existingUser) {
+      // If user already exists and has TRAINEE role, skip adding him as an org admin
+      if (existingUser.role.includes(SystemRoles.TRAINEE)) {
+        continue;
+      }
+
       await addAdminToOrganization(orgId, existingUser._id, existingUser.email);
 
       // Only add ORGADMIN role if the user doesn't already have it
@@ -149,6 +154,11 @@ const processTrainers = async (trainers, orgId, orgName) => {
     const existingUser = await findUser({ email }, 'email _id name username role');
 
     if (existingUser) {
+      // If user already exists and has TRAINEE role, skip adding him as a trainer
+      if (existingUser.role.includes(SystemRoles.TRAINEE)) {
+        continue;
+      }
+
       await addTrainerToOrganization(orgId, existingUser._id, existingUser.email);
 
       // Only add TRAINER role if the user doesn't already have it
