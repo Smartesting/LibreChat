@@ -16,24 +16,28 @@ const checkAccess = async (user, permissionType, permissions, bodyProps = {}, ch
     return false;
   }
 
-  //fixme update if multiple roles
-  const role = await getRoleByName(user.role.toString());
-  if (role && role.permissions && role.permissions[permissionType]) {
-    const hasAnyPermission = permissions.some((permission) => {
-      if (role.permissions[permissionType][permission]) {
+  const roles = await Promise.all(user.role.map((userRole) => getRoleByName(userRole)));
+
+  for (const role of roles) {
+    if (role && role.permissions && role.permissions[permissionType]) {
+      const hasAnyPermission = permissions.some((permission) => {
+        if (role.permissions[permissionType][permission]) {
+          return true;
+        }
+
+        if (bodyProps[permission] && checkObject) {
+          return bodyProps[permission].some((prop) =>
+            Object.prototype.hasOwnProperty.call(checkObject, prop),
+          );
+        }
+
+        return false;
+      });
+
+      if (hasAnyPermission) {
         return true;
       }
-
-      if (bodyProps[permission] && checkObject) {
-        return bodyProps[permission].some((prop) =>
-          Object.prototype.hasOwnProperty.call(checkObject, prop),
-        );
-      }
-
-      return false;
-    });
-
-    return hasAnyPermission;
+    }
   }
 
   return false;
