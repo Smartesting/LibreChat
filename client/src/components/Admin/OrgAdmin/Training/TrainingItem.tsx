@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { useSmaLocalize } from '~/hooks';
-import { ChevronDown, ChevronUp, Edit, Search, Trash2, User } from 'lucide-react';
+import { ChevronDown, ChevronUp, Edit, Eye, Trash2, User } from 'lucide-react';
 import TrainingDetails from './TrainingDetails';
 import { Training, TrainingWithStatus } from 'librechat-data-provider';
 
@@ -57,7 +57,7 @@ const TrainingItem: FC<{
               setIsTrainingModalOpen(true);
             }}
           >
-            <Search size={16} className="text-text-primary" />
+            <Eye size={16} className="text-text-primary" />
           </button>
           {editable && (
             <button
