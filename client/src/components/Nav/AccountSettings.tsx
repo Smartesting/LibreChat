@@ -2,7 +2,7 @@ import { memo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import * as Select from '@ariakit/react/select';
 import { FileText, LogOut, ShieldEllipsis } from 'lucide-react';
-import { DropdownMenuSeparator, GearIcon, LinkIcon } from '~/components';
+import { DropdownMenuSeparator, GearIcon } from '~/components';
 import { useGetStartupConfig, useGetUserBalance } from '~/data-provider';
 import FilesView from '~/components/Chat/Input/Files/FilesView';
 import { useAuthContext } from '~/hooks/AuthContext';
