@@ -13,6 +13,10 @@ const {
   findTrainingOrganizationsByTrainer,
 } = require('~/models/TrainingOrganization');
 const {
+  getTrainingsByOrganization,
+  deleteTraining,
+} = require('~/models/Training');
+const {
   processAdministrators,
   processTrainers,
 } = require('~/server/services/TrainingOrganizationService');
@@ -100,6 +104,13 @@ const deleteTrainingOrganizationHandler = async (req, res) => {
 
     if (!organizationId) {
       return res.status(400).json({ error: 'Missing organization ID' });
+    }
+
+    const trainings = await getTrainingsByOrganization(organizationId);
+
+    for (const training of trainings) {
+      await deleteTraining(training._id);
+      logger.info(`Deleted training ${training._id} associated with organization ${organizationId}`);
     }
 
     const deletedOrg = await deleteTrainingOrganization(organizationId);
