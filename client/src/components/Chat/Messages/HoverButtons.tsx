@@ -115,7 +115,7 @@ export default function HoverButtons({
           )}
         />
       )}
-      {isEditableEndpoint && (
+      {isEditableEndpoint && !hideEditButton && (
         <button
           id={`edit-${message.messageId}`}
           className={cn(

@@ -62,6 +62,7 @@ export default function useGenerationsByLatest({
     !isCreatedByUser && !searchResult && !isEditing && !isSubmitting && branchingSupported;
 
   const hideEditButton =
+    !isCreatedByUser ||
     isSubmitting ||
     error ||
     searchResult ||
