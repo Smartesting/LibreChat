@@ -1,4 +1,4 @@
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useLocalize } from '~/hooks';
 
