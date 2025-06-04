@@ -55,6 +55,7 @@ const OrgList: FC = () => {
         onClose={() => setIsOrgCreationModalOpened(false)}
       />
       <GenericList
+        className="rounded-lg border border-border-light p-4"
         title={smaLocalize('com_superadmin_training_organizations')}
         items={trainingOrganizations}
         getKey={(org) => org._id}

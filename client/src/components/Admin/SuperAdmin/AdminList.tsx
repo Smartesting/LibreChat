@@ -106,6 +106,7 @@ const AdminList: FC = () => {
         confirmButton={smaLocalize('com_ui_revoke')}
       />
       <GenericList
+        className="rounded-lg border border-border-light p-4"
         title={smaLocalize('com_superadmin_administrators')}
         items={existingAndInvitedAdmins}
         getKey={(item) => item.email}

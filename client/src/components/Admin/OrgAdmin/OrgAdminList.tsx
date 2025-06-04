@@ -108,7 +108,7 @@ const OrgAdminList: FC<{
         confirmButton={smaLocalize('com_ui_revoke')}
       />
       <GenericList
-        className="mb-6"
+        className="mb-6 rounded-lg border border-border-light p-4"
         title={smaLocalize('com_orgadmin_administrators')}
         items={allAdmins}
         getKey={(user) => user.email}
