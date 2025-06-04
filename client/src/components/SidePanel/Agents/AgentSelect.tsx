@@ -52,7 +52,7 @@ export default function AgentSelect({
       };
 
       const capabilities: TAgentCapabilities = {
-        [AgentCapabilities.file_search]: false,
+        [AgentCapabilities.file_search]: fullAgent.tool_resources?.file_search?.file_ids.length > 0,
         [AgentCapabilities.execute_code]: false,
         [AgentCapabilities.end_after_tools]: false,
         [AgentCapabilities.hide_sequential_outputs]: false,
