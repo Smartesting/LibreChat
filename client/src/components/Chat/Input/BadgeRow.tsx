@@ -1,16 +1,15 @@
 import React, {
-  memo,
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useMemo,
   forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
   useReducer,
+  useRef,
+  useState,
 } from 'react';
-import { useRecoilValue, useRecoilCallback } from 'recoil';
+import { useRecoilCallback, useRecoilValue } from 'recoil';
 import type { LucideIcon } from 'lucide-react';
-import CodeInterpreter from './CodeInterpreter';
 import type { BadgeItem } from '~/common';
 import { useChatBadges } from '~/hooks';
 import { Badge } from '~/components/ui';
@@ -352,12 +351,7 @@ function BadgeRow({
           />
         </div>
       )}
-      {showEphemeralBadges === true && (
-        <>
-          <CodeInterpreter conversationId={conversationId} />
-          <MCPSelect conversationId={conversationId} />
-        </>
-      )}
+      {showEphemeralBadges === true && <MCPSelect conversationId={conversationId} />}
       {ghostBadge && (
         <div
           className="ghost-badge h-full"
