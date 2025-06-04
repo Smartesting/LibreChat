@@ -1,4 +1,4 @@
-import { Plus, X } from 'lucide-react';
+import { Plus, Trash2, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useLocalize } from '~/hooks';
 
@@ -79,7 +79,7 @@ const GenericList = <T,>({
                 aria-label={localize('com_ui_delete')}
                 disabled={isUpdatingItems}
               >
-                <X size={16} className="text-text-primary" />
+                <Trash2 size={16} className="text-text-primary" />
               </button>
             )}
             {extraButtons &&
@@ -131,7 +131,7 @@ const GenericList = <T,>({
               aria-label={localize('com_ui_cancel') + ' ' + localize('com_ui_add')}
               disabled={isUpdatingItems}
             >
-              <X size={16} className="text-text-primary" />
+              <Trash2 size={16} className="text-text-primary" />
             </button>
           </li>
         )}
