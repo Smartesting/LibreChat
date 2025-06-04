@@ -27,7 +27,7 @@ const defaultTrainingFormValues: TrainingCreateParams = {
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Default to browser timezone
   startDateTime: new Date(),
   endDateTime: new Date(Date.now() + 3600000), // Default to 1 hour from now
-  participantCount: 0,
+  participantCount: 1,
   trainers: [],
   trainees: [],
   trainingOrganizationId: '',
