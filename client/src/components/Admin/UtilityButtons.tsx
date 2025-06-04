@@ -1,6 +1,6 @@
 import React, { FC, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, MessageSquare, Moon, Sun } from 'lucide-react';
+import { Home, LogOut, Moon, Sun } from 'lucide-react';
 import { SystemRoles } from 'librechat-data-provider';
 import { ThemeContext } from '~/hooks/ThemeContext';
 import { useAuthContext } from '~/hooks/AuthContext';
@@ -19,7 +19,8 @@ const UtilityButtons: FC = () => {
   const [langcode, setLangcode] = useRecoilState(store.lang);
   const { data: trainerData } = useIsActiveTrainerQuery();
   const isSuperAdmin = user?.role.includes(SystemRoles.ADMIN);
-  const isTrainerWithOngoingTraining = user?.role.includes(SystemRoles.TRAINER) && trainerData?.isActiveTrainer;
+  const isTrainerWithOngoingTraining =
+    user?.role.includes(SystemRoles.TRAINER) && trainerData?.isActiveTrainer;
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -58,13 +59,13 @@ const UtilityButtons: FC = () => {
     <div className="absolute right-4 top-4 flex space-x-2">
       {(isSuperAdmin || isTrainerWithOngoingTraining) && (
         <TooltipAnchor
-          aria-label={localize('com_ui_new_chat')}
-          description={localize('com_ui_new_chat')}
+          aria-label={localize('com_ui_back_to_prompts')}
+          description={localize('com_ui_back_to_prompts')}
           role="button"
           onClick={goToNewChat}
           className="inline-flex size-10 flex-shrink-0 items-center justify-center rounded-xl border border-border-light bg-transparent text-text-primary transition-all ease-in-out hover:bg-surface-tertiary disabled:pointer-events-none disabled:opacity-50"
         >
-          <MessageSquare size={24} />
+          <Home size={24} />
         </TooltipAnchor>
       )}
       <TooltipAnchor
