@@ -56,8 +56,8 @@ const TrainingModal: FC<TrainingModalProps> = ({
 
   const copyToClipboard = async (trainees: Trainee[]) => {
     const textToCopy = trainees
-      .map((trainee) => `${trainee.username}:${trainee.password}`)
-      .join('\n');
+      .map((trainee) => `User: ${trainee.username}\nPassword: ${trainee.password}`)
+      .join('\n\n');
     try {
       await navigator.clipboard.writeText(textToCopy);
       showToast({
