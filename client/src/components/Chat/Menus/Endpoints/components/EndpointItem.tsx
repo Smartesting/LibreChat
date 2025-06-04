@@ -99,6 +99,10 @@ export function EndpointItem({ endpoint }: EndpointItemProps) {
     </div>
   );
 
+  if (endpointRequiresUserKey(endpoint.value)) {
+    return;
+  }
+
   if (endpoint.hasModels) {
     const filteredModels = searchValue
       ? filterModels(
