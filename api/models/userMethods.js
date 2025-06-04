@@ -198,17 +198,18 @@ const comparePassword = async (user, candidatePassword) => {
  * Generates multiple trainee users with random UUIDs for email addresses and random passwords.
  *
  * @param {number} count - The number of trainee users to create.
+ * @param {number} prevCount - Previous user count
  * @returns {Promise<Array<{email: string, password: string, id: string}>>} An array of created user objects with their credentials.
  */
-const generateTraineeUsers = async (count) => {
+const generateTraineeUsers = async (count, prevCount = 0) => {
   const crypto = require('crypto');
   const { SystemRoles } = require('librechat-data-provider');
 
   const users = [];
 
-  for (let i = 0; i < count; i++) {
-    const uuid = crypto.randomUUID();
-    const email = `${uuid}@smartesting.com`;
+  for (let i = prevCount; i < prevCount + count; i++) {
+    const now = Date.now().toString(36);
+    const email = `${i}-${now}@smartesting.com`;
 
     const password = crypto.randomBytes(8).toString('hex');
     const salt = bcrypt.genSaltSync(10);

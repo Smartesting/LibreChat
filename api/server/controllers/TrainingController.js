@@ -31,7 +31,7 @@ const create = async (req, res) => {
     if (trainingData.participantCount && Number(trainingData.participantCount) > 0) {
       const count = Number(trainingData.participantCount);
 
-      const generatedUsers = await generateTraineeUsers(count);
+      const generatedUsers = await generateTraineeUsers(count, 0);
 
       const trainees = generatedUsers.map((user) => ({
         username: user.email,
@@ -131,7 +131,10 @@ const update = async (req, res) => {
       const currentParticipantsCount = currentTraining.participantCount;
       const newCount = Number(updateData.participantCount);
       if (newCount > currentParticipantsCount) {
-        const newGeneratedUsers = await generateTraineeUsers(newCount - currentParticipantsCount);
+        const newGeneratedUsers = await generateTraineeUsers(
+          newCount - currentParticipantsCount,
+          currentParticipantsCount,
+        );
         const newTrainees = newGeneratedUsers.map((user) => ({
           username: user.email,
           password: user.password,
