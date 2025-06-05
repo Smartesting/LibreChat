@@ -4,6 +4,7 @@ import { conversationPreset } from './defaults';
 // @ts-ignore
 export interface IConversation extends Document {
   conversationId: string;
+  comparedConversationIds?: string[];
   title?: string;
   user?: string;
   messages?: Types.ObjectId[];
@@ -61,6 +62,10 @@ const convoSchema: Schema<IConversation> = new Schema(
       required: true,
       index: true,
       meiliIndex: true,
+    },
+    comparedConversationIds: {
+      type: [String],
+      default: [],
     },
     title: {
       type: String,

@@ -76,10 +76,6 @@ const useNewConvo = (index = 0) => {
         const { endpoint = null } = conversation;
         const buildDefaultConversation = (endpoint === null || buildDefault) ?? false;
         const activePreset =
-          // use default preset only when it's defined,
-          // preset is not provided,
-          // endpoint matches or is null (to allow endpoint change),
-          // and buildDefaultConversation is true
           defaultPreset &&
           !preset &&
           (defaultPreset.endpoint === endpoint || !endpoint) &&
@@ -188,6 +184,7 @@ const useNewConvo = (index = 0) => {
       buildDefault = true,
       keepLatestMessage = false,
       keepAddedConvos = false,
+      selectedModels = [],
     }: {
       template?: Partial<TConversation>;
       preset?: Partial<TPreset>;
@@ -196,6 +193,7 @@ const useNewConvo = (index = 0) => {
       disableFocus?: boolean;
       keepLatestMessage?: boolean;
       keepAddedConvos?: boolean;
+      selectedModels?: Array<{ endpoint: string; model: string }>;
     } = {}) {
       pauseGlobalAudio();
       if (!saveBadgesState) {
@@ -211,65 +209,127 @@ const useNewConvo = (index = 0) => {
           ? { endpoint: _template.endpoint }
           : _template;
 
-      const conversation = {
-        conversationId: Constants.NEW_CONVO as string,
-        title: 'New Chat',
-        endpoint: null,
-        ...template,
-        createdAt: '',
-        updatedAt: '',
-      };
+      if (selectedModels.length === 0) {
+        const conversation = {
+          conversationId: Constants.NEW_CONVO as string,
+          title: 'New Chat',
+          endpoint: null,
+          ...template,
+          createdAt: '',
+          updatedAt: '',
+        };
 
-      let preset = _preset;
-      const defaultModelSpec = getDefaultModelSpec(startupConfig);
-      if (
-        !preset &&
-        startupConfig &&
-        (startupConfig.modelSpecs?.prioritize === true ||
-          (startupConfig.interface?.modelSelect ?? true) !== true) &&
-        defaultModelSpec
-      ) {
-        preset = {
-          ...defaultModelSpec.preset,
-          iconURL: getModelSpecIconURL(defaultModelSpec),
-          spec: defaultModelSpec.name,
-        } as TConversation;
-      }
-
-      if (conversation.conversationId === 'new' && !modelsData) {
-        const filesToDelete = Array.from(files.values())
-          .filter(
-            (file) =>
-              file.filepath != null &&
-              file.filepath !== '' &&
-              file.source &&
-              !(file.embedded ?? false) &&
-              file.temp_file_id,
-          )
-          .map((file) => ({
-            file_id: file.file_id,
-            embedded: !!(file.embedded ?? false),
-            filepath: file.filepath as string,
-            source: file.source as FileSources, // Ensure that the source is of type FileSources
-          }));
-
-        setFiles(new Map());
-        localStorage.setItem(LocalStorageKeys.FILES_TO_DELETE, JSON.stringify({}));
-
-        if (!saveDrafts && filesToDelete.length > 0) {
-          mutateAsync({ files: filesToDelete });
+        let preset = _preset;
+        const defaultModelSpec = getDefaultModelSpec(startupConfig);
+        if (
+          !preset &&
+          startupConfig &&
+          (startupConfig.modelSpecs?.prioritize === true ||
+            (startupConfig.interface?.modelSelect ?? true) !== true) &&
+          defaultModelSpec
+        ) {
+          preset = {
+            ...defaultModelSpec.preset,
+            iconURL: getModelSpecIconURL(defaultModelSpec),
+            spec: defaultModelSpec.name,
+          } as TConversation;
         }
+
+        if (conversation.conversationId === 'new' && !modelsData) {
+          const filesToDelete = Array.from(files.values())
+            .filter(
+              (file) =>
+                file.filepath != null &&
+                file.filepath !== '' &&
+                file.source &&
+                !(file.embedded ?? false) &&
+                file.temp_file_id,
+            )
+            .map((file) => ({
+              file_id: file.file_id,
+              embedded: !!(file.embedded ?? false),
+              filepath: file.filepath as string,
+              source: file.source as FileSources,
+            }));
+
+          setFiles(new Map());
+          localStorage.setItem(LocalStorageKeys.FILES_TO_DELETE, JSON.stringify({}));
+
+          if (!saveDrafts && filesToDelete.length > 0) {
+            mutateAsync({ files: filesToDelete });
+          }
+        }
+
+        switchToConversation(
+          conversation,
+          preset,
+          modelsData,
+          buildDefault,
+          keepLatestMessage,
+          keepAddedConvos,
+          disableFocus,
+        );
+        return;
       }
 
-      switchToConversation(
-        conversation,
-        preset,
-        modelsData,
-        buildDefault,
-        keepLatestMessage,
-        keepAddedConvos,
-        disableFocus,
-      );
+      const conversations: TConversation[] = [];
+      const conversationIds: string[] = [];
+
+      for (const { endpoint, model } of selectedModels) {
+        const conversation = {
+          conversationId: Constants.NEW_CONVO as string,
+          title: 'New Chat',
+          endpoint,
+          model,
+          ...template,
+          createdAt: '',
+          updatedAt: '',
+        };
+
+        let preset = _preset;
+        const defaultModelSpec = getDefaultModelSpec(startupConfig);
+        if (
+          !preset &&
+          startupConfig &&
+          (startupConfig.modelSpecs?.prioritize === true ||
+            (startupConfig.interface?.modelSelect ?? true) !== true) &&
+          defaultModelSpec
+        ) {
+          preset = {
+            ...defaultModelSpec.preset,
+            iconURL: getModelSpecIconURL(defaultModelSpec),
+            spec: defaultModelSpec.name,
+          } as TConversation;
+        }
+
+        const builtConversation = buildDefaultConvo({
+          conversation,
+          lastConversationSetup: preset as TConversation,
+          endpoint,
+          models: modelsData?.[endpoint] ?? [],
+        });
+
+        conversations.push(builtConversation);
+        conversationIds.push(builtConversation.conversationId);
+      }
+
+      for (const conversation of conversations) {
+        conversation.comparedConversationIds = conversationIds.filter(
+          (id) => id !== conversation.conversationId,
+        );
+      }
+
+      if (conversations.length > 0) {
+        switchToConversation(
+          conversations[0],
+          _preset,
+          modelsData,
+          buildDefault,
+          keepLatestMessage,
+          keepAddedConvos,
+          disableFocus,
+        );
+      }
     },
     [
       pauseGlobalAudio,
