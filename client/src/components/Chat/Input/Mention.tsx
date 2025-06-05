@@ -80,7 +80,7 @@ export default function Mention({
         setInputOptions(options);
         setActiveIndex(0);
         inputRef.current?.focus();
-      } else {
+      } else if (mention.type === 'endpoint') {
         // If we have selected models, create conversations for all of them
         if (selectedModels.length > 0) {
           // @ts-ignore - We know this is safe because we're passing the correct type
@@ -88,6 +88,13 @@ export default function Mention({
         } else {
           onSelectMention?.(mention);
         }
+        setSelectedModels([]);
+
+        if (textAreaRef.current) {
+          removeCharIfLast(textAreaRef.current, commandChar);
+        }
+      } else {
+        onSelectMention?.(mention);
         setSelectedModels([]);
 
         if (textAreaRef.current) {
