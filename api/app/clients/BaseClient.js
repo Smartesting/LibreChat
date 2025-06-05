@@ -212,7 +212,7 @@ class BaseClient {
     };
   }
 
-  createUserMessage({ messageId, parentMessageId, conversationId, text }) {
+  createUserMessage({ messageId, parentMessageId, conversationId, text, comparedIds }) {
     return {
       messageId,
       parentMessageId,
@@ -220,6 +220,7 @@ class BaseClient {
       sender: 'User',
       text,
       isCreatedByUser: true,
+      comparedIds,
     };
   }
 
@@ -232,6 +233,7 @@ class BaseClient {
       userMessageId,
       responseMessageId,
       saveOptions,
+      comparedIds,
     } = await this.setMessageOptions(opts);
 
     const userMessage = opts.isEdited
@@ -241,6 +243,7 @@ class BaseClient {
         parentMessageId,
         conversationId,
         text: message,
+        comparedIds,
       });
 
     if (typeof opts?.getReqData === 'function') {
@@ -661,6 +664,7 @@ class BaseClient {
       messageId: responseMessageId,
       conversationId,
       parentMessageId: userMessage.messageId,
+      comparedIds: userMessage.comparedIds,
       isCreatedByUser: false,
       isEdited,
       model: this.getResponseModel(),
@@ -885,6 +889,7 @@ class BaseClient {
 
     const fieldsToKeep = {
       conversationId: message.conversationId,
+      comparedIds: message.comparedIds,
       endpoint: this.options.endpoint,
       endpointType: this.options.endpointType,
       ...endpointOptions,

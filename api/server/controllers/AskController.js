@@ -22,6 +22,7 @@ const AskController = async (req, res, next, initializeClient, addTitle) => {
     modelDisplayLabel,
     parentMessageId = null,
     overrideParentMessageId = null,
+    comparedIds = null,
   } = req.body;
 
   let client = null;
@@ -174,6 +175,7 @@ const AskController = async (req, res, next, initializeClient, addTitle) => {
       parentMessageId,
       conversationId: reqDataContext.conversationId,
       overrideParentMessageId,
+      comparedIds,
       getReqData: updateReqData,
       onStart,
       abortController,

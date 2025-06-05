@@ -301,6 +301,7 @@ export type TAskProps = {
   conversationId?: string | null;
   messageId?: string | null;
   clientTimestamp?: string;
+  comparedIds?: string[];
 };
 
 export type TOptions = {

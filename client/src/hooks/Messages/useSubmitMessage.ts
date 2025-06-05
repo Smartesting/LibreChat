@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import { useCallback } from 'react';
 import { Constants } from 'librechat-data-provider';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { useChatContext, useChatFormContext, useAddedChatContext } from '~/Providers';
+import { useAddedChatContext, useChatContext, useChatFormContext } from '~/Providers';
 import { useAuthContext } from '~/hooks/AuthContext';
 import { replaceSpecialVars } from '~/utils';
 import store from '~/store';
@@ -43,6 +43,7 @@ export default function useSubmitMessage() {
         activeConvos.every((convoId) => convoId === Constants.NEW_CONVO) &&
         !rootMessages?.length;
       const overrideConvoId = isNewMultiConvo ? v4() : undefined;
+      const additionalConvoId = isNewMultiConvo ? v4() : undefined;
       const overrideUserMessageId = hasAdded ? v4() : undefined;
       const rootIndex = addedIndex - 1;
       const clientTimestamp = new Date().toISOString();
@@ -52,15 +53,17 @@ export default function useSubmitMessage() {
         overrideConvoId: appendIndex(rootIndex, overrideConvoId),
         overrideUserMessageId: appendIndex(rootIndex, overrideUserMessageId),
         clientTimestamp,
+        comparedIds: additionalConvoId ? [additionalConvoId] : [],
       });
 
       if (hasAdded) {
         askAdditional(
           {
             text: data.text,
-            overrideConvoId: appendIndex(addedIndex, undefined),
+            overrideConvoId: appendIndex(addedIndex, additionalConvoId),
             overrideUserMessageId: appendIndex(addedIndex, undefined),
             clientTimestamp,
+            comparedIds: overrideConvoId ? [overrideConvoId] : [],
           },
           { overrideMessages: rootMessages },
         );

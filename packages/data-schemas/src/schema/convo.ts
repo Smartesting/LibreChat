@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 import { conversationPreset } from './defaults';
 
 // @ts-ignore
@@ -46,6 +46,7 @@ export interface IConversation extends Document {
   maxContextTokens?: number;
   max_tokens?: number;
   reasoning_effort?: string;
+  comparedIds?: string[];
   // Additional fields
   files?: string[];
   expiredAt?: Date;
@@ -90,6 +91,7 @@ const convoSchema: Schema<IConversation> = new Schema(
     expiredAt: {
       type: Date,
     },
+    comparedIds: { type: [String], default: [] },
   },
   { timestamps: true },
 );

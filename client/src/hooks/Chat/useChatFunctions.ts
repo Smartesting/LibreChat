@@ -86,6 +86,7 @@ export default function useChatFunctions({
       parentMessageId = null,
       conversationId = null,
       messageId = null,
+      comparedIds = null,
     },
     {
       editedText = null,
@@ -301,6 +302,7 @@ export default function useChatFunctions({
       initialResponse,
       isTemporary,
       ephemeralAgent,
+      comparedIds,
     };
 
     if (isRegenerate) {
