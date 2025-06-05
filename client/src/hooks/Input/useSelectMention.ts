@@ -14,6 +14,11 @@ import { useChatContext } from '~/Providers';
 import { useDefaultConvo } from '~/hooks';
 import store from '~/store';
 
+type SelectedModel = {
+  endpoint: string;
+  model: string;
+};
+
 export default function useSelectMention({
   presets,
   modelSpecs,
@@ -252,7 +257,7 @@ export default function useSelectMention({
   );
 
   const onSelectMention = useCallback(
-    (option: MentionOption) => {
+    (option: MentionOption, selectedModels?: SelectedModel[]) => {
       const key = option.value;
       if (option.type === 'preset') {
         const preset = presets?.find((p) => p.presetId === key);
@@ -274,8 +279,78 @@ export default function useSelectMention({
           agent_id: key,
         });
       }
+
+      // If we have selected models, create conversations for all of them
+      if (selectedModels && selectedModels.length > 0) {
+        const conversations = selectedModels.map((model) => {
+          const {
+            template,
+            shouldSwitch,
+            isNewModular,
+            newEndpointType,
+            isCurrentModular,
+            isExistingConversation,
+          } = getConvoSwitchLogic({
+            newEndpoint: model.endpoint,
+            modularChat,
+            conversation,
+            endpointsConfig,
+          });
+
+          template.model = model.model;
+          template.spec = null;
+          template.iconURL = null;
+          template.modelLabel = null;
+
+          const isModular = isCurrentModular && isNewModular && shouldSwitch;
+          if (isExistingConversation && isModular) {
+            template.endpointType = newEndpointType;
+
+            const currentConvo = getDefaultConversation({
+              conversation: {
+                ...(conversation ?? {}),
+                spec: null,
+                iconURL: null,
+                modelLabel: null,
+                endpointType: template.endpointType,
+              },
+              preset: template,
+            });
+
+            return {
+              template: currentConvo,
+              preset: currentConvo,
+              keepLatestMessage: true,
+              keepAddedConvos: true,
+            };
+          }
+
+          return {
+            template: { ...(template as Partial<TConversation>) },
+            preset: { ...template, endpoint: model.endpoint },
+            keepAddedConvos: isModular,
+          };
+        });
+
+        // Create all conversations
+        conversations.forEach((convo) => {
+          newConversation(convo);
+        });
+      }
     },
-    [modelSpecs, onSelectEndpoint, onSelectPreset, onSelectSpec, presets, assistantsMap],
+    [
+      modelSpecs,
+      onSelectEndpoint,
+      onSelectPreset,
+      onSelectSpec,
+      presets,
+      assistantsMap,
+      modularChat,
+      conversation,
+      endpointsConfig,
+      getDefaultConversation,
+      newConversation,
+    ],
   );
 
   if (returnHandlers) {

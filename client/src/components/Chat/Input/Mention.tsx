@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
-import { EModelEndpoint } from 'librechat-data-provider';
 import type { SetterOrUpdater } from 'recoil';
 import type { MentionOption, ConvoGenerator } from '~/common';
 import useSelectMention from '~/hooks/Input/useSelectMention';
@@ -11,6 +10,11 @@ import { removeCharIfLast } from '~/utils';
 import MentionItem from './MentionItem';
 
 const ROW_HEIGHT = 40;
+
+type SelectedModel = {
+  endpoint: string;
+  model: string;
+};
 
 export default function Mention({
   setShowMentionPopover,
@@ -50,6 +54,7 @@ export default function Mention({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [inputOptions, setInputOptions] = useState<MentionOption[]>(options);
+  const [selectedModels, setSelectedModels] = useState<SelectedModel[]>([]);
 
   const { open, setOpen, searchValue, setSearchValue, matches } = useCombobox({
     value: '',
@@ -65,26 +70,45 @@ export default function Mention({
       setSearchValue('');
       setOpen(false);
       setShowMentionPopover(false);
-      onSelectMention?.(mention);
 
-      if (textAreaRef.current) {
-        removeCharIfLast(textAreaRef.current, commandChar);
+      if (mention.type === 'model' && mention.label) {
+        // Add the selected model to the list
+        const newModel: SelectedModel = { endpoint: mention.value, model: mention.label };
+        setSelectedModels((prev) => [...prev, newModel]);
+        // Keep the popover open for more selections
+        setOpen(true);
+        setInputOptions(options);
+        setActiveIndex(0);
+        inputRef.current?.focus();
+      } else {
+        // If we have selected models, create conversations for all of them
+        if (selectedModels.length > 0) {
+          // @ts-ignore - We know this is safe because we're passing the correct type
+          onSelectMention?.(mention, selectedModels);
+        } else {
+          onSelectMention?.(mention);
+        }
+        setSelectedModels([]);
+
+        if (textAreaRef.current) {
+          removeCharIfLast(textAreaRef.current, commandChar);
+        }
       }
     };
 
-    if (mention.type === 'endpoint' && mention.value === EModelEndpoint.agents) {
+    if (mention.type === 'endpoint' && mention.value === 'agents') {
       setSearchValue('');
       setInputOptions(agentsList ?? []);
       setActiveIndex(0);
       inputRef.current?.focus();
-    } else if (mention.type === 'endpoint' && mention.value === EModelEndpoint.assistants) {
+    } else if (mention.type === 'endpoint' && mention.value === 'assistants') {
       setSearchValue('');
-      setInputOptions(assistantListMap[EModelEndpoint.assistants] ?? []);
+      setInputOptions(assistantListMap['assistants'] ?? []);
       setActiveIndex(0);
       inputRef.current?.focus();
-    } else if (mention.type === 'endpoint' && mention.value === EModelEndpoint.azureAssistants) {
+    } else if (mention.type === 'endpoint' && mention.value === 'azureAssistants') {
       setSearchValue('');
-      setInputOptions(assistantListMap[EModelEndpoint.azureAssistants] ?? []);
+      setInputOptions(assistantListMap['azureAssistants'] ?? []);
       setActiveIndex(0);
       inputRef.current?.focus();
     } else if (mention.type === 'endpoint') {
@@ -107,6 +131,7 @@ export default function Mention({
     if (!open) {
       setInputOptions(options);
       setActiveIndex(0);
+      setSelectedModels([]);
     }
   }, [open, options]);
 
@@ -202,6 +227,26 @@ export default function Mention({
             }, 150);
           }}
         />
+        {selectedModels.length > 0 && (
+          <div className="mb-2 flex flex-wrap gap-2 p-2">
+            {selectedModels.map((model, index) => (
+              <div
+                key={`${model.endpoint}-${model.model}-${index}`}
+                className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-sm dark:bg-gray-600"
+              >
+                <span>{model.model}</span>
+                <button
+                  onClick={() => {
+                    setSelectedModels((prev) => prev.filter((_, i) => i !== index));
+                  }}
+                  className="ml-1 rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-500"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         {open && (
           <div className="max-h-40">
             <AutoSizer disableHeight>
