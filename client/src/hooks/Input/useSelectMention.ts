@@ -332,9 +332,26 @@ export default function useSelectMention({
           };
         });
 
-        // Create all conversations
-        conversations.forEach((convo) => {
-          newConversation(convo);
+        // Create all conversations first to get their IDs
+        const createdConversations = conversations.map((convo) => {
+          const result = newConversation(convo);
+          return result;
+        });
+
+        // Now update each conversation with the IDs of other conversations
+        createdConversations.forEach((convo, index) => {
+          const otherIds = createdConversations
+            .map((c, i) => (i !== index ? c.conversationId : null))
+            .filter((id): id is string => id !== null);
+
+          if (otherIds.length > 0) {
+            newConversation({
+              template: { ...convo, comparedConversationIds: otherIds },
+              preset: convo,
+              keepLatestMessage: true,
+              keepAddedConvos: true,
+            });
+          }
         });
       }
     },
