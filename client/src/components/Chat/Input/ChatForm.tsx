@@ -214,7 +214,7 @@ const ChatForm = memo(({ index = 0 }: { index?: number }) => {
           {showPlusPopover && !isAssistantsEndpoint(endpoint) && (
             <Mention
               setShowMentionPopover={setShowPlusPopover}
-              newConversation={generateConversation}
+              newConversation={newConversation}
               textAreaRef={textAreaRef}
               commandChar="+"
               placeholder="com_ui_add_model_preset"
