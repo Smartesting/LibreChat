@@ -60,8 +60,8 @@ export default function useSubmitMessage() {
         askAdditional(
           {
             text: data.text,
-            overrideConvoId: appendIndex(addedIndex, additionalConvoId),
-            overrideUserMessageId: appendIndex(addedIndex, undefined),
+            overrideConvoId: appendIndex(rootIndex, additionalConvoId),
+            overrideUserMessageId: appendIndex(rootIndex, undefined),
             clientTimestamp,
             comparedIds: overrideConvoId ? [overrideConvoId] : [],
           },
