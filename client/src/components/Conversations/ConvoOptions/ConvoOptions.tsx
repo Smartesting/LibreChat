@@ -36,7 +36,10 @@ function ConvoOptions({
           'z-30 inline-flex h-7 w-7 items-center justify-center gap-2 rounded-md border-none p-0 text-sm font-medium ring-ring-primary transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
           'opacity-0 focus:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100 data-[open]:opacity-100',
         )}
-        onClick={handleDeleteClick}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDeleteClick();
+        }}
         variant={'destructive'}
       >
         <Trash2 className="icon-md text-text-secondary" aria-hidden={true} />
