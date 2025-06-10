@@ -91,7 +91,7 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
         organizationTrainers={trainers}
         disabled={isEditDisabled}
       />
-      <div className="mb-6">
+      <div className="mb-6 rounded-lg border border-border-light p-4">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-text-primary">{smaLocalize(titleKey)}</h2>
           {isUpcoming && (

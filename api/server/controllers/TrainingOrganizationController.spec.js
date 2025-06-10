@@ -31,6 +31,12 @@ jest.mock('~/models/TrainingOrganization', () => ({
   addTrainerToOrganization: jest.fn(),
 }));
 
+// Mock Training model functions
+jest.mock('~/models/Training', () => ({
+  getTrainingsByOrganization: jest.fn(),
+  deleteTraining: jest.fn(),
+}));
+
 // Mock TrainingOrganizationService
 jest.mock('../services/TrainingOrganizationService', () => ({
   processAdministrators: jest.fn(),
@@ -84,6 +90,10 @@ const {
   findTrainingOrganizationsByAdmin: findTrainingOrganizationsByAdminMock,
   findTrainingOrganizationsByTrainer: findTrainingOrganizationsByTrainerMock,
 } = require('~/models/TrainingOrganization');
+const {
+  getTrainingsByOrganization: getTrainingsByOrganizationMock,
+  deleteTraining: deleteTrainingMock,
+} = require('~/models/Training');
 const {
   processAdministrators,
   processTrainers,
@@ -265,9 +275,13 @@ describe('TrainingOrganizationController', () => {
   });
 
   describe('deleteTrainingOrganization', () => {
-    it('should delete a training organization successfully', async () => {
+    it('should delete a training organization and its associated trainings successfully', async () => {
       // Setup
       req.params.organizationId = 'org-id';
+      const trainings = [
+        { _id: 'training-id-1', name: 'Training 1' },
+        { _id: 'training-id-2', name: 'Training 2' },
+      ];
       const deletedOrg = {
         _id: 'org-id',
         name: 'Test Organization',
@@ -278,6 +292,8 @@ describe('TrainingOrganizationController', () => {
           { _id: 'trainer-id', email: 'trainer@example.com', role: [SystemRoles.TRAINER] },
         ],
       };
+      getTrainingsByOrganizationMock.mockResolvedValue(trainings);
+      deleteTrainingMock.mockResolvedValue({});
       deleteTrainingOrganizationMock.mockResolvedValue(deletedOrg);
       findTrainingOrganizationsByAdminMock.mockResolvedValue([]);
       findTrainingOrganizationsByTrainerMock.mockResolvedValue([]);
@@ -287,6 +303,44 @@ describe('TrainingOrganizationController', () => {
       await deleteTrainingOrganization(req, res);
 
       // Assert
+      expect(getTrainingsByOrganizationMock).toHaveBeenCalledWith('org-id');
+      expect(deleteTrainingMock).toHaveBeenCalledTimes(2);
+      expect(deleteTrainingMock).toHaveBeenCalledWith('training-id-1');
+      expect(deleteTrainingMock).toHaveBeenCalledWith('training-id-2');
+      expect(deleteTrainingOrganizationMock).toHaveBeenCalledWith('org-id');
+      expect(findTrainingOrganizationsByAdminMock).toHaveBeenCalledWith('admin-id');
+      expect(findTrainingOrganizationsByTrainerMock).toHaveBeenCalledWith('trainer-id');
+      expect(updateUser).toHaveBeenCalledTimes(2);
+      expect(res.status).toHaveBeenCalledWith(204);
+      expect(res.send).toHaveBeenCalled();
+    });
+
+    it('should delete a training organization with no associated trainings', async () => {
+      // Setup
+      req.params.organizationId = 'org-id';
+      const trainings = []; // No trainings associated with this organization
+      const deletedOrg = {
+        _id: 'org-id',
+        name: 'Test Organization',
+        administrators: [
+          { _id: 'admin-id', email: 'admin@example.com', role: [SystemRoles.ORGADMIN] },
+        ],
+        trainers: [
+          { _id: 'trainer-id', email: 'trainer@example.com', role: [SystemRoles.TRAINER] },
+        ],
+      };
+      getTrainingsByOrganizationMock.mockResolvedValue(trainings);
+      deleteTrainingOrganizationMock.mockResolvedValue(deletedOrg);
+      findTrainingOrganizationsByAdminMock.mockResolvedValue([]);
+      findTrainingOrganizationsByTrainerMock.mockResolvedValue([]);
+      updateUser.mockResolvedValue({});
+
+      // Execute
+      await deleteTrainingOrganization(req, res);
+
+      // Assert
+      expect(getTrainingsByOrganizationMock).toHaveBeenCalledWith('org-id');
+      expect(deleteTrainingMock).not.toHaveBeenCalled(); // Should not be called since there are no trainings
       expect(deleteTrainingOrganizationMock).toHaveBeenCalledWith('org-id');
       expect(findTrainingOrganizationsByAdminMock).toHaveBeenCalledWith('admin-id');
       expect(findTrainingOrganizationsByTrainerMock).toHaveBeenCalledWith('trainer-id');

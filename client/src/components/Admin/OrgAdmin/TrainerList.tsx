@@ -112,6 +112,7 @@ const TrainerList: FC<TrainersListProps> = ({ orgId, trainers, trainerInvitation
         confirmButton={smaLocalize('com_ui_revoke')}
       />
       <GenericList
+        className="rounded-lg border border-border-light p-4"
         title={smaLocalize('com_orgadmin_trainers')}
         items={allTrainers}
         getKey={(user) => user.email}

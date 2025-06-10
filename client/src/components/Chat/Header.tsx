@@ -8,7 +8,6 @@ import ExportAndShareMenu from './ExportAndShareMenu';
 import { useHasAccess, useMediaQuery } from '~/hooks';
 import BookmarkMenu from './Menus/BookmarkMenu';
 import { TemporaryChat } from './TemporaryChat';
-import AddMultiConvo from './AddMultiConvo';
 
 export default function Header() {
   const { data: startupConfig } = useGetStartupConfig();
@@ -19,10 +18,10 @@ export default function Header() {
     permission: Permissions.USE,
   });
 
-  const hasAccessToMultiConvo = useHasAccess({
+  /*const hasAccessToMultiConvo = useHasAccess({
     permissionType: PermissionTypes.MULTI_CONVO,
     permission: Permissions.USE,
-  });
+  });*/
 
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
 
@@ -33,7 +32,7 @@ export default function Header() {
           {!navVisible && <HeaderNewChat />}
           {<ModelSelector startupConfig={startupConfig} />}
           {hasAccessToBookmarks && <BookmarkMenu />}
-          {hasAccessToMultiConvo && <AddMultiConvo />}
+          {/*hasAccessToMultiConvo && <AddMultiConvo />*/}
           {isSmallScreen && (
             <>
               <ExportAndShareMenu
