@@ -415,10 +415,6 @@ const TrainingForm: FC<{
                   value: 0,
                   message: smaLocalize('com_orgadmin_error_participant_count_min'),
                 },
-                max: {
-                  value: 15,
-                  message: smaLocalize('com_orgadmin_error_participant_count_max'),
-                },
               }}
               render={({ field }) => (
                 <>
