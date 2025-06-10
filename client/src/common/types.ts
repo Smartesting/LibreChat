@@ -297,6 +297,7 @@ export type TAskProps = {
   text: string;
   overrideConvoId?: string;
   overrideUserMessageId?: string;
+  overrideParentMessageId?: string;
   parentMessageId?: string | null;
   conversationId?: string | null;
   messageId?: string | null;

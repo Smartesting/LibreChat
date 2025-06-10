@@ -53,7 +53,7 @@ export default function useSubmitMessage() {
         overrideConvoId: appendIndex(rootIndex, overrideConvoId),
         overrideUserMessageId: appendIndex(rootIndex, overrideUserMessageId),
         clientTimestamp,
-        comparedIds: additionalConvoId ? [additionalConvoId] : [],
+        comparedIds: additionalConvoId ? [additionalConvoId] : undefined,
       });
 
       if (hasAdded) {
@@ -63,7 +63,7 @@ export default function useSubmitMessage() {
             overrideConvoId: appendIndex(rootIndex, additionalConvoId),
             overrideUserMessageId: appendIndex(rootIndex, undefined),
             clientTimestamp,
-            comparedIds: overrideConvoId ? [overrideConvoId] : [],
+            comparedIds: overrideConvoId ? [overrideConvoId] : undefined,
           },
           { overrideMessages: rootMessages },
         );

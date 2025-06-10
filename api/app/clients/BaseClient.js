@@ -157,9 +157,6 @@ class BaseClient {
     if (overrideConvoId) {
       const [conversationId, index] = overrideConvoId.split(Constants.COMMON_DIVIDER);
       overrideConvoId = conversationId;
-      if (index !== '0') {
-        this.skipSaveConvo = true;
-      }
     }
     if (overrideUserMessageId) {
       const [userMessageId, index] = overrideUserMessageId.split(Constants.COMMON_DIVIDER);
@@ -184,7 +181,7 @@ class BaseClient {
     const saveOptions = this.getSaveOptions();
     this.abortController = opts.abortController ?? new AbortController();
     const conversationId = overrideConvoId ?? opts.conversationId ?? crypto.randomUUID();
-    const parentMessageId = opts.parentMessageId ?? Constants.NO_PARENT;
+    const parentMessageId = opts.overrideParentMessageId ?? opts.parentMessageId ?? Constants.NO_PARENT;
     const userMessageId =
       overrideUserMessageId ?? opts.overrideParentMessageId ?? crypto.randomUUID();
     let responseMessageId = opts.responseMessageId ?? crypto.randomUUID();

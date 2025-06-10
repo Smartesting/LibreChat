@@ -638,6 +638,7 @@ export const tConversationSchema = z.object({
   agentOptions: tAgentOptionsSchema.nullable().optional(),
   /** @deprecated Prefer `modelLabel` over `chatGptLabel` */
   chatGptLabel: z.string().nullable().optional(),
+  comparedIds: z.array(z.string()).optional(),
 });
 
 export const tPresetSchema = tConversationSchema

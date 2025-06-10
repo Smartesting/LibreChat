@@ -99,6 +99,10 @@ module.exports = {
         update.conversationId = newConversationId;
       }
 
+      if (!convo.comparedIds) {
+        delete update.comparedIds;
+      }
+
       if (req.body.isTemporary) {
         const expiredAt = new Date();
         expiredAt.setDate(expiredAt.getDate() + 30);
