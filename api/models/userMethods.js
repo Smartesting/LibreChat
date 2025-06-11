@@ -209,7 +209,7 @@ const generateTraineeUsers = async (count, prevCount = 0) => {
 
   for (let i = prevCount; i < prevCount + count; i++) {
     const now = Date.now().toString(36);
-    const email = `${i}-${now}@smartesting.com`;
+    const email = `${i+1}-${now}@smartesting.com`;
 
     const password = crypto.randomBytes(8).toString('hex');
     const salt = bcrypt.genSaltSync(10);
