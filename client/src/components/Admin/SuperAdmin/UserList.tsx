@@ -195,17 +195,19 @@ const UserList: FC = () => {
                 <TableCell className="hover:bg-surface text-text-primary">
                   {getRoleName(user.role)}
                 </TableCell>
-                <TableCell className="hover:bg-surface text-text-primary">
-                  <TooltipAnchor
-                    aria-label={smaLocalize('com_ui_delete')}
-                    description={smaLocalize('com_ui_delete')}
-                    role="button"
-                    onClick={() => setUserIdToDelete(user._id)}
-                    className="inline-flex size-10 flex-shrink-0 items-center justify-center rounded-xl border border-border-light bg-transparent text-text-primary transition-all ease-in-out hover:bg-surface-tertiary disabled:pointer-events-none disabled:opacity-50"
-                  >
-                    <Trash2 size={16} className="h-4 w-4 text-text-primary" />
-                  </TooltipAnchor>
-                </TableCell>
+                {user.role.toString() !== SystemRoles.TRAINEE && (
+                  <TableCell className="hover:bg-surface text-text-primary">
+                    <TooltipAnchor
+                      aria-label={smaLocalize('com_ui_delete')}
+                      description={smaLocalize('com_ui_delete')}
+                      role="button"
+                      onClick={() => setUserIdToDelete(user._id)}
+                      className="inline-flex size-10 flex-shrink-0 items-center justify-center rounded-xl border border-border-light bg-transparent text-text-primary transition-all ease-in-out hover:bg-surface-tertiary disabled:pointer-events-none disabled:opacity-50"
+                    >
+                      <Trash2 size={16} className="h-4 w-4 text-text-primary" />
+                    </TooltipAnchor>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
