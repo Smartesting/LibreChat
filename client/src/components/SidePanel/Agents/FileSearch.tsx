@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
   EModelEndpoint,
@@ -24,24 +24,43 @@ export default function FileSearch({
 }) {
   const localize = useLocalize();
   const { setFilesLoading } = useChatContext();
-  const { watch } = useFormContext<AgentForm>();
+  const { watch, setValue } = useFormContext<AgentForm>();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<Map<string, ExtendedFile>>(new Map());
+  const wasCheckedWithFilesRef = useRef(false);
 
   const { data: fileConfig = defaultFileConfig } = useGetFileConfig({
     select: (data) => mergeFileConfig(data),
   });
 
+  // Custom file setter that maintains checkbox state
+  const handleSetFiles = (newFiles: React.SetStateAction<Map<string, ExtendedFile>>) => {
+    setFiles((currentFiles) => {
+      const updatedFiles = typeof newFiles === 'function' ? newFiles(currentFiles) : newFiles;
+
+      // If files were removed and now there are no files
+      if (updatedFiles.size === 0 && currentFiles.size > 0 && wasCheckedWithFilesRef.current) {
+        // Ensure checkbox stays checked on next render
+        setTimeout(() => {
+          setValue(AgentCapabilities.file_search, true, { shouldDirty: true });
+        }, 0);
+      }
+
+      return updatedFiles;
+    });
+  };
+
+  // Create a custom file handling hook with our custom file setter
   const { handleFileChange } = useFileHandling({
     overrideEndpoint: EModelEndpoint.agents,
     additionalMetadata: { agent_id, tool_resource: EToolResources.file_search },
-    fileSetter: setFiles,
+    fileSetter: handleSetFiles,
   });
 
   useLazyEffect(
     () => {
       if (_files) {
-        setFiles(new Map(_files));
+        handleSetFiles(new Map(_files));
       }
     },
     [_files],
@@ -49,6 +68,13 @@ export default function FileSearch({
   );
 
   const fileSearchChecked = watch(AgentCapabilities.file_search);
+
+  // Track if checkbox was checked while files were present
+  useEffect(() => {
+    if (files.size > 0 && fileSearchChecked) {
+      wasCheckedWithFilesRef.current = true;
+    }
+  }, [files.size, fileSearchChecked]);
 
   const endpointFileConfig = fileConfig.endpoints[EModelEndpoint.agents];
   const isUploadDisabled = endpointFileConfig.disabled ?? false;
@@ -79,7 +105,7 @@ export default function FileSearch({
         {/* File Search (RAG API) Files */}
         <FileRow
           files={files}
-          setFiles={setFiles}
+          setFiles={handleSetFiles}
           setFilesLoading={setFilesLoading}
           agent_id={agent_id}
           tool_resource={EToolResources.file_search}
