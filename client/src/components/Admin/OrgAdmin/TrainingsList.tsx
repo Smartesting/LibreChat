@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Plus } from 'lucide-react';
-import { Training, TrainingWithStatus } from 'librechat-data-provider';
-import { useSmaLocalize } from '~/hooks';
+import { SystemRoles, Training, TrainingWithStatus } from 'librechat-data-provider';
+import { useAuthContext, useSmaLocalize } from '~/hooks';
 import TrainingItem from '~/components/Admin/OrgAdmin/Training/TrainingItem';
 import TrainingModal from '~/components/Admin/OrgAdmin/Training/TrainingModal';
 import ConfirmModal from '~/components/ui/ConfirmModal';
@@ -24,6 +24,8 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
   const [trainingToDelete, setTrainingToDelete] = useState<string | null>(null);
   const [isEditDisabled, setIsEditDisabled] = useState<boolean>(false);
   const { showToast } = useToastContext();
+  const { user } = useAuthContext();
+  const isSuperAdmin = user?.role.includes(SystemRoles.ADMIN);
 
   const isUpcoming = type === 'upcoming';
   let titleKey:
@@ -121,7 +123,7 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
                 key={training._id}
                 training={training}
                 editable={isUpcoming}
-                deletable={isUpcoming}
+                deletable={isUpcoming || isSuperAdmin}
                 setTrainingToEdit={setTrainingToEdit}
                 setIsEditDisabled={setIsEditDisabled}
                 setIsTrainingModalOpen={setIsTrainingModalOpen}
