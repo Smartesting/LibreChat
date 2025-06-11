@@ -58,6 +58,10 @@ export default function AgentSelect({
         [AgentCapabilities.hide_sequential_outputs]: false,
       };
 
+      // Get current form values to preserve tools
+      const currentValues = control._formValues;
+      const currentTools = currentValues?.tools || [];
+
       const agentTools: string[] = [];
       (fullAgent.tools ?? []).forEach((tool) => {
         if (capabilities[tool] !== undefined) {
@@ -68,11 +72,22 @@ export default function AgentSelect({
         agentTools.push(tool);
       });
 
+      // Preserve calculator and other tools that might have been added in the UI
+      // but not yet saved to the agent
+      const preservedTools = [...agentTools];
+      if (currentTools.length > 0) {
+        currentTools.forEach(tool => {
+          if (!preservedTools.includes(tool)) {
+            preservedTools.push(tool);
+          }
+        });
+      }
+
       const formValues: Partial<AgentForm & TAgentCapabilities> = {
         ...capabilities,
         agent: update,
         model: update.model,
-        tools: agentTools,
+        tools: preservedTools,
       };
 
       Object.entries(fullAgent).forEach(([name, value]) => {
