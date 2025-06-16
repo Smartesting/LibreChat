@@ -419,7 +419,7 @@ const TrainingForm: FC<{
                     {...field}
                     value={field.value ?? 0}
                     disabled={disabled}
-                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                    onChange={(e) => field.onChange(String(parseInt(e.target.value, 10) || 0))}
                     className={inputClass}
                     type="number"
                     min="0"
