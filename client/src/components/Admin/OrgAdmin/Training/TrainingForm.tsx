@@ -1,9 +1,8 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { cn, defaultTextProps, removeFocusOutlines } from '~/utils';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useLocalize, useSmaLocalize } from '~/hooks';
+import { useSmaLocalize } from '~/hooks';
 import { NotificationSeverity } from '~/common';
-import { Button } from '~/components';
 import {
   useCreateTrainingMutation,
   useUpdateTrainingMutation,
@@ -36,27 +35,23 @@ const defaultTrainingFormValues: TrainingCreateParams = {
 
 const TrainingForm: FC<{
   onSubmit: () => void;
-  onCancel: () => void;
   organizationId: string;
+  setIsSubmitting: (isSubmitting: boolean) => void;
   training?: Training;
-  hideButtons?: boolean;
   trainers?: string[];
   formRef?: React.RefObject<HTMLFormElement>;
   disabled?: boolean;
 }> = ({
   onSubmit,
-  onCancel,
   organizationId,
+  setIsSubmitting,
   training,
-  hideButtons = false,
   trainers,
   formRef,
   disabled = false,
 }) => {
   const smaLocalize = useSmaLocalize();
-  const localize = useLocalize();
   const { showToast } = useToastContext();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditing = !!training;
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [startDateValue, setStartDateValue] = useState('');
@@ -188,7 +183,7 @@ const TrainingForm: FC<{
         });
       }
     },
-    [createTraining, updateTraining, isEditing, training, onSubmit, showToast, smaLocalize],
+    [setIsSubmitting, isEditing, training, updateTraining, showToast, smaLocalize, onSubmit, createTraining],
   );
 
   return (
@@ -199,7 +194,7 @@ const TrainingForm: FC<{
         className="scrollbar-gutter-stable h-auto w-full flex-shrink-0 overflow-x-hidden"
         aria-label="Training creation form"
       >
-        <div className="flex flex-col overflow-auto">
+        <div className="flex flex-col overflow-auto px-2">
           <div className="mb-4">
             <label className={labelClass} htmlFor="name">
               {smaLocalize('com_orgadmin_training_name')}
@@ -435,31 +430,6 @@ const TrainingForm: FC<{
               )}
             />
           </div>
-
-          {!hideButtons && (
-            <div className="flex gap-4">
-              <Button
-                size={'sm'}
-                variant={'outline'}
-                className="btn btn-neutral border-token-border-light relative h-9 w-full gap-1 rounded-lg font-medium"
-                type="button"
-                onClick={onCancel}
-              >
-                {localize('com_ui_cancel')}
-              </Button>
-              <button
-                className="btn btn-primary focus:shadow-outline flex h-9 w-full items-center justify-center px-4 py-2 font-semibold text-white hover:bg-green-600 focus:border-green-500 disabled:opacity-50"
-                type="submit"
-                disabled={isSubmitting || disabled}
-              >
-                {isSubmitting
-                  ? localize('com_ui_loading')
-                  : isEditing
-                    ? localize('com_ui_save')
-                    : localize('com_ui_create')}
-              </button>
-            </div>
-          )}
         </div>
       </form>
     </FormProvider>

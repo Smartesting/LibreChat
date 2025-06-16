@@ -38,6 +38,7 @@ const TrainingModal: FC<TrainingModalProps> = ({
   const isEditing = !!training;
   const [trainers, setTrainers] = useState<{ email: string }[]>([]);
   const [trainees, setTrainees] = useState<Trainee[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -156,10 +157,9 @@ const TrainingModal: FC<TrainingModalProps> = ({
                 <div className="w-1/2 overflow-auto border-r border-border-light p-6">
                   <TrainingForm
                     onSubmit={onClose}
-                    onCancel={onClose}
                     organizationId={organizationId}
+                    setIsSubmitting={setIsSubmitting}
                     training={training}
-                    hideButtons={true}
                     trainers={trainers.map((t) => t.email)}
                     formRef={formRef}
                     disabled={disabled}
@@ -217,7 +217,7 @@ const TrainingModal: FC<TrainingModalProps> = ({
                   {localize('com_ui_cancel')}
                 </button>
                 <button
-                  disabled={disabled}
+                  disabled={isSubmitting || disabled}
                   className="btn btn-primary focus:shadow-outline h-9 px-4 py-2 font-semibold text-white hover:bg-green-600 focus:border-green-500"
                   type="button"
                   onClick={() => {
@@ -228,7 +228,11 @@ const TrainingModal: FC<TrainingModalProps> = ({
                     }
                   }}
                 >
-                  {isEditing ? localize('com_ui_save') : localize('com_ui_create')}
+                  {isSubmitting
+                    ? smaLocalize('com_ui_loading')
+                    : isEditing
+                      ? localize('com_ui_save')
+                      : localize('com_ui_create')}
                 </button>
               </div>
             </DialogPanel>
