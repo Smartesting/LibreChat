@@ -28,7 +28,7 @@ router.get(
 router.get('/:organizationId/trainings/get/:trainingId', requireJwtAuth, checkOrgAccess, getById);
 
 // Update a training
-router.put('/:organization/trainings/update/:trainingId', requireJwtAuth, checkOrgAccess, update);
+router.put('/:organizationId/trainings/update/:trainingId', requireJwtAuth, checkOrgAccess, update);
 
 // Delete a training
 router.delete(
