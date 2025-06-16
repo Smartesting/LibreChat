@@ -331,6 +331,7 @@ const TrainingForm: FC<{
                   <input
                     {...field}
                     type="datetime-local"
+                    max="9999-01-01T00:00"
                     className={inputClass}
                     aria-label={smaLocalize('com_orgadmin_start_date')}
                     value={startDateValue}
@@ -379,6 +380,7 @@ const TrainingForm: FC<{
                   <input
                     {...field}
                     type="datetime-local"
+                    max="9999-01-01T00:00"
                     className={inputClass}
                     aria-label={smaLocalize('com_orgadmin_end_date')}
                     value={endDateValue}
