@@ -176,37 +176,8 @@ const createAbortController = (req, res, getAbortData, getReqData) => {
   const onStart = (userMessage, responseMessageId) => {
     sendMessage(res, { message: userMessage, created: true });
 
-    const abortKey = userMessage?.conversationId ?? req.user.id;
+    const abortKey = `${userMessage?.conversationId ?? req.user.id}:${responseMessageId}`;
     getReqData({ abortKey });
-    const prevRequest = abortControllers.get(abortKey);
-    const { overrideUserMessageId } = req?.body ?? {};
-
-    if (overrideUserMessageId != null && prevRequest && prevRequest?.abortController) {
-      const data = prevRequest.abortController.getAbortData();
-      getReqData({ userMessage: data?.userMessage });
-      const addedAbortKey = `${abortKey}:${responseMessageId}`;
-
-      // Store minimal options
-      const minimalOptions = {
-        endpoint: endpointOption.endpoint,
-        iconURL: endpointOption.iconURL,
-        model: endpointOption.modelOptions?.model || endpointOption.model_parameters?.model,
-      };
-
-      abortControllers.set(addedAbortKey, { abortController, ...minimalOptions });
-
-      // Use a simple function for cleanup to avoid capturing context
-      const cleanupHandler = () => {
-        try {
-          cleanupAbortController(addedAbortKey);
-        } catch (e) {
-          // Ignore cleanup errors
-        }
-      };
-
-      res.on('finish', cleanupHandler);
-      return;
-    }
 
     // Store minimal options
     const minimalOptions = {

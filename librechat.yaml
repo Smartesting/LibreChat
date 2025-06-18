@@ -16,7 +16,7 @@ interface:
   presets: true
   prompts: true
   bookmarks: true
-  multiConvo: false
+  multiConvo: true
   agents: true
 
 # Definition of custom endpoints
