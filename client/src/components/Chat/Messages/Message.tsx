@@ -1,11 +1,7 @@
 import React from 'react';
-import { useRecoilValue } from 'recoil';
 import { useMessageProcess } from '~/hooks';
 import type { TMessageProps } from '~/common';
 import MessageRender from './ui/MessageRender';
-// eslint-disable-next-line import/no-cycle
-import { cn } from '~/utils';
-import store from '~/store';
 
 const MessageContainer = React.memo(
   ({
@@ -28,10 +24,9 @@ const MessageContainer = React.memo(
 );
 
 export default function Message(props: TMessageProps) {
-  const { showSibling, handleScroll, siblingMessage, latestMultiMessage, isSubmittingFamily } =
-    useMessageProcess({ message: props.message });
-  const { message } = props;
-  const maximizeChatSpace = useRecoilValue(store.maximizeChatSpace);
+  const { message, siblingCount } = props;
+  const { handleScroll, siblingMessage: newSiblingMessageInCache, isSubmittingFamily } =
+    useMessageProcess({ message });
 
   if (!message || typeof message !== 'object') {
     return null;
@@ -40,32 +35,25 @@ export default function Message(props: TMessageProps) {
   return (
     <>
       <MessageContainer handleScroll={handleScroll}>
-        {showSibling ? (
+        {siblingCount === 0 && newSiblingMessageInCache ? (
           <div className="m-auto my-2 flex justify-center p-4 py-2 md:gap-6">
-            <div
-              className={cn(
-                'flex w-full flex-row flex-wrap justify-between gap-1 md:flex-nowrap md:gap-2',
-                maximizeChatSpace ? 'w-full max-w-full' : 'md:max-w-5xl xl:max-w-6xl',
-              )}
-            >
-              <MessageRender
-                {...props}
-                message={message}
-                isSubmittingFamily={isSubmittingFamily}
-                isCard
-              />
-              <MessageRender
-                {...props}
-                isMultiMessage
-                isCard
-                message={siblingMessage ?? latestMultiMessage ?? undefined}
-                isSubmittingFamily={isSubmittingFamily}
-              />
-            </div>
+            <MessageRender
+              {...props}
+              message={message}
+              isSubmittingFamily={isSubmittingFamily}
+              isCard
+            />
+            <MessageRender
+              {...props}
+              isMultiMessage
+              isCard
+              message={newSiblingMessageInCache}
+              isSubmittingFamily={isSubmittingFamily}
+            />
           </div>
         ) : (
           <div className="m-auto my-2 flex justify-center p-4 py-2 md:gap-6">
-            <MessageRender {...props} />
+            <MessageRender {...props} isCard={!message.isCreatedByUser && siblingCount !== 0} />
           </div>
         )}
       </MessageContainer>

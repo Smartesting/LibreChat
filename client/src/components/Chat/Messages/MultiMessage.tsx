@@ -5,51 +5,18 @@ import type { TMessageProps } from '~/common';
 import MessageContent from '~/components/Messages/MessageContent';
 import MessageParts from './MessageParts';
 import Message from './Message';
-
-const flattenMessageTree = (
-  messagesTree: TMessage[] | null | undefined,
-  depth = 0,
-  parentId: string | null = null,
-): TMessage[][] => {
-  if (!messagesTree || !messagesTree.length) {
-    return [];
-  }
-
-  const messagesByDepth: TMessage[][] = [];
-  const currentLevelMessages: TMessage[] = [];
-
-  for (const message of messagesTree) {
-    if (!message) {
-      continue;
-    }
-
-    const messageWithDepth = { ...message, depth, parentId };
-    currentLevelMessages.push(messageWithDepth);
-  }
-
-  if (currentLevelMessages.length > 0) {
-    messagesByDepth.push(currentLevelMessages);
-  }
-  for (const message of messagesTree) {
-    if (!message || !message.children || !message.children.length) {
-      continue;
-    }
-
-    const childrenGroups = flattenMessageTree(message.children, depth + 1, message.messageId);
-    messagesByDepth.push(...childrenGroups);
-  }
-
-  return messagesByDepth;
-};
+import { useChatContext } from '~/Providers';
 
 export default function MultiMessage({
-  messagesTree,
+  convoMessages,
   currentEditId,
   setCurrentEditId,
 }: TMessageProps) {
+  const { conversation } = useChatContext();
+
   const messageGroups = useMemo(() => {
-    return flattenMessageTree(messagesTree);
-  }, [messagesTree]);
+    return createMessageGroups(convoMessages, conversation?.model);
+  }, [convoMessages, conversation?.model]);
 
   if (!messageGroups.length) {
     return null;
@@ -90,7 +57,7 @@ export default function MultiMessage({
                         message={message as TMessage}
                         currentEditId={currentEditId}
                         setCurrentEditId={setCurrentEditId}
-                        isCard={!message.isCreatedByUser && messageGroup.length > 1}
+                        siblingCount={messageGroup.length - 1}
                       />
                     </div>
                   );
@@ -102,7 +69,7 @@ export default function MultiMessage({
                       message={message as TMessage}
                       currentEditId={currentEditId}
                       setCurrentEditId={setCurrentEditId}
-                      isCard={!message.isCreatedByUser && messageGroup.length > 1}
+                      siblingCount={messageGroup.length - 1}
                     />
                   </div>
                 );
@@ -113,4 +80,42 @@ export default function MultiMessage({
       })}
     </div>
   );
+}
+
+function createMessageGroups(
+  convoMessages: TMessage[] | null | undefined,
+  mainChatModel?: string,
+): TMessage[][] {
+  if (!convoMessages || !convoMessages.length) {
+    return [];
+  }
+
+  const messageGroups: TMessage[][] = [];
+  const currentGroup: TMessage[] = [];
+
+  for (let i = 0; i < convoMessages.length; i++) {
+    const convoMessage = convoMessages[i];
+    const isLastMessage = i === convoMessages.length - 1;
+
+    if (convoMessage.model === null || convoMessage.model === undefined) {
+      if (currentGroup.length > 0) {
+        messageGroups.push(currentGroup.slice());
+        currentGroup.length = 0;
+      }
+
+      messageGroups.push([convoMessage]);
+    } else {
+      if (convoMessage.model === mainChatModel) {
+        currentGroup.unshift(convoMessage);
+      } else {
+        currentGroup.push(convoMessage);
+      }
+
+      if (isLastMessage) {
+        messageGroups.push(currentGroup.slice());
+      }
+    }
+  }
+
+  return messageGroups;
 }

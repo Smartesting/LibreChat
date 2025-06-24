@@ -1,18 +1,16 @@
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { useGetMessagesByConvoId } from 'librechat-data-provider/react-query';
-import type { TMessage } from 'librechat-data-provider';
 import type { ChatFormValues } from '~/common';
-import { ChatContext, AddedChatContext, useFileMapContext, ChatFormProvider } from '~/Providers';
-import { useChatHelpers, useAddedResponse, useSSE } from '~/hooks';
+import { AddedChatContext, ChatContext, ChatFormProvider } from '~/Providers';
+import { useAddedResponse, useChatHelpers, useSSE } from '~/hooks';
 import ConversationStarters from './Input/ConversationStarters';
 import MessagesView from './Messages/MessagesView';
 import { Spinner } from '~/components/svg';
 import Presentation from './Presentation';
 import ChatForm from './Input/ChatForm';
-import { buildTree } from '~/utils';
 import Landing from './Landing';
 import Header from './Header';
 import Footer from './Footer';
@@ -24,21 +22,9 @@ function ChatView({ index = 0 }: { index?: number }) {
   const addedSubmission = useRecoilValue(store.submissionByIndex(index + 1));
   const centerFormOnLanding = useRecoilValue(store.centerFormOnLanding);
 
-  const fileMap = useFileMapContext();
-
-  const { data: messagesTree = null, isLoading } = useGetMessagesByConvoId(conversationId ?? '', {
-    select: useCallback(
-      (data: TMessage[]) => {
-        const dataTree = buildTree({ messages: data, fileMap });
-        return dataTree?.length === 0 ? null : (dataTree ?? null);
-      },
-      [fileMap],
-    ),
-    enabled: !!fileMap,
-  });
-
+  const { data: convoMessages = null, isLoading } = useGetMessagesByConvoId(conversationId ?? '');
   const chatHelpers = useChatHelpers(index, conversationId);
-  const addedChatHelpers = useAddedResponse({ rootIndex: index });
+  const addedChatHelpers = useAddedResponse({ rootIndex: index }, conversationId);
 
   useSSE(rootSubmission, chatHelpers, false);
   useSSE(addedSubmission, addedChatHelpers, true);
@@ -48,7 +34,7 @@ function ChatView({ index = 0 }: { index?: number }) {
   });
 
   let content: JSX.Element | null | undefined;
-  const isLandingPage = !messagesTree || messagesTree.length === 0;
+  const isLandingPage = !convoMessages || convoMessages.length === 0;
 
   if (isLoading && conversationId !== 'new') {
     content = (
@@ -59,7 +45,7 @@ function ChatView({ index = 0 }: { index?: number }) {
       </div>
     );
   } else if (!isLandingPage) {
-    content = <MessagesView messagesTree={messagesTree} />;
+    content = <MessagesView convoMessages={convoMessages} />;
   } else {
     content = <Landing centerFormOnLanding={centerFormOnLanding} />;
   }

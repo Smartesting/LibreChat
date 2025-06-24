@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import useGenerateConvo from '~/hooks/Conversations/useGenerateConvo';
 import useAddedHelpers from '~/hooks/Chat/useAddedHelpers';
 
-export default function useAddedResponse({ rootIndex }: { rootIndex: number }) {
+export default function useAddedResponse({ rootIndex }: { rootIndex: number }, paramId?: string) {
   const currentIndex = useMemo(() => rootIndex + 1, [rootIndex]);
   const {
     ask,
@@ -16,6 +16,7 @@ export default function useAddedResponse({ rootIndex }: { rootIndex: number }) {
   } = useAddedHelpers({
     rootIndex,
     currentIndex,
+    paramId,
   });
 
   const { generateConversation } = useGenerateConvo({

@@ -25,9 +25,12 @@ const MessageContainer = React.memo(
 );
 
 export default function MessageContent(props: TMessageProps) {
-  const { showSibling, handleScroll, siblingMessage, latestMultiMessage, isSubmittingFamily } =
-    useMessageProcess({ message: props.message });
-  const { message } = props;
+  const { message, siblingCount } = props;
+  const {
+    handleScroll,
+    siblingMessage: newSiblingMessageInCache,
+    isSubmittingFamily,
+  } = useMessageProcess({ message });
 
   if (!message || typeof message !== 'object') {
     return null;
@@ -36,27 +39,25 @@ export default function MessageContent(props: TMessageProps) {
   return (
     <>
       <MessageContainer handleScroll={handleScroll}>
-        {showSibling ? (
+        {siblingCount === 0 && newSiblingMessageInCache ? (
           <div className="m-auto my-2 flex justify-center p-4 py-2 md:gap-6">
-            <div className="flex w-full flex-row flex-wrap justify-between gap-1 md:max-w-5xl md:flex-nowrap md:gap-2 lg:max-w-5xl xl:max-w-6xl">
-              <ContentRender
-                {...props}
-                message={message}
-                isSubmittingFamily={isSubmittingFamily}
-                isCard
-              />
-              <ContentRender
-                {...props}
-                isMultiMessage
-                isCard
-                message={siblingMessage ?? latestMultiMessage ?? undefined}
-                isSubmittingFamily={isSubmittingFamily}
-              />
-            </div>
+            <ContentRender
+              {...props}
+              message={message}
+              isSubmittingFamily={isSubmittingFamily}
+              isCard
+            />
+            <ContentRender
+              {...props}
+              isMultiMessage
+              isCard
+              message={newSiblingMessageInCache}
+              isSubmittingFamily={isSubmittingFamily}
+            />
           </div>
         ) : (
           <div className="m-auto flex justify-center p-4 py-2 md:gap-6">
-            <ContentRender {...props} />
+            <ContentRender {...props} isCard={!message.isCreatedByUser && siblingCount !== 0} />
           </div>
         )}
       </MessageContainer>

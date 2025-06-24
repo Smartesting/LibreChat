@@ -9,13 +9,12 @@ import { cn } from '~/utils';
 import store from '~/store';
 
 export default function MessagesView({
-  messagesTree: _messagesTree,
+  convoMessages: _convoMessages,
 }: {
-  messagesTree?: TMessage[] | null;
+  convoMessages?: TMessage[] | null;
 }) {
   const localize = useLocalize();
   const scrollButtonPreference = useRecoilValue(store.showScrollButton);
-  const maximizeChatSpace = useRecoilValue(store.maximizeChatSpace);
   const fontSize = useRecoilValue(store.fontSize);
   const { screenshotTargetRef } = useScreenshot();
   const [currentEditId, setCurrentEditId] = useState<number | string | null>(-1);
@@ -27,7 +26,7 @@ export default function MessagesView({
     showScrollButton,
     handleSmoothToRef,
     debouncedHandleScroll,
-  } = useMessageScrolling(_messagesTree);
+  } = useMessageScrolling(_convoMessages);
 
   const { conversationId } = conversation ?? {};
 
@@ -46,7 +45,7 @@ export default function MessagesView({
             }}
           >
             <div className="flex flex-col pb-9 dark:bg-transparent">
-              {(_messagesTree && _messagesTree.length == 0) || _messagesTree === null ? (
+              {(_convoMessages && _convoMessages.length == 0) || _convoMessages === null ? (
                 <div
                   className={cn(
                     'flex w-full items-center justify-center p-3 text-text-secondary',
@@ -60,7 +59,7 @@ export default function MessagesView({
                   <div ref={screenshotTargetRef}>
                     <MultiMessage
                       key={conversationId}
-                      messagesTree={_messagesTree}
+                      convoMessages={_convoMessages}
                       messageId={conversationId ?? null}
                       setCurrentEditId={setCurrentEditId}
                       currentEditId={currentEditId ?? null}

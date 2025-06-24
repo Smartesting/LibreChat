@@ -319,7 +319,7 @@ export type TMessageProps = {
   conversation?: t.TConversation | null;
   messageId?: string | null;
   message?: t.TMessage;
-  messagesTree?: t.TMessage[];
+  convoMessages?: t.TMessage[];
   currentEditId: string | number | null;
   isSearchView?: boolean;
   siblingIdx?: number;

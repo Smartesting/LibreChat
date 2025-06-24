@@ -31,20 +31,21 @@ export default function useAddedHelpers({
     store.messagesSiblingIdxFamily(latestMessage?.parentMessageId ?? null),
   );
 
-  const queryParam = paramId === 'new' ? paramId : conversation?.conversationId ?? paramId ?? '';
+  const conversationId = conversation?.conversationId ?? '';
+  const queryParam = paramId === 'new' ? paramId : conversationId ?? paramId ?? '';
 
   const setMessages = useCallback(
     (messages: TMessage[]) => {
-      queryClient.setQueryData<TMessage[]>(
-        [QueryKeys.messages, queryParam, currentIndex],
-        messages,
-      );
+      queryClient.setQueryData<TMessage[]>([QueryKeys.messages, queryParam, currentIndex], messages);
+      if (queryParam === 'new') {
+        queryClient.setQueryData<TMessage[]>([QueryKeys.messages, conversationId, currentIndex], messages);
+      }
       const latestMultiMessage = messages[messages.length - 1];
       if (latestMultiMessage) {
         setLatestMultiMessage({ ...latestMultiMessage, depth: -1 });
       }
     },
-    [queryParam, queryClient, currentIndex, setLatestMultiMessage],
+    [queryParam, conversationId, queryClient, currentIndex, setLatestMultiMessage],
   );
 
   const getMessages = useCallback(() => {

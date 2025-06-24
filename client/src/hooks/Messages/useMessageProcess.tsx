@@ -1,11 +1,12 @@
 import throttle from 'lodash/throttle';
 import { useRecoilValue } from 'recoil';
-import { Constants } from 'librechat-data-provider';
-import { useEffect, useRef, useCallback, useMemo, useState } from 'react';
-import type { TMessage } from 'librechat-data-provider';
-import { useChatContext, useAddedChatContext } from '~/Providers';
+import { Constants, QueryKeys, TMessage } from 'librechat-data-provider';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useAddedChatContext, useChatContext } from '~/Providers';
 import { getTextKey, logger } from '~/utils';
 import store from '~/store';
+import { useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function useMessageProcess({ message }: { message?: TMessage | null }) {
   const latestText = useRef<string | number>('');
@@ -15,7 +16,6 @@ export default function useMessageProcess({ message }: { message?: TMessage | nu
   const {
     index,
     conversation,
-    latestMessage,
     setAbortScroll,
     setLatestMessage,
     isSubmitting: isSubmittingRoot,
@@ -26,6 +26,15 @@ export default function useMessageProcess({ message }: { message?: TMessage | nu
     () => isSubmittingRoot || isSubmittingAdditional,
     [isSubmittingRoot, isSubmittingAdditional],
   );
+
+  const { conversationId: paramId } = useParams();
+  const queryClient = useQueryClient();
+  const queryParam = paramId === 'new' ? paramId : (conversation?.conversationId ?? paramId ?? '');
+  const addedMessages = queryClient.getQueryData<TMessage[]>([
+    QueryKeys.messages,
+    queryParam,
+    index + 1,
+  ]);
 
   useEffect(() => {
     const convoId = conversation?.conversationId;
@@ -80,29 +89,17 @@ export default function useMessageProcess({ message }: { message?: TMessage | nu
     [isSubmittingFamily, setAbortScroll],
   );
 
-  const showSibling = useMemo(
-    () =>
-      (hasNoChildren && latestMultiMessage && (latestMultiMessage.children?.length ?? 0) === 0) ||
-      !!siblingMessage,
-    [hasNoChildren, latestMultiMessage, siblingMessage],
-  );
-
   useEffect(() => {
-    if (
-      hasNoChildren &&
-      latestMultiMessage &&
-      latestMultiMessage.conversationId === message?.conversationId
-    ) {
-      const newSibling = Object.assign({}, latestMultiMessage, {
-        parentMessageId: message.parentMessageId,
-        depth: message.depth,
-      });
-      setSiblingMessage(newSibling);
+    if (message?.model && hasNoChildren) {
+      setSiblingMessage(
+        addedMessages
+          ? addedMessages.find((m) => m.parentMessageId === message.parentMessageId)
+          : null,
+      );
     }
-  }, [hasNoChildren, latestMultiMessage, message, setSiblingMessage, latestMessage]);
+  }, [message, setSiblingMessage, addedMessages, hasNoChildren]);
 
   return {
-    showSibling,
     handleScroll,
     conversation,
     siblingMessage,

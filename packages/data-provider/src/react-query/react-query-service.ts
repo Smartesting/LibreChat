@@ -32,9 +32,10 @@ export const useAbortRequestWithMessage = (): UseMutationResult<
 export const useGetMessagesByConvoId = <TData = s.TMessage[]>(
   id: string,
   config?: UseQueryOptions<s.TMessage[], unknown, TData>,
+  index?: number,
 ): QueryObserverResult<TData> => {
   return useQuery<s.TMessage[], unknown, TData>(
-    [QueryKeys.messages, id],
+    index ? [QueryKeys.messages, id, index] : [QueryKeys.messages, id],
     () => dataService.getMessagesByConvoId(id),
     {
       refetchOnWindowFocus: false,

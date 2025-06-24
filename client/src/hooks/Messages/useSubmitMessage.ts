@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import { useCallback } from 'react';
 import { Constants } from 'librechat-data-provider';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { useChatContext, useChatFormContext, useAddedChatContext } from '~/Providers';
+import { useAddedChatContext, useChatContext, useChatFormContext } from '~/Providers';
 import { useAuthContext } from '~/hooks/AuthContext';
 import { replaceSpecialVars } from '~/utils';
 import store from '~/store';
@@ -55,15 +55,12 @@ export default function useSubmitMessage() {
       });
 
       if (hasAdded) {
-        askAdditional(
-          {
-            text: data.text,
-            overrideConvoId: appendIndex(addedIndex, overrideConvoId),
-            overrideUserMessageId: appendIndex(addedIndex, overrideUserMessageId),
-            clientTimestamp,
-          },
-          { overrideMessages: rootMessages },
-        );
+        askAdditional({
+          text: data.text,
+          overrideConvoId: appendIndex(addedIndex, overrideConvoId),
+          overrideUserMessageId: appendIndex(addedIndex, overrideUserMessageId),
+          clientTimestamp,
+        });
       }
       methods.reset();
     },

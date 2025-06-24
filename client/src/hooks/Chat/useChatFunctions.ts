@@ -1,24 +1,24 @@
 import { v4 } from 'uuid';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  Constants,
-  QueryKeys,
-  ContentTypes,
-  EModelEndpoint,
-  parseCompactConvo,
-  isAssistantsEndpoint,
-} from 'librechat-data-provider';
-import { useSetRecoilState, useResetRecoilState, useRecoilValue } from 'recoil';
 import type {
-  TMessage,
-  TSubmission,
+  EndpointSchemaKey,
   TConversation,
   TEndpointOption,
   TEndpointsConfig,
-  EndpointSchemaKey,
+  TMessage,
+  TSubmission,
+} from 'librechat-data-provider';
+import {
+  Constants,
+  ContentTypes,
+  EModelEndpoint,
+  isAssistantsEndpoint,
+  parseCompactConvo,
+  QueryKeys,
 } from 'librechat-data-provider';
 import type { SetterOrUpdater } from 'recoil';
-import type { TAskFunction, ExtendedFile } from '~/common';
+import { useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil';
+import type { ExtendedFile, TAskFunction } from '~/common';
 import useSetFilesToDelete from '~/hooks/Files/useSetFilesToDelete';
 import useGetSender from '~/hooks/Conversations/useGetSender';
 import store, { useGetEphemeralAgent } from '~/store';
@@ -94,7 +94,6 @@ export default function useChatFunctions({
       isRegenerate = false,
       isContinued = false,
       isEdited = false,
-      overrideMessages,
     } = {},
   ) => {
     setShowStopButton(false);
@@ -123,7 +122,7 @@ export default function useChatFunctions({
     const ephemeralAgent = getEphemeralAgent(conversationId ?? Constants.NEW_CONVO);
     const isEditOrContinue = isEdited || isContinued;
 
-    let currentMessages: TMessage[] | null = overrideMessages ?? getMessages() ?? [];
+    let currentMessages: TMessage[] | null = getMessages() ?? [];
 
     // construct the query message
     // this is not a real messageId, it is used as placeholder before real messageId returned
