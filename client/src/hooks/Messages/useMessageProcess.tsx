@@ -93,7 +93,7 @@ export default function useMessageProcess({ message }: { message?: TMessage | nu
     if (message?.model && hasNoChildren) {
       setSiblingMessage(
         addedMessages
-          ? addedMessages.find((m) => m.parentMessageId === message.parentMessageId)
+          ? (addedMessages.find((m) => m.parentMessageId === message.parentMessageId) ?? null)
           : null,
       );
     }
