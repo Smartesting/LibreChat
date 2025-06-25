@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import type { TMessage } from 'librechat-data-provider';
 import { isAssistantsEndpoint } from 'librechat-data-provider';
 import type { TMessageProps } from '~/common';
-import MessageContent from '~/components/Messages/MessageContent';
 import MessageParts from './MessageParts';
 import Message from './Message';
 import { useChatContext } from '~/Providers';
@@ -50,17 +49,6 @@ export default function MultiMessage({
                       />
                     </div>
                   );
-                } else if (message.content) {
-                  return (
-                    <div key={message.messageId} className={messageWidth}>
-                      <MessageContent
-                        message={message as TMessage}
-                        currentEditId={currentEditId}
-                        setCurrentEditId={setCurrentEditId}
-                        siblingCount={messageGroup.length - 1}
-                      />
-                    </div>
-                  );
                 }
 
                 return (
@@ -84,7 +72,7 @@ export default function MultiMessage({
 
 function createMessageGroups(
   convoMessages: TMessage[] | null | undefined,
-  mainChatModel?: string,
+  mainChatModel?: string | null,
 ): TMessage[][] {
   if (!convoMessages || !convoMessages.length) {
     return [];
