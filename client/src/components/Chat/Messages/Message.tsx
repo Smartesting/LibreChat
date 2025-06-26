@@ -41,7 +41,7 @@ export default function Message(
   return (
     <>
       <MessageContainer handleScroll={handleScroll}>
-        {siblingMessageInCache ? (
+        {!hasStoredSiblingMessage && siblingMessageInCache ? (
           <div className="m-auto my-2 flex justify-center p-4 py-2 md:gap-6">
             {message.content ? (
               <ContentRender
