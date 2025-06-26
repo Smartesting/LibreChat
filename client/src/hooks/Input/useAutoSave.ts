@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce';
 import { SetterOrUpdater, useRecoilValue } from 'recoil';
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { LocalStorageKeys, TFile } from 'librechat-data-provider';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Constants, LocalStorageKeys, TFile } from 'librechat-data-provider';
 import type { ExtendedFile } from '~/common';
 import { useChatFormContext } from '~/Providers';
 import { useGetFiles } from '~/data-provider';
@@ -164,7 +164,7 @@ export const useAutoSave = ({
     if (!saveDrafts || conversationId == null || conversationId === '') {
       return;
     }
-    if (conversationId === currentConversationId) {
+    if (conversationId === currentConversationId || conversationId === Constants.PENDING_CONVO) {
       return;
     }
 
