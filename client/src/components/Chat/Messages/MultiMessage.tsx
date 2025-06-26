@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
-import type { TMessage } from 'librechat-data-provider';
-import { isAssistantsEndpoint } from 'librechat-data-provider';
+import { isAssistantsEndpoint, QueryKeys, TMessage } from 'librechat-data-provider';
 import type { TMessageProps } from '~/common';
 import MessageParts from './MessageParts';
 import Message from './Message';
 import { useChatContext } from '~/Providers';
+import { useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 
 export default function MultiMessage({
   convoMessages,
@@ -12,6 +13,10 @@ export default function MultiMessage({
   setCurrentEditId,
 }: TMessageProps) {
   const { conversation } = useChatContext();
+  const { conversationId: paramId } = useParams();
+  const queryClient = useQueryClient();
+  const queryParam = paramId === 'new' ? paramId : (conversation?.conversationId ?? paramId ?? '');
+  const addedMessages = queryClient.getQueryData<TMessage[]>([QueryKeys.messages, queryParam, 1]);
 
   const messageGroups = useMemo(() => {
     return createMessageGroups(convoMessages, conversation?.model);
@@ -57,7 +62,8 @@ export default function MultiMessage({
                       message={message as TMessage}
                       currentEditId={currentEditId}
                       setCurrentEditId={setCurrentEditId}
-                      siblingCount={messageGroup.length - 1}
+                      hasStoredSiblingMessage={messageGroup.length - 1 > 0}
+                      siblingMessageInCache={findSiblingMessage(message, addedMessages)}
                     />
                   </div>
                 );
@@ -68,6 +74,14 @@ export default function MultiMessage({
       })}
     </div>
   );
+}
+
+function findSiblingMessage(currentMessage: TMessage, addedMessages?: TMessage[]): TMessage | null {
+  if (!addedMessages || currentMessage.sender === 'User') {
+    return null;
+  }
+
+  return addedMessages.find((m) => m.parentMessageId === currentMessage.parentMessageId) ?? null;
 }
 
 function createMessageGroups(

@@ -1,8 +1,9 @@
 import React from 'react';
-import { useMessageProcess } from '~/hooks';
 import type { TMessageProps } from '~/common';
 import MessageRender from './ui/MessageRender';
 import ContentRender from '~/components/Messages/ContentRender';
+import { TMessage } from 'librechat-data-provider';
+import useMessageProcess from '~/hooks/Messages/useMessageProcess';
 
 const MessageContainer = React.memo(
   ({
@@ -24,13 +25,14 @@ const MessageContainer = React.memo(
   },
 );
 
-export default function Message(props: TMessageProps) {
-  const { message, siblingCount } = props;
-  const {
-    handleScroll,
-    siblingMessage: newSiblingMessageInCache,
-    isSubmittingFamily,
-  } = useMessageProcess({ message });
+export default function Message(
+  props: TMessageProps & {
+    hasStoredSiblingMessage: boolean;
+    siblingMessageInCache?: TMessage | null;
+  },
+) {
+  const { message, hasStoredSiblingMessage, siblingMessageInCache } = props;
+  const { handleScroll, isSubmittingFamily } = useMessageProcess({ message });
 
   if (!message || typeof message !== 'object') {
     return null;
@@ -39,7 +41,7 @@ export default function Message(props: TMessageProps) {
   return (
     <>
       <MessageContainer handleScroll={handleScroll}>
-        {siblingCount === 0 && newSiblingMessageInCache ? (
+        {siblingMessageInCache ? (
           <div className="m-auto my-2 flex justify-center p-4 py-2 md:gap-6">
             {message.content ? (
               <ContentRender
@@ -56,30 +58,42 @@ export default function Message(props: TMessageProps) {
                 isCard
               />
             )}
-            {newSiblingMessageInCache.content ? (
+            {siblingMessageInCache.content ? (
               <ContentRender
                 {...props}
+                message={siblingMessageInCache}
+                isSubmittingFamily={isSubmittingFamily}
                 isMultiMessage
                 isCard
-                message={newSiblingMessageInCache}
-                isSubmittingFamily={isSubmittingFamily}
               />
             ) : (
               <MessageRender
                 {...props}
+                message={siblingMessageInCache}
+                isSubmittingFamily={isSubmittingFamily}
                 isMultiMessage
                 isCard
-                message={newSiblingMessageInCache}
-                isSubmittingFamily={isSubmittingFamily}
               />
             )}
           </div>
         ) : (
           <div className="m-auto my-2 flex justify-center p-4 py-2 md:gap-6">
             {message.content ? (
-              <ContentRender {...props} isCard={!message.isCreatedByUser && siblingCount !== 0} />
+              <ContentRender
+                {...props}
+                isCard={
+                  hasStoredSiblingMessage ||
+                  siblingMessageInCache !== null
+                }
+              />
             ) : (
-              <MessageRender {...props} isCard={!message.isCreatedByUser && siblingCount !== 0} />
+              <MessageRender
+                {...props}
+                isCard={
+                  hasStoredSiblingMessage ||
+                  siblingMessageInCache !== null
+                }
+              />
             )}
           </div>
         )}
