@@ -1,11 +1,11 @@
 import React, { FC, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, LogOut, Moon, Sun } from 'lucide-react';
+import { HelpCircle, Home, LogOut, Moon, Sun } from 'lucide-react';
 import { SystemRoles } from 'librechat-data-provider';
 import { ThemeContext } from '~/hooks/ThemeContext';
 import { useAuthContext } from '~/hooks/AuthContext';
 import { Dropdown, TooltipAnchor } from '~/components';
-import { useLocalize } from '~/hooks';
+import { useLocalize, useSmaLocalize } from '~/hooks';
 import { useRecoilState } from 'recoil';
 import Cookies from 'js-cookie';
 import store from '~/store';
@@ -16,6 +16,7 @@ const UtilityButtons: FC = () => {
   const { logout, user } = useAuthContext();
   const navigate = useNavigate();
   const localize = useLocalize();
+  const smaLocalize = useSmaLocalize();
   const [langcode, setLangcode] = useRecoilState(store.lang);
   const { data: trainerData } = useIsActiveTrainerQuery();
   const isSuperAdmin = user?.role.includes(SystemRoles.ADMIN);
@@ -33,6 +34,10 @@ const UtilityButtons: FC = () => {
 
   const handleLogout = () => {
     logout();
+  };
+
+  const openDocumentation = () => {
+    window.open('https://www.smartesting.com/en/workbench-onlinehelp/', '_blank');
   };
 
   const changeLang = (value: string) => {
@@ -68,6 +73,7 @@ const UtilityButtons: FC = () => {
           <Home size={24} />
         </TooltipAnchor>
       )}
+
       <TooltipAnchor
         aria-label={localize('com_nav_theme')}
         description={localize('com_nav_theme')}
@@ -76,6 +82,16 @@ const UtilityButtons: FC = () => {
         className="inline-flex size-10 flex-shrink-0 items-center justify-center rounded-xl border border-border-light bg-transparent text-text-primary transition-all ease-in-out hover:bg-surface-tertiary disabled:pointer-events-none disabled:opacity-50"
       >
         {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
+      </TooltipAnchor>
+
+      <TooltipAnchor
+        aria-label={smaLocalize('com_nav_documentation')}
+        description={smaLocalize('com_nav_documentation')}
+        role="button"
+        onClick={openDocumentation}
+        className="inline-flex size-10 flex-shrink-0 items-center justify-center rounded-xl border border-border-light bg-transparent text-text-primary transition-all ease-in-out hover:bg-surface-tertiary disabled:pointer-events-none disabled:opacity-50"
+      >
+        <HelpCircle size={24} />
       </TooltipAnchor>
 
       <div className="relative">
