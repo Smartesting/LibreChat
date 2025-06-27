@@ -27,11 +27,14 @@ export default function useSingleSessionVerifier(logout: () => void) {
         if (!session) {
           showToastAndLogout(smaLocalize('com_ui_error_multiples_connections'));
         }
+
+        return session;
       } catch (e) {
         logger.error(e);
         showToastAndLogout(
           `${smaLocalize('com_ui_error_session_verification')}${e instanceof AxiosError && e.response?.data?.message ? ` ${e.response.data.message}` : ''}`,
         );
+        throw e;
       }
     },
     {
