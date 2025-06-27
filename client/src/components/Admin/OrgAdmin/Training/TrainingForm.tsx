@@ -20,12 +20,17 @@ const inputClass = cn(
   removeFocusOutlines,
 );
 
-const defaultTrainingFormValues: TrainingCreateParams = {
+type TrainingFormValues = Omit<TrainingCreateParams, 'startDateTime' | 'endDateTime'> & {
+  startDateTime?: Date | undefined;
+  endDateTime?: Date | undefined;
+};
+
+const defaultTrainingFormValues: TrainingFormValues = {
   name: 'Accelerate your Testing Processes with GenAI',
   description: '',
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Default to browser timezone
-  startDateTime: new Date(),
-  endDateTime: new Date(Date.now() + 3600000), // Default to 1 hour from now
+  startDateTime: undefined,
+  endDateTime: undefined,
   participantCount: 1,
   trainers: [],
   trainees: [],
