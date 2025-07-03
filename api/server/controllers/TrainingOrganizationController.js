@@ -12,10 +12,7 @@ const {
   findTrainingOrganizationsByAdmin,
   findTrainingOrganizationsByTrainer,
 } = require('~/models/TrainingOrganization');
-const {
-  getTrainingsByOrganization,
-  deleteTraining,
-} = require('~/models/Training');
+const { getTrainingsByOrganization, deleteTraining } = require('~/models/Training');
 const {
   processAdministrators,
   processTrainers,
@@ -110,7 +107,9 @@ const deleteTrainingOrganizationHandler = async (req, res) => {
 
     for (const training of trainings) {
       await deleteTraining(training._id);
-      logger.info(`Deleted training ${training._id} associated with organization ${organizationId}`);
+      logger.info(
+        `Deleted training ${training._id} associated with organization ${organizationId}`,
+      );
     }
 
     const deletedOrg = await deleteTrainingOrganization(organizationId);
@@ -345,7 +344,10 @@ const addTrainerHandler = async (req, res) => {
       return res.status(400).json({ error: 'Trainer already invited in this organization' });
     }
 
-    await processTrainers([email], organizationId, trainingOrganization.name);
+    const result = await processTrainers([email], organizationId, trainingOrganization.name);
+    if (result && result.result === false) {
+      return res.status(result.errorCode).json({ error: result.errorMsg });
+    }
 
     const updatedOrg = await getTrainingOrganizationById(organizationId);
 
@@ -355,7 +357,10 @@ const addTrainerHandler = async (req, res) => {
 
     res.status(200).json(updatedOrg);
   } catch (error) {
-    logger.error(`[/training-organizations/${req.params.organizationId}/trainers] Error adding trainer`, error);
+    logger.error(
+      `[/training-organizations/${req.params.organizationId}/trainers] Error adding trainer`,
+      error,
+    );
     res.status(500).json({ error: error.message });
   }
 };

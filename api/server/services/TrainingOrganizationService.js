@@ -148,11 +148,11 @@ const sendOrgAdminInvitationEmail = async (email, token, orgName) => {
  * @param {Array} trainers - Array of trainer emails
  * @param {string} orgId - The ID of the training organization
  * @param {string} orgName - The name of the training organization
- * @returns {Promise<void>}
+ * @returns {Promise<{result: boolean, errorCode?: number, errorMsg?: string}>}
  */
 const processTrainers = async (trainers, orgId, orgName) => {
   if (!trainers || !Array.isArray(trainers)) {
-    return [];
+    return { result: false, errorCode: 422, errorMsg: 'No trainers provided' };
   }
 
   const uniqueTrainers = Array.from(new Set(trainers.map((email) => email.toLowerCase())));
@@ -163,7 +163,7 @@ const processTrainers = async (trainers, orgId, orgName) => {
     if (existingUser) {
       // If user already exists and has TRAINEE role, skip adding him as a trainer
       if (existingUser.role.includes(SystemRoles.TRAINEE)) {
-        continue;
+        return { result: false, errorCode: 422, errorMsg: 'Trainee cannot be added as trainer' };
       }
 
       await addTrainerToOrganization(orgId, existingUser._id, existingUser.email);
@@ -188,6 +188,7 @@ const processTrainers = async (trainers, orgId, orgName) => {
       await sendTrainerInvitationEmail(email, token, orgName);
     }
   }
+  return { result: true };
 };
 
 /**
@@ -298,7 +299,9 @@ const deleteUserFromOrganizations = async (userId) => {
       `[deleteUserFromOrganizations] User ${userId} removed from ${adminOrgs.length} organizations as administrator and ${trainerOrgs.length} organizations as trainer`,
     );
   } catch (error) {
-    logger.error(`[deleteUserFromOrganizations] Error removing user ${userId} from organizations: ${error.message}`);
+    logger.error(
+      `[deleteUserFromOrganizations] Error removing user ${userId} from organizations: ${error.message}`,
+    );
     throw error;
   }
 };
