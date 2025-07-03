@@ -99,7 +99,7 @@ export function EndpointItem({ endpoint }: EndpointItemProps) {
     </div>
   );
 
-  if (endpointRequiresUserKey(endpoint.value)) {
+  if (endpointRequiresUserKey(endpoint.value) || !endpoint.hasModels) {
     return;
   }
 
