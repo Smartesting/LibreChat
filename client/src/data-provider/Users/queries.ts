@@ -10,7 +10,7 @@ export const useGetAllUsersQuery = (
   return useQuery<t.TUser[]>([QueryKeys.users], () => dataService.getAllUsers(), {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-    refetchOnMount: false,
+    refetchOnMount: true,
     retry: false,
     ...config,
     enabled: (config?.enabled ?? true) && queriesEnabled,
