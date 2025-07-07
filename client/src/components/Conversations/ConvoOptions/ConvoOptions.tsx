@@ -140,11 +140,6 @@ function ConvoOptions({
         render: (props) => <button {...props} />,
       },
       {
-        label: localize('com_ui_rename'),
-        onClick: renameHandler,
-        icon: <Pen className="icon-sm mr-2 text-text-primary" />,
-      },
-      {
         label: localize('com_ui_duplicate'),
         onClick: handleDuplicateClick,
         hideOnClick: false,
