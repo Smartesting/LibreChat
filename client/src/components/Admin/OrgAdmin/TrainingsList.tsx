@@ -28,6 +28,7 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
   const isSuperAdmin = user?.role.includes(SystemRoles.ADMIN);
 
   const isUpcoming = type === 'upcoming';
+  const isEditable = isUpcoming || (isSuperAdmin && type === 'ongoing');
   let titleKey:
     | 'com_orgadmin_upcoming_trainings'
     | 'com_orgadmin_past_trainings'
@@ -122,7 +123,7 @@ const TrainingsList: FC<TrainingsListProps> = ({ orgId, trainings, isLoading, tr
               <TrainingItem
                 key={training._id}
                 training={training}
-                editable={isUpcoming}
+                editable={isEditable}
                 deletable={isUpcoming || isSuperAdmin}
                 setTrainingToEdit={setTrainingToEdit}
                 setIsEditDisabled={setIsEditDisabled}
