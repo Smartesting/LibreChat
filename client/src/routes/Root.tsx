@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import type { ContextType } from '~/common';
 import {
@@ -8,12 +8,11 @@ import {
   SearchContext,
   SetConvoProvider,
 } from '~/Providers';
-import { useAuthContext, useAssistantsMap, useAgentsMap, useFileMap, useSearch } from '~/hooks';
+import { useAgentsMap, useAssistantsMap, useAuthContext, useFileMap, useSearch } from '~/hooks';
 import TermsAndConditionsModal from '~/components/ui/TermsAndConditionsModal';
-import { useUserTermsQuery, useGetStartupConfig } from '~/data-provider';
-import { Nav, MobileNav } from '~/components/Nav';
+import { useGetStartupConfig, useUserTermsQuery } from '~/data-provider';
+import { MobileNav, Nav } from '~/components/Nav';
 import { Banner } from '~/components/Banners';
-import useSingleSessionVerifier from '~/hooks/useSingleSessionVerifier';
 
 export default function Root() {
   const [showTerms, setShowTerms] = useState(false);
@@ -29,7 +28,7 @@ export default function Root() {
   const fileMap = useFileMap({ isAuthenticated });
   const search = useSearch({ isAuthenticated });
 
-  useSingleSessionVerifier(() => logout('/login'));
+  /* useSingleSessionVerifier(() => logout('/login')); TODO: à réactiver quand on aura compris pourquoi c'est problématique, si ça l'est */
 
   const { data: config } = useGetStartupConfig();
   const { data: termsData } = useUserTermsQuery({
