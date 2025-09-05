@@ -40,14 +40,6 @@ async function decrypt(encryptedValue) {
 // --- v2: AES-CBC with a random IV per encryption ---
 
 async function encryptV2(value) {
-  console.log({
-    algorithm,
-    keyLength: key.length,
-    stringLength: process.env.CREDS_KEY.length,
-    start: process.env.CREDS_KEY.slice(0, 2),
-    end: process.env.CREDS_KEY.slice(-2),
-  });
-
   const gen_iv = webcrypto.getRandomValues(new Uint8Array(16));
   const cryptoKey = await webcrypto.subtle.importKey('raw', key, { name: algorithm }, false, [
     'encrypt',
